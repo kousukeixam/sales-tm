@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { supambase } from "./supabase";
 
 const CATEGORIES = {
   A: {
@@ -522,19 +523,24 @@ function LoginPage({ onLogin }) {
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const go = () => {
+  const go = async () => {
     setLoading(true);
     setErr("");
-    setTimeout(() => {
-      const u = INIT_USERS.find(
-        (u) => u.email === email && u.password === pass,
-      );
-      if (u) onLogin(u);
-      else {
-        setErr("メールアドレスまたはパスワードが正しくありません");
-        setLoading(false);
-      }
-    }, 500);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    });
+    if (error) {
+      setErr("メールアドレスまたはパスワードが正しくありません");
+      setLoading(false);
+    } else {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", data.user.id)
+        .single();
+      onLogin({ ...profile, email: data.user.email });
+    }
   };
   const si = {
     width: "100%",
@@ -4433,7 +4439,8 @@ export default function App() {
     setCurrentUser(u);
     setPage("dashboard");
   };
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setCurrentUser(null);
     setPage("dashboard");
     setSelectedMember(null);
@@ -4479,13 +4486,17 @@ export default function App() {
       ? "linear-gradient(135deg,#F59E0B,#EF4444)"
       : "linear-gradient(135deg,#3B82F6,#8B5CF6)";
   const navItems = [
-  { id: "dashboard", label: "ダッシュボード", icon: "chart" },
-  { id: "report", label: "日報入力", icon: "edit" },
-  { id: "log", label: "自分の記録", icon: "list" },
-  ...(isAdmin && !isSA ? [{ id: "team", label: "部下の記録", icon: "users" }] : []),
-  ...(isSA ? [{ id: "superadmin", label: "システム管理", icon: "settings" }] : []),
-  { id: "board", label: "ボード", icon: "board" },
-];
+    { id: "dashboard", label: "ダッシュボード", icon: "chart" },
+    { id: "report", label: "日報入力", icon: "edit" },
+    { id: "log", label: "自分の記録", icon: "list" },
+    ...(isAdmin && !isSA
+      ? [{ id: "team", label: "部下の記録", icon: "users" }]
+      : []),
+    ...(isSA
+      ? [{ id: "superadmin", label: "システム管理", icon: "settings" }]
+      : []),
+    { id: "board", label: "ボード", icon: "board" },
+  ];
   const titles = {
     dashboard: "ダッシュボード",
     report: "日報入力",
