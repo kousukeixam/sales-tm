@@ -1270,26 +1270,45 @@ function DailyReportPage({ currentUser, onSave }) {
   const delRow = (id) =>
     setRows((r) => (r.length > 1 ? r.filter((row) => row.id !== id) : r));
   const totalMins = rows.reduce((s, r) => s + getMins(r.start, r.end), 0);
-  const handleSave = () => {
+  const handleSave = async () => {
     const valid = rows.filter(
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
     );
     if (!valid.length) return;
-    onSave(
-      valid.map((r) => ({
-        date,
-        task: r.task,
-        detail: r.detail,
-        start: r.start,
-        end: r.end,
-        minutes: getMins(r.start, r.end),
-        cat: r.cat,
-        user: currentUser.name,
-        managerComment: "",
-        managerDayComment: "",
-        dayComment,
-      })),
-    );
+    
+    const newLogs = valid.map((r) => ({
+      user_id: currentUser.id,
+      user_name: currentUser.name,
+      date,
+      task: r.task,
+      detail: r.detail,
+      start_time: r.start,
+      end_time: r.end,
+      minutes: getMins(r.start, r.end),
+      cat: r.cat,
+      day_comment: dayComment,
+    }));
+
+    const { error } = await supabase.from("logs").insert(newLogs);
+    
+    if (error) {
+      alert("保存に失敗しました: " + error.message);
+      return;
+    }
+
+    onSave(valid.map((r) => ({
+      date,
+      task: r.task,
+      detail: r.detail,
+      start: r.start,
+      end: r.end,
+      minutes: getMins(r.start, r.end),
+      cat: r.cat,
+      user: currentUser.name,
+      managerComment: "",
+      managerDayComment: "",
+      dayComment,
+    })));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -1492,27 +1511,72 @@ function DailyReportPage({ currentUser, onSave }) {
                     </span>
                   )}
                 </div>
-                <select
-                  value={row.cat}
-                  onChange={(e) => upd(row.id, "cat", e.target.value)}
-                  style={{
-                    padding: "6px 10px",
-                    borderRadius: 7,
-                    border: "1px solid #e2e8f0",
-                    fontSize: 13,
-                    color: cc,
-                    fontWeight: row.cat ? 700 : 400,
-                    background: row.cat ? cb : "#fff",
-                    outline: "none",
-                  }}
-                >
-                  <option value="">区分を選択</option>
-                  {Object.entries(CATEGORIES).map(([k, v]) => (
-                    <option key={k} value={k}>
-                      {k}: {v.label}
-                    </option>
-                  ))}
-                </select>
+                <div style={{ position: "relative" }}>
+  <button
+    type="button"
+    onClick={() => upd(row.id, "_showCat", !row._showCat)}
+    style={{
+      padding: "6px 10px",
+      borderRadius: 7,
+      border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "#e2e8f0"}`,
+      fontSize: 13,
+      color: row.cat ? CATEGORIES[row.cat].color : "#94a3b8",
+      fontWeight: row.cat ? 700 : 400,
+      background: row.cat ? CATEGORIES[row.cat].bg : "#fff",
+      cursor: "pointer",
+      fontFamily: "inherit",
+      minWidth: 140,
+      textAlign: "left",
+    }}
+  >
+    {row.cat ? `${row.cat}: ${CATEGORIES[row.cat].label}` : "区分を選択 ▼"}
+  </button>
+  {row._showCat && (
+    <div style={{
+      position: "absolute",
+      top: "100%",
+      left: 0,
+      zIndex: 50,
+      background: "#fff",
+      border: "1px solid #e2e8f0",
+      borderRadius: 10,
+      boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+      overflow: "hidden",
+      minWidth: 180,
+    }}>
+      {Object.entries(CATEGORIES).map(([k, v]) => (
+        <div
+          key={k}
+          onClick={() => {
+            upd(row.id, "cat", k);
+            upd(row.id, "_showCat", false);
+          }}
+          style={{
+            padding: "10px 14px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: row.cat === k ? v.bg : "#fff",
+            borderLeft: `3px solid ${row.cat === k ? v.color : "transparent"}`,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = v.bg}
+          onMouseLeave={(e) => e.currentTarget.style.background = row.cat === k ? v.bg : "#fff"}
+        >
+          <div style={{
+            width: 10,
+            height: 10,
+            borderRadius: "50%",
+            background: v.color,
+            flexShrink: 0,
+          }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: v.color }}>{k}</span>
+          <span style={{ fontSize: 12, color: "#64748b" }}>{v.label}</span>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
                 {rows.length > 1 && (
                   <button
                     onClick={() => delRow(row.id)}
