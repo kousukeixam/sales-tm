@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { supambase } from "./supabase";
+import { supabase } from "./supabase";
 
 const CATEGORIES = {
   A: {
