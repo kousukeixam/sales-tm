@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { supabase } from "./supabase";
 
 const CATEGORIES = {
@@ -3503,8 +3503,10 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
       total: all.length,
     };
   }, [boards, allUsers, currentUser.groupId]);
-  const handleDrop = (cardId, newColId) => {
+  const handleDrop = async (cardId, newColId) => {
     if (!isOwner) return;
+    
+    // 先にUIを更新（即時反映）
     setBoards((p) => ({
       ...p,
       [viewId]: {
@@ -3514,43 +3516,95 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
         ),
       },
     }));
+
+    // その後DBに保存
+    await supabase
+      .from("kanban_cards")
+      .update({ col: newColId })
+      .eq("id", cardId);
   };
-  const handleSave = (updated) => {
+  const handleSave = async (updated) => {
     if (!updated.id) {
-      setBoards((p) => ({
-        ...p,
-        [viewId]: {
-          ...board,
-          cards: [...board.cards, { ...updated, id: Date.now() }],
-        },
-      }));
+      const { data, error } = await supabase
+        .from("kanban_cards")
+        .insert({
+          user_id: currentUser.id,
+          col: updated.col,
+          title: updated.title,
+          description: updated.desc,
+          prio: updated.prio,
+          due: updated.due,
+          comments: updated.comments,
+        })
+        .select()
+        .single();
+      if (!error && data) {
+        setBoards((p) => ({
+          ...p,
+          [viewId]: {
+            ...board,
+            cards: [...board.cards, { ...updated, id: data.id }],
+          },
+        }));
+      }
     } else {
+      const { error } = await supabase
+        .from("kanban_cards")
+        .update({
+          col: updated.col,
+          title: updated.title,
+          description: updated.desc,
+          prio: updated.prio,
+          due: updated.due,
+          comments: updated.comments,
+        })
+        .eq("id", updated.id);
+      if (!error) {
+        setBoards((p) => ({
+          ...p,
+          [viewId]: {
+            ...board,
+            cards: board.cards.map((c) => (c.id === updated.id ? updated : c)),
+          },
+        }));
+      }
+    }
+  };
+  const handleDelete = async (id) => {
+    const { error } = await supabase
+      .from("kanban_cards")
+      .delete()
+      .eq("id", id);
+    if (!error) {
       setBoards((p) => ({
         ...p,
         [viewId]: {
           ...board,
-          cards: board.cards.map((c) => (c.id === updated.id ? updated : c)),
+          cards: board.cards.filter((c) => c.id !== id),
         },
       }));
     }
   };
-  const handleDelete = (id) =>
-    setBoards((p) => ({
-      ...p,
-      [viewId]: { ...board, cards: board.cards.filter((c) => c.id !== id) },
-    }));
-  const handleAddCol = () => {
+  const handleAddCol = async () => {
     if (!newColName.trim()) return;
-    setBoards((p) => ({
-      ...p,
-      [viewId]: {
-        ...board,
-        cols: [
-          ...board.cols,
-          { id: `col_${Date.now()}`, name: newColName.trim() },
-        ],
-      },
-    }));
+    const newColId = `col_${Date.now()}`;
+    const { error } = await supabase
+      .from("kanban_cols")
+      .insert({
+        user_id: currentUser.id,
+        col_id: newColId,
+        name: newColName.trim(),
+        position: board.cols.length,
+      });
+    if (!error) {
+      setBoards((p) => ({
+        ...p,
+        [viewId]: {
+          ...board,
+          cols: [...board.cols, { id: newColId, name: newColName.trim() }],
+        },
+      }));
+    }
     setNewColName("");
     setAddingCol(false);
   };
@@ -4494,10 +4548,71 @@ function SuperAdminPage({ users, setUsers, groups, logs }) {
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [page, setPage] = useState("dashboard");
-  const [logs, setLogs] = useState(INITIAL_LOGS);
+  const [logs, setLogs] = useState([]);
+  useEffect(() => {
+    const fetchLogs = async () => {
+      const { data, error } = await supabase
+        .from("logs")
+        .select("*")
+        .order("date", { ascending: false });
+      if (!error && data) {
+        setLogs(data.map((l) => ({
+          id: l.id,
+          date: l.date,
+          task: l.task,
+          detail: l.detail,
+          start: l.start_time,
+          end: l.end_time,
+          minutes: l.minutes,
+          cat: l.cat,
+          user: l.user_name,
+          managerComment: l.manager_comment || "",
+          managerDayComment: l.manager_day_comment || "",
+          dayComment: l.day_comment || "",
+        })));
+      }
+    };
+    if (currentUser) fetchLogs();
+  }, [currentUser]);
   const [users, setUsers] = useState(INIT_USERS);
   const [groups] = useState(INIT_GROUPS);
-  const [boards, setBoards] = useState(() => initBoards());
+  const [boards, setBoards] = useState({});
+  useEffect(() => {
+    const fetchBoards = async () => {
+      const { data: cards } = await supabase.from("kanban_cards").select("*");
+      const { data: cols } = await supabase.from("kanban_cols").select("*").order("position");
+
+      if (!cards || !cols) return;
+
+      const newBoards = {};
+
+      // デフォルトカラムを設定
+      const allUsers = await supabase.from("profiles").select("*");
+      if (allUsers.data) {
+        allUsers.data.forEach((u) => {
+          const userCols = cols.filter((c) => c.user_id === u.id);
+          newBoards[u.id] = {
+            cols: userCols.length > 0
+              ? userCols.map((c) => ({ id: c.col_id, name: c.name }))
+              : [{ id: "todo", name: "Todo" }, { id: "prog", name: "In Progress" }, { id: "done", name: "Done" }],
+            cards: cards
+              .filter((c) => c.user_id === u.id)
+              .map((c) => ({
+                id: c.id,
+                col: c.col,
+                title: c.title,
+                desc: c.description,
+                prio: c.prio,
+                due: c.due,
+                comments: c.comments || [],
+              })),
+          };
+        });
+      }
+      setBoards(newBoards);
+    };
+    if (currentUser) fetchBoards();
+  }, [currentUser]);
   const [selectedMember, setSelectedMember] = useState(null);
   const login = (u) => {
     setCurrentUser(u);
@@ -4515,18 +4630,33 @@ export default function App() {
       ...nl.map((l, i) => ({ ...l, id: p.length + i + 1 })),
     ]);
   const deleteLog = (id) => setLogs((p) => p.filter((l) => l.id !== id));
-  const saveMgrComment = (id, comment) =>
-    setLogs((p) =>
-      p.map((l) => (l.id === id ? { ...l, managerComment: comment } : l)),
-    );
-  const saveDayComment = (date, user, comment) =>
-    setLogs((p) =>
-      p.map((l) =>
-        l.date === date && l.user === user
-          ? { ...l, managerDayComment: comment }
-          : l,
-      ),
-    );
+  const saveMgrComment = async (id, comment) => {
+    const { error } = await supabase
+      .from("logs")
+      .update({ manager_comment: comment })
+      .eq("id", id);
+    if (!error) {
+      setLogs((p) =>
+        p.map((l) => (l.id === id ? { ...l, managerComment: comment } : l)),
+      );
+    }
+  };
+  const saveDayComment = async (date, user, comment) => {
+    const { error } = await supabase
+      .from("logs")
+      .update({ manager_day_comment: comment })
+      .eq("date", date)
+      .eq("user_name", user);
+    if (!error) {
+      setLogs((p) =>
+        p.map((l) =>
+          l.date === date && l.user === user
+            ? { ...l, managerDayComment: comment }
+            : l,
+        ),
+      );
+    }
+  };
   const selectMember = (m) => {
     setSelectedMember(m);
     setPage("member_detail");
