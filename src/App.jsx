@@ -36,46 +36,30 @@ const CATEGORIES = {
 const INIT_USERS = [
   {
     id: 1,
-    name: "山田 太郎",
-    email: "yamada@company.com",
-    password: "pass123",
+    name: "テスト部下1",
+    email: "member1@company.com",
+    password: "Test1234!",
     role: "member",
     groupId: 1,
   },
   {
     id: 2,
-    name: "鈴木 花子",
-    email: "suzuki@company.com",
-    password: "pass123",
+    name: "テスト部下2",
+    email: "member2@company.com",
+    password: "Test1234!",
     role: "member",
     groupId: 1,
   },
   {
     id: 3,
-    name: "佐藤 次郎",
-    email: "sato@company.com",
-    password: "pass123",
-    role: "member",
-    groupId: 2,
-  },
-  {
-    id: 4,
-    name: "田中 上司",
-    email: "tanaka@company.com",
-    password: "admin123",
+    name: "テスト上司",
+    email: "manager@company.com",
+    password: "Test1234!",
     role: "admin",
     groupId: 1,
   },
   {
-    id: 5,
-    name: "高橋 上司",
-    email: "takahashi@company.com",
-    password: "admin123",
-    role: "admin",
-    groupId: 2,
-  },
-  {
-    id: 6,
+    id: 4,
     name: "システム管理者",
     email: "sysadmin@company.com",
     password: "sysadmin123",
@@ -3225,7 +3209,13 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
 
 function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
   const today = new Date().toISOString().split("T")[0];
-  const dc = !card.due ? "ok" : card.due < today ? "over" : card.due <= addDays(3) ? "near" : "ok";
+  const dc = !card.due
+    ? "ok"
+    : card.due < today
+      ? "over"
+      : card.due <= addDays(3)
+        ? "near"
+        : "ok";
   const pc = { high: "#EF4444", mid: "#F59E0B", low: "#10B981" };
   const pl = { high: "高", mid: "中", low: "低" };
   return (
@@ -3255,23 +3245,94 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
         e.currentTarget.style.borderColor = "#e2e8f0";
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
-        <div style={{ width: 6, height: 6, borderRadius: "50%", background: pc[card.prio], marginTop: 5, flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", lineHeight: 1.4, flex: 1 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 8,
+          marginBottom: 6,
+        }}
+      >
+        <div
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            background: pc[card.prio],
+            marginTop: 5,
+            flexShrink: 0,
+          }}
+        />
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: "#1e293b",
+            lineHeight: 1.4,
+            flex: 1,
+          }}
+        >
           {card.title}
         </span>
       </div>
       {card.desc && (
-        <p style={{ margin: "0 0 8px 14px", fontSize: 12, color: "#64748b", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+        <p
+          style={{
+            margin: "0 0 8px 14px",
+            fontSize: 12,
+            color: "#64748b",
+            lineHeight: 1.5,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
           {card.desc}
         </p>
       )}
-      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", paddingLeft: 14 }}>
-        <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 8, background: pc[card.prio] + "18", color: pc[card.prio], fontWeight: 600 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          alignItems: "center",
+          flexWrap: "wrap",
+          paddingLeft: 14,
+        }}
+      >
+        <span
+          style={{
+            fontSize: 11,
+            padding: "2px 7px",
+            borderRadius: 8,
+            background: pc[card.prio] + "18",
+            color: pc[card.prio],
+            fontWeight: 600,
+          }}
+        >
           {pl[card.prio]}
         </span>
         {card.due && (
-          <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 8, fontWeight: 500, background: dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#f1f5f9", color: dc === "over" ? "#991B1B" : dc === "near" ? "#92400E" : "#64748b" }}>
+          <span
+            style={{
+              fontSize: 11,
+              padding: "2px 7px",
+              borderRadius: 8,
+              fontWeight: 500,
+              background:
+                dc === "over"
+                  ? "#FEF2F2"
+                  : dc === "near"
+                    ? "#FFFBEB"
+                    : "#f1f5f9",
+              color:
+                dc === "over"
+                  ? "#991B1B"
+                  : dc === "near"
+                    ? "#92400E"
+                    : "#64748b",
+            }}
+          >
             📅 {card.due}
           </span>
         )}
@@ -3285,13 +3346,30 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
   );
 }
 
-function KanbanColumn({ col, cards, isOwner, onAddCard, onOpenCard, onDrop, onDeleteCol }) {
+function KanbanColumn({
+  col,
+  cards,
+  isOwner,
+  onAddCard,
+  onOpenCard,
+  onDrop,
+  onDeleteCol,
+}) {
   const [over, setOver] = useState(false);
   const cc = { todo: "#64748b", prog: "#3B82F6", done: "#10B981" };
   const color = cc[col.id] || "#8B5CF6";
   return (
     <div
-      style={{ width: 280, flexShrink: 0, background: "#f8fafc", borderRadius: 14, border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 280px)" }}
+      style={{
+        width: 280,
+        flexShrink: 0,
+        background: "#f8fafc",
+        borderRadius: 14,
+        border: "1px solid #e2e8f0",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "calc(100vh - 280px)",
+      }}
       onDragOver={(e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
@@ -3314,16 +3392,53 @@ function KanbanColumn({ col, cards, isOwner, onAddCard, onOpenCard, onDrop, onDe
         setOver(false);
       }}
     >
-      <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", flex: 1 }}>{col.name}</span>
-        <span style={{ fontSize: 12, color: "#94a3b8", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "1px 8px" }}>
+      <div
+        style={{
+          padding: "14px 16px 12px",
+          borderBottom: "1px solid #e2e8f0",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <div
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: color,
+          }}
+        />
+        <span
+          style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", flex: 1 }}
+        >
+          {col.name}
+        </span>
+        <span
+          style={{
+            fontSize: 12,
+            color: "#94a3b8",
+            background: "#fff",
+            border: "1px solid #e2e8f0",
+            borderRadius: 20,
+            padding: "1px 8px",
+          }}
+        >
           {cards.length}
         </span>
         {isOwner && !["todo", "prog", "done"].includes(col.id) && (
           <button
             onClick={() => onDeleteCol(col.id)}
-            style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", padding: "2px 4px", borderRadius: 4, display: "flex", transition: "color 0.15s" }}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#EF4444",
+              padding: "2px 4px",
+              borderRadius: 4,
+              display: "flex",
+              transition: "color 0.15s",
+            }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#991B1B")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "#EF4444")}
           >
@@ -3332,21 +3447,66 @@ function KanbanColumn({ col, cards, isOwner, onAddCard, onOpenCard, onDrop, onDe
         )}
       </div>
       <div
-        style={{ flex: 1, overflowY: "auto", padding: 10, display: "flex", flexDirection: "column", gap: 8, background: over ? "#EFF6FF" : "transparent", transition: "background 0.15s", minHeight: 60 }}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: 10,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          background: over ? "#EFF6FF" : "transparent",
+          transition: "background 0.15s",
+          minHeight: 60,
+        }}
       >
         {cards.map((c) => (
-          <KanbanCard key={c.id} card={c} isOwner={isOwner} onOpen={onOpenCard} />
+          <KanbanCard
+            key={c.id}
+            card={c}
+            isOwner={isOwner}
+            onOpen={onOpenCard}
+          />
         ))}
         {over && (
-          <div style={{ height: 56, borderRadius: 10, border: "2px dashed #93C5FD", background: "#DBEAFE", flexShrink: 0 }} />
+          <div
+            style={{
+              height: 56,
+              borderRadius: 10,
+              border: "2px dashed #93C5FD",
+              background: "#DBEAFE",
+              flexShrink: 0,
+            }}
+          />
         )}
       </div>
       {isOwner && (
         <button
           onClick={() => onAddCard(col.id)}
-          style={{ margin: "8px 10px 10px", padding: "8px", border: "1px dashed #cbd5e1", borderRadius: 10, background: "transparent", color: "#94a3b8", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "inherit", transition: "all 0.15s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.color = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; }}
+          style={{
+            margin: "8px 10px 10px",
+            padding: "8px",
+            border: "1px dashed #cbd5e1",
+            borderRadius: 10,
+            background: "transparent",
+            color: "#94a3b8",
+            fontSize: 13,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontFamily: "inherit",
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = "#3B82F6";
+            e.currentTarget.style.color = "#3B82F6";
+            e.currentTarget.style.background = "#EFF6FF";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = "#cbd5e1";
+            e.currentTarget.style.color = "#94a3b8";
+            e.currentTarget.style.background = "transparent";
+          }}
         >
           <Icon name="plus" size={14} />
           タスクを追加
@@ -3493,8 +3653,11 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     setAddingCol(false);
   };
   const handleDeleteCol = async (colId) => {
-    if (!window.confirm("このカラムを削除しますか？カードも一緒に削除されます。")) return;
-    
+    if (
+      !window.confirm("このカラムを削除しますか？カードも一緒に削除されます。")
+    )
+      return;
+
     // カラム内のカードを削除
     await supabase
       .from("kanban_cards")
@@ -3815,6 +3978,330 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           onDelete={handleDelete}
         />
       )}
+    </div>
+  );
+}
+function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
+  const [name, setName] = useState(currentUser.name);
+  const [newPassword, setNewPassword] = useState("");
+  const [managerId, setManagerId] = useState(currentUser.manager_id || "");
+  const [groupId, setGroupId] = useState(currentUser.group_id || "");
+  const [role, setRole] = useState(currentUser.role || "member");
+  const [ok, setOk] = useState("");
+  const [err, setErr] = useState("");
+
+  const managers = allUsers.filter(
+    (u) => u.role === "admin" && u.id !== currentUser.id,
+  );
+
+  const handleSave = async () => {
+    setOk("");
+    setErr("");
+    try {
+      // 名前を更新
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          name,
+          ...(isSA
+            ? { group_id: groupId ? parseInt(groupId) : null, role }
+            : {}),
+          manager_id: managerId || null,
+        })
+        .eq("id", currentUser.id);
+      if (profileError) throw profileError;
+
+      // パスワード変更
+      if (newPassword) {
+        const { error: passError } = await supabase.auth.updateUser({
+          password: newPassword,
+        });
+        if (passError) throw passError;
+      }
+
+      onUpdateUser({ ...currentUser, name, manager_id: managerId || null });
+      setOk("保存しました！");
+      setNewPassword("");
+      setTimeout(() => setOk(""), 3000);
+    } catch (e) {
+      setErr("保存に失敗しました: " + e.message);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: 600 }}>
+      <div style={{ ...C, marginBottom: 16 }}>
+        <h3
+          style={{
+            margin: "0 0 20px",
+            fontSize: 15,
+            fontWeight: 700,
+            color: "#1e293b",
+          }}
+        >
+          プロフィール設定
+        </h3>
+        {ok && (
+          <div
+            style={{
+              background: "#DCFCE7",
+              border: "1px solid #BBF7D0",
+              borderRadius: 8,
+              padding: "10px 14px",
+              marginBottom: 14,
+              color: "#15803D",
+              fontSize: 13,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <Icon name="check" size={14} />
+            {ok}
+          </div>
+        )}
+        {err && (
+          <div
+            style={{
+              background: "#FEF2F2",
+              border: "1px solid #FECACA",
+              borderRadius: 8,
+              padding: "10px 14px",
+              marginBottom: 14,
+              color: "#991B1B",
+              fontSize: 13,
+            }}
+          >
+            {err}
+          </div>
+        )}
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            氏名
+          </label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={I}
+            onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+            onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+          />
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            メールアドレス
+          </label>
+          <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
+            {currentUser.email}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            パスワード変更{" "}
+            <span style={{ fontWeight: 400, fontSize: 11 }}>
+              （変更しない場合は空欄）
+            </span>
+          </label>
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="新しいパスワード"
+            style={I}
+            onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+            onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+          />
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            上司
+          </label>
+          <select
+            value={managerId}
+            onChange={(e) => setManagerId(e.target.value)}
+            style={I}
+          >
+            <option value="">未設定</option>
+            {managers.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            所属グループ
+          </label>
+          <div
+            style={{
+              ...I,
+              background: "#f1f5f9",
+              color: isSA ? "#1e293b" : "#94a3b8",
+            }}
+          >
+            {isSA ? (
+              <select
+                value={groupId}
+                onChange={(e) => setGroupId(e.target.value)}
+                style={{
+                  ...I,
+                  background: "transparent",
+                  border: "none",
+                  padding: 0,
+                }}
+              >
+                <option value="">未所属</option>
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              groups.find((g) => g.id === currentUser.group_id)?.name ||
+              "未所属"
+            )}
+          </div>
+        </div>
+
+        {isSA && (
+          <div style={{ marginBottom: 20 }}>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#64748b",
+                display: "block",
+                marginBottom: 5,
+              }}
+            >
+              ロール
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              style={I}
+            >
+              <option value="member">部下</option>
+              <option value="admin">上司</option>
+              <option value="superadmin">管理者</option>
+            </select>
+          </div>
+        )}
+
+        <button onClick={handleSave} style={BP}>
+          <Icon name="save" size={14} />
+          保存
+        </button>
+      </div>
+    </div>
+  );
+}
+function GroupForm({ groups, setGroups }) {
+  const [name, setName] = useState("");
+  const [color, setColor] = useState("#3B82F6");
+  const [editId, setEditId] = useState(null);
+  const [ok, setOk] = useState("");
+
+  const handleSave = async () => {
+    if (!name.trim()) return;
+    if (editId) {
+      const { error } = await supabase
+        .from("groups")
+        .update({ name: name.trim(), color })
+        .eq("id", editId);
+      if (!error) {
+        setGroups((p) => p.map((g) => (g.id === editId ? { ...g, name: name.trim(), color } : g)));
+        setOk("更新しました！");
+      }
+    } else {
+      const { data, error } = await supabase
+        .from("groups")
+        .insert({ name: name.trim(), color })
+        .select()
+        .single();
+      if (!error && data) {
+        setGroups((p) => [...p, data]);
+        setOk("追加しました！");
+      }
+    }
+    setName(""); setColor("#3B82F6"); setEditId(null);
+    setTimeout(() => setOk(""), 2000);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("このグループを削除しますか？")) return;
+    const { error } = await supabase.from("groups").delete().eq("id", id);
+    if (!error) setGroups((p) => p.filter((g) => g.id !== id));
+  };
+
+  return (
+    <div>
+      {ok && <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}><Icon name="check" size={14} />{ok}</div>}
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
+        <div style={{ flex: 1 }}>
+          <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>グループ名</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="例：営業第3グループ" style={I} onFocus={(e) => (e.target.style.borderColor = "#3B82F6")} onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")} />
+        </div>
+        <div>
+          <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>カラー</label>
+          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ width: 48, height: 38, borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer", padding: 2 }} />
+        </div>
+        <button onClick={handleSave} style={BP}>
+          <Icon name="save" size={14} />{editId ? "更新" : "追加"}
+        </button>
+        {editId && <button onClick={() => { setEditId(null); setName(""); setColor("#3B82F6"); }} style={BB}>キャンセル</button>}
+      </div>
+      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+        {groups.map((g) => (
+          <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+            <div style={{ width: 14, height: 14, borderRadius: "50%", background: g.color, flexShrink: 0 }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", flex: 1 }}>{g.name}</span>
+            <button onClick={() => { setEditId(g.id); setName(g.name); setColor(g.color); }} style={{ ...BB, padding: "5px 10px", fontSize: 12, gap: 4 }}><Icon name="edit" size={13} />編集</button>
+            <button onClick={() => handleDelete(g.id)} style={{ ...BB, padding: "5px 10px", fontSize: 12, gap: 4, color: "#EF4444", borderColor: "#FECACA" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#FEF2F2")} onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}><Icon name="trash" size={13} />削除</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -4207,179 +4694,194 @@ function SuperAdminPage({ users, setUsers, groups, logs }) {
         </div>
       )}
       {tab === "groups" && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))",
-            gap: 16,
-          }}
-        >
-          {groups.map((g) => {
-            const members = users.filter((u) => u.groupId === g.id);
-            const admins = members.filter((u) => u.role === "admin");
-            const mems = members.filter((u) => u.role === "member");
-            return (
-              <div
-                key={g.id}
-                style={{ ...C, borderTop: `4px solid ${g.color}` }}
-              >
+        <div>
+          <div style={{ ...C, marginBottom: 16 }}>
+            <h3
+              style={{
+                margin: "0 0 16px",
+                fontSize: 15,
+                fontWeight: 700,
+                color: "#1e293b",
+              }}
+            >
+              グループを追加
+            </h3>
+            <GroupForm groups={groups} setGroups={setGroups} />
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))",
+              gap: 16,
+            }}
+          >
+            {groups.map((g) => {
+              const members = users.filter((u) => u.groupId === g.id);
+              const admins = members.filter((u) => u.role === "admin");
+              const mems = members.filter((u) => u.role === "member");
+              return (
                 <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    marginBottom: 16,
-                  }}
+                  key={g.id}
+                  style={{ ...C, borderTop: `4px solid ${g.color}` }}
                 >
                   <div
                     style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: "50%",
-                      background: g.color,
-                    }}
-                  />
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: "#1e293b",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      marginBottom: 16,
                     }}
                   >
-                    {g.name}
-                  </h3>
-                  <span
-                    style={{
-                      marginLeft: "auto",
-                      fontSize: 12,
-                      color: "#94a3b8",
-                    }}
-                  >
-                    {members.length}名
-                  </span>
+                    <div
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        background: g.color,
+                      }}
+                    />
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: 15,
+                        fontWeight: 700,
+                        color: "#1e293b",
+                      }}
+                    >
+                      {g.name}
+                    </h3>
+                    <span
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: 12,
+                        color: "#94a3b8",
+                      }}
+                    >
+                      {members.length}名
+                    </span>
+                  </div>
+                  {admins.length > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: "#94a3b8",
+                          fontWeight: 600,
+                          marginBottom: 6,
+                        }}
+                      >
+                        上司
+                      </div>
+                      {admins.map((u) => (
+                        <div
+                          key={u.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "6px 10px",
+                            background: "#FFFBEB",
+                            borderRadius: 8,
+                            marginBottom: 4,
+                            border: "1px solid #FDE68A",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 26,
+                              height: 26,
+                              borderRadius: 8,
+                              background:
+                                "linear-gradient(135deg,#F59E0B,#EF4444)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "#fff",
+                              fontSize: 11,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {u.name[0]}
+                          </div>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: "#92400E",
+                            }}
+                          >
+                            {u.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {mems.length > 0 && (
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: "#94a3b8",
+                          fontWeight: 600,
+                          marginBottom: 6,
+                        }}
+                      >
+                        部下
+                      </div>
+                      {mems.map((u) => (
+                        <div
+                          key={u.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "6px 10px",
+                            background: "#EFF6FF",
+                            borderRadius: 8,
+                            marginBottom: 4,
+                            border: "1px solid #BFDBFE",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 26,
+                              height: 26,
+                              borderRadius: 8,
+                              background:
+                                "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "#fff",
+                              fontSize: 11,
+                              fontWeight: 700,
+                            }}
+                          >
+                            {u.name[0]}
+                          </div>
+                          <span style={{ fontSize: 13, color: "#1D4ED8" }}>
+                            {u.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {members.length === 0 && (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        color: "#94a3b8",
+                        fontSize: 13,
+                        padding: "16px 0",
+                      }}
+                    >
+                      メンバーなし
+                    </div>
+                  )}
                 </div>
-                {admins.length > 0 && (
-                  <div style={{ marginBottom: 10 }}>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: "#94a3b8",
-                        fontWeight: 600,
-                        marginBottom: 6,
-                      }}
-                    >
-                      上司
-                    </div>
-                    {admins.map((u) => (
-                      <div
-                        key={u.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          padding: "6px 10px",
-                          background: "#FFFBEB",
-                          borderRadius: 8,
-                          marginBottom: 4,
-                          border: "1px solid #FDE68A",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 26,
-                            height: 26,
-                            borderRadius: 8,
-                            background:
-                              "linear-gradient(135deg,#F59E0B,#EF4444)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#fff",
-                            fontSize: 11,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {u.name[0]}
-                        </div>
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: "#92400E",
-                          }}
-                        >
-                          {u.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {mems.length > 0 && (
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: "#94a3b8",
-                        fontWeight: 600,
-                        marginBottom: 6,
-                      }}
-                    >
-                      部下
-                    </div>
-                    {mems.map((u) => (
-                      <div
-                        key={u.id}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          padding: "6px 10px",
-                          background: "#EFF6FF",
-                          borderRadius: 8,
-                          marginBottom: 4,
-                          border: "1px solid #BFDBFE",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 26,
-                            height: 26,
-                            borderRadius: 8,
-                            background:
-                              "linear-gradient(135deg,#3B82F6,#8B5CF6)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: "#fff",
-                            fontSize: 11,
-                            fontWeight: 700,
-                          }}
-                        >
-                          {u.name[0]}
-                        </div>
-                        <span style={{ fontSize: 13, color: "#1D4ED8" }}>
-                          {u.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {members.length === 0 && (
-                  <div
-                    style={{
-                      textAlign: "center",
-                      color: "#94a3b8",
-                      fontSize: 13,
-                      padding: "16px 0",
-                    }}
-                  >
-                    メンバーなし
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
       {tab === "export" && (
@@ -4619,12 +5121,14 @@ export default function App() {
     ...(isSA
       ? [{ id: "superadmin", label: "システム管理", icon: "settings" }]
       : []),
+    { id: "mypage", label: "マイページ", icon: "person" },
     { id: "board", label: "ボード", icon: "board" },
   ];
   const titles = {
     dashboard: "ダッシュボード",
     report: "日報入力",
     log: "自分の記録",
+    mypage: "マイページ",
     board: "ボード",
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
@@ -4636,6 +5140,7 @@ export default function App() {
       : "自分の業務集計を確認できます",
     report: "業務内容を入力します（行追加・詳細入力・高さ調整対応）",
     log: "自分の記録を確認できます（行をクリックで詳細・上司コメント表示）",
+    mypage: "プロフィール・設定を管理できます",
     board: "マイボードと部署メンバーのボードを確認できます",
     team: "部下を選んで記録・ダッシュボードを確認できます",
     member_detail:
@@ -4947,6 +5452,15 @@ export default function App() {
             onBack={backToTeam}
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
+          />
+        )}
+        {page === "mypage" && (
+          <MyPage
+            currentUser={currentUser}
+            allUsers={users}
+            groups={groups}
+            isSA={isSA}
+            onUpdateUser={(updated) => setCurrentUser(updated)}
           />
         )}
         {page === "superadmin" && isSA && (
