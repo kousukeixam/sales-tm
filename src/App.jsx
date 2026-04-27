@@ -1275,7 +1275,7 @@ function DailyReportPage({ currentUser, onSave }) {
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
     );
     if (!valid.length) return;
-    
+
     const newLogs = valid.map((r) => ({
       user_id: currentUser.id,
       user_name: currentUser.name,
@@ -1290,25 +1290,27 @@ function DailyReportPage({ currentUser, onSave }) {
     }));
 
     const { error } = await supabase.from("logs").insert(newLogs);
-    
+
     if (error) {
       alert("保存に失敗しました: " + error.message);
       return;
     }
 
-    onSave(valid.map((r) => ({
-      date,
-      task: r.task,
-      detail: r.detail,
-      start: r.start,
-      end: r.end,
-      minutes: getMins(r.start, r.end),
-      cat: r.cat,
-      user: currentUser.name,
-      managerComment: "",
-      managerDayComment: "",
-      dayComment,
-    })));
+    onSave(
+      valid.map((r) => ({
+        date,
+        task: r.task,
+        detail: r.detail,
+        start: r.start,
+        end: r.end,
+        minutes: getMins(r.start, r.end),
+        cat: r.cat,
+        user: currentUser.name,
+        managerComment: "",
+        managerDayComment: "",
+        dayComment,
+      })),
+    );
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -1512,71 +1514,92 @@ function DailyReportPage({ currentUser, onSave }) {
                   )}
                 </div>
                 <div style={{ position: "relative" }}>
-  <button
-    type="button"
-    onClick={() => upd(row.id, "_showCat", !row._showCat)}
-    style={{
-      padding: "6px 10px",
-      borderRadius: 7,
-      border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "#e2e8f0"}`,
-      fontSize: 13,
-      color: row.cat ? CATEGORIES[row.cat].color : "#94a3b8",
-      fontWeight: row.cat ? 700 : 400,
-      background: row.cat ? CATEGORIES[row.cat].bg : "#fff",
-      cursor: "pointer",
-      fontFamily: "inherit",
-      minWidth: 140,
-      textAlign: "left",
-    }}
-  >
-    {row.cat ? `${row.cat}: ${CATEGORIES[row.cat].label}` : "区分を選択 ▼"}
-  </button>
-  {row._showCat && (
-    <div style={{
-      position: "absolute",
-      top: "100%",
-      left: 0,
-      zIndex: 50,
-      background: "#fff",
-      border: "1px solid #e2e8f0",
-      borderRadius: 10,
-      boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-      overflow: "hidden",
-      minWidth: 180,
-    }}>
-      {Object.entries(CATEGORIES).map(([k, v]) => (
-        <div
-          key={k}
-          onClick={() => {
-            upd(row.id, "cat", k);
-            upd(row.id, "_showCat", false);
-          }}
-          style={{
-            padding: "10px 14px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            background: row.cat === k ? v.bg : "#fff",
-            borderLeft: `3px solid ${row.cat === k ? v.color : "transparent"}`,
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = v.bg}
-          onMouseLeave={(e) => e.currentTarget.style.background = row.cat === k ? v.bg : "#fff"}
-        >
-          <div style={{
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            background: v.color,
-            flexShrink: 0,
-          }} />
-          <span style={{ fontSize: 13, fontWeight: 600, color: v.color }}>{k}</span>
-          <span style={{ fontSize: 12, color: "#64748b" }}>{v.label}</span>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
+                  <button
+                    type="button"
+                    onClick={() => upd(row.id, "_showCat", !row._showCat)}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 7,
+                      border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "#e2e8f0"}`,
+                      fontSize: 13,
+                      color: row.cat ? CATEGORIES[row.cat].color : "#94a3b8",
+                      fontWeight: row.cat ? 700 : 400,
+                      background: row.cat ? CATEGORIES[row.cat].bg : "#fff",
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      minWidth: 140,
+                      textAlign: "left",
+                    }}
+                  >
+                    {row.cat
+                      ? `${row.cat}: ${CATEGORIES[row.cat].label}`
+                      : "区分を選択 ▼"}
+                  </button>
+                  {row._showCat && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        zIndex: 50,
+                        background: "#fff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: 10,
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                        overflow: "hidden",
+                        minWidth: 180,
+                      }}
+                    >
+                      {Object.entries(CATEGORIES).map(([k, v]) => (
+                        <div
+                          key={k}
+                          onClick={() => {
+                            upd(row.id, "cat", k);
+                            upd(row.id, "_showCat", false);
+                          }}
+                          style={{
+                            padding: "10px 14px",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            background: row.cat === k ? v.bg : "#fff",
+                            borderLeft: `3px solid ${row.cat === k ? v.color : "transparent"}`,
+                          }}
+                          onMouseEnter={(e) =>
+                            (e.currentTarget.style.background = v.bg)
+                          }
+                          onMouseLeave={(e) =>
+                            (e.currentTarget.style.background =
+                              row.cat === k ? v.bg : "#fff")
+                          }
+                        >
+                          <div
+                            style={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: "50%",
+                              background: v.color,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              color: v.color,
+                            }}
+                          >
+                            {k}
+                          </span>
+                          <span style={{ fontSize: 12, color: "#64748b" }}>
+                            {v.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {rows.length > 1 && (
                   <button
                     onClick={() => delRow(row.id)}
@@ -1585,7 +1608,7 @@ function DailyReportPage({ currentUser, onSave }) {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "#cbd5e1",
+                      color: "#0d4ba1",
                       padding: "4px 6px",
                       borderRadius: 6,
                       display: "flex",
@@ -3200,28 +3223,26 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
   );
 }
 
-function KanbanCard({ card, isOwner, onOpen }) {
+function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
   const today = new Date().toISOString().split("T")[0];
-  const dc = !card.due
-    ? "ok"
-    : card.due < today
-      ? "over"
-      : card.due <= addDays(3)
-        ? "near"
-        : "ok";
+  const dc = !card.due ? "ok" : card.due < today ? "over" : card.due <= addDays(3) ? "near" : "ok";
   const pc = { high: "#EF4444", mid: "#F59E0B", low: "#10B981" };
   const pl = { high: "高", mid: "中", low: "低" };
   return (
     <div
       draggable={isOwner}
-      onDragStart={(e) => e.dataTransfer.setData("cardId", String(card.id))}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("cardId", String(card.id));
+        e.dataTransfer.effectAllowed = "move";
+        if (onDragStart) onDragStart(card.id);
+      }}
       onClick={() => onOpen(card)}
       style={{
         background: "#fff",
         borderRadius: 12,
         border: "1px solid #e2e8f0",
         padding: "12px 14px",
-        cursor: "pointer",
+        cursor: isOwner ? "grab" : "pointer",
         transition: "all 0.15s",
         userSelect: "none",
       }}
@@ -3234,94 +3255,23 @@ function KanbanCard({ card, isOwner, onOpen }) {
         e.currentTarget.style.borderColor = "#e2e8f0";
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 8,
-          marginBottom: 6,
-        }}
-      >
-        <div
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: pc[card.prio],
-            marginTop: 5,
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: "#1e293b",
-            lineHeight: 1.4,
-            flex: 1,
-          }}
-        >
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 6 }}>
+        <div style={{ width: 6, height: 6, borderRadius: "50%", background: pc[card.prio], marginTop: 5, flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", lineHeight: 1.4, flex: 1 }}>
           {card.title}
         </span>
       </div>
       {card.desc && (
-        <p
-          style={{
-            margin: "0 0 8px 14px",
-            fontSize: 12,
-            color: "#64748b",
-            lineHeight: 1.5,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
+        <p style={{ margin: "0 0 8px 14px", fontSize: 12, color: "#64748b", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
           {card.desc}
         </p>
       )}
-      <div
-        style={{
-          display: "flex",
-          gap: 6,
-          alignItems: "center",
-          flexWrap: "wrap",
-          paddingLeft: 14,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            padding: "2px 7px",
-            borderRadius: 8,
-            background: pc[card.prio] + "18",
-            color: pc[card.prio],
-            fontWeight: 600,
-          }}
-        >
+      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", paddingLeft: 14 }}>
+        <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 8, background: pc[card.prio] + "18", color: pc[card.prio], fontWeight: 600 }}>
           {pl[card.prio]}
         </span>
         {card.due && (
-          <span
-            style={{
-              fontSize: 11,
-              padding: "2px 7px",
-              borderRadius: 8,
-              fontWeight: 500,
-              background:
-                dc === "over"
-                  ? "#FEF2F2"
-                  : dc === "near"
-                    ? "#FFFBEB"
-                    : "#f1f5f9",
-              color:
-                dc === "over"
-                  ? "#991B1B"
-                  : dc === "near"
-                    ? "#92400E"
-                    : "#64748b",
-            }}
-          >
+          <span style={{ fontSize: 11, padding: "2px 7px", borderRadius: 8, fontWeight: 500, background: dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#f1f5f9", color: dc === "over" ? "#991B1B" : dc === "near" ? "#92400E" : "#64748b" }}>
             📅 {card.due}
           </span>
         )}
@@ -3335,129 +3285,68 @@ function KanbanCard({ card, isOwner, onOpen }) {
   );
 }
 
-function KanbanColumn({ col, cards, isOwner, onAddCard, onOpenCard, onDrop }) {
+function KanbanColumn({ col, cards, isOwner, onAddCard, onOpenCard, onDrop, onDeleteCol }) {
   const [over, setOver] = useState(false);
   const cc = { todo: "#64748b", prog: "#3B82F6", done: "#10B981" };
   const color = cc[col.id] || "#8B5CF6";
   return (
     <div
-      style={{
-        width: 280,
-        flexShrink: 0,
-        background: "#f8fafc",
-        borderRadius: 14,
-        border: "1px solid #e2e8f0",
-        display: "flex",
-        flexDirection: "column",
-        maxHeight: "calc(100vh - 280px)",
-      }}
+      style={{ width: 280, flexShrink: 0, background: "#f8fafc", borderRadius: 14, border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", maxHeight: "calc(100vh - 280px)" }}
       onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        setOver(true);
+      }}
+      onDragEnter={(e) => {
         e.preventDefault();
         setOver(true);
       }}
-      onDragLeave={() => setOver(false)}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setOver(false);
+        }
+      }}
       onDrop={(e) => {
         e.preventDefault();
-        onDrop(parseInt(e.dataTransfer.getData("cardId")), col.id);
+        e.stopPropagation();
+        const id = parseInt(e.dataTransfer.getData("cardId"));
+        if (id) onDrop(id, col.id);
         setOver(false);
       }}
     >
-      <div
-        style={{
-          padding: "14px 16px 12px",
-          borderBottom: "1px solid #e2e8f0",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
-        <div
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: "50%",
-            background: color,
-          }}
-        />
-        <span
-          style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", flex: 1 }}
-        >
-          {col.name}
-        </span>
-        <span
-          style={{
-            fontSize: 12,
-            color: "#94a3b8",
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 20,
-            padding: "1px 8px",
-          }}
-        >
+      <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", gap: 8 }}>
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", flex: 1 }}>{col.name}</span>
+        <span style={{ fontSize: 12, color: "#94a3b8", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 20, padding: "1px 8px" }}>
           {cards.length}
         </span>
+        {isOwner && !["todo", "prog", "done"].includes(col.id) && (
+          <button
+            onClick={() => onDeleteCol(col.id)}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", padding: "2px 4px", borderRadius: 4, display: "flex", transition: "color 0.15s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#991B1B")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#EF4444")}
+          >
+            <Icon name="x" size={14} />
+          </button>
+        )}
       </div>
       <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: 10,
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          background: over ? "#EFF6FF" : "transparent",
-          transition: "background 0.15s",
-          minHeight: 60,
-        }}
+        style={{ flex: 1, overflowY: "auto", padding: 10, display: "flex", flexDirection: "column", gap: 8, background: over ? "#EFF6FF" : "transparent", transition: "background 0.15s", minHeight: 60 }}
       >
         {cards.map((c) => (
-          <KanbanCard
-            key={c.id}
-            card={c}
-            isOwner={isOwner}
-            onOpen={onOpenCard}
-          />
+          <KanbanCard key={c.id} card={c} isOwner={isOwner} onOpen={onOpenCard} />
         ))}
         {over && (
-          <div
-            style={{
-              height: 56,
-              borderRadius: 10,
-              border: "2px dashed #93C5FD",
-              background: "#DBEAFE",
-              flexShrink: 0,
-            }}
-          />
+          <div style={{ height: 56, borderRadius: 10, border: "2px dashed #93C5FD", background: "#DBEAFE", flexShrink: 0 }} />
         )}
       </div>
       {isOwner && (
         <button
           onClick={() => onAddCard(col.id)}
-          style={{
-            margin: "8px 10px 10px",
-            padding: "8px",
-            border: "1px dashed #cbd5e1",
-            borderRadius: 10,
-            background: "transparent",
-            color: "#94a3b8",
-            fontSize: 13,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            fontFamily: "inherit",
-            transition: "all 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#3B82F6";
-            e.currentTarget.style.color = "#3B82F6";
-            e.currentTarget.style.background = "#EFF6FF";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#cbd5e1";
-            e.currentTarget.style.color = "#94a3b8";
-            e.currentTarget.style.background = "transparent";
-          }}
+          style={{ margin: "8px 10px 10px", padding: "8px", border: "1px dashed #cbd5e1", borderRadius: 10, background: "transparent", color: "#94a3b8", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontFamily: "inherit", transition: "all 0.15s" }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.color = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; }}
         >
           <Icon name="plus" size={14} />
           タスクを追加
@@ -3505,7 +3394,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   }, [boards, allUsers, currentUser.groupId]);
   const handleDrop = async (cardId, newColId) => {
     if (!isOwner) return;
-    
+
     // 先にUIを更新（即時反映）
     setBoards((p) => ({
       ...p,
@@ -3571,10 +3460,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     }
   };
   const handleDelete = async (id) => {
-    const { error } = await supabase
-      .from("kanban_cards")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("kanban_cards").delete().eq("id", id);
     if (!error) {
       setBoards((p) => ({
         ...p,
@@ -3588,14 +3474,12 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   const handleAddCol = async () => {
     if (!newColName.trim()) return;
     const newColId = `col_${Date.now()}`;
-    const { error } = await supabase
-      .from("kanban_cols")
-      .insert({
-        user_id: currentUser.id,
-        col_id: newColId,
-        name: newColName.trim(),
-        position: board.cols.length,
-      });
+    const { error } = await supabase.from("kanban_cols").insert({
+      user_id: currentUser.id,
+      col_id: newColId,
+      name: newColName.trim(),
+      position: board.cols.length,
+    });
     if (!error) {
       setBoards((p) => ({
         ...p,
@@ -3607,6 +3491,32 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     }
     setNewColName("");
     setAddingCol(false);
+  };
+  const handleDeleteCol = async (colId) => {
+    if (!window.confirm("このカラムを削除しますか？カードも一緒に削除されます。")) return;
+    
+    // カラム内のカードを削除
+    await supabase
+      .from("kanban_cards")
+      .delete()
+      .eq("col", colId)
+      .eq("user_id", currentUser.id);
+
+    // カラムを削除
+    await supabase
+      .from("kanban_cols")
+      .delete()
+      .eq("col_id", colId)
+      .eq("user_id", currentUser.id);
+
+    setBoards((p) => ({
+      ...p,
+      [viewId]: {
+        ...board,
+        cols: board.cols.filter((c) => c.id !== colId),
+        cards: board.cards.filter((c) => c.col !== colId),
+      },
+    }));
   };
   return (
     <div>
@@ -3822,6 +3732,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             }
             onOpenCard={(c) => setModal({ card: c, colId: c.col })}
             onDrop={handleDrop}
+            onDeleteCol={handleDeleteCol}
           />
         ))}
         {isOwner &&
@@ -4556,20 +4467,22 @@ export default function App() {
         .select("*")
         .order("date", { ascending: false });
       if (!error && data) {
-        setLogs(data.map((l) => ({
-          id: l.id,
-          date: l.date,
-          task: l.task,
-          detail: l.detail,
-          start: l.start_time,
-          end: l.end_time,
-          minutes: l.minutes,
-          cat: l.cat,
-          user: l.user_name,
-          managerComment: l.manager_comment || "",
-          managerDayComment: l.manager_day_comment || "",
-          dayComment: l.day_comment || "",
-        })));
+        setLogs(
+          data.map((l) => ({
+            id: l.id,
+            date: l.date,
+            task: l.task,
+            detail: l.detail,
+            start: l.start_time,
+            end: l.end_time,
+            minutes: l.minutes,
+            cat: l.cat,
+            user: l.user_name,
+            managerComment: l.manager_comment || "",
+            managerDayComment: l.manager_day_comment || "",
+            dayComment: l.day_comment || "",
+          })),
+        );
       }
     };
     if (currentUser) fetchLogs();
@@ -4580,44 +4493,51 @@ export default function App() {
   useEffect(() => {
     const fetchBoards = async () => {
       const { data: cards } = await supabase.from("kanban_cards").select("*");
-      const { data: cols } = await supabase.from("kanban_cols").select("*").order("position");
+      const { data: cols } = await supabase
+        .from("kanban_cols")
+        .select("*")
+        .order("position");
+      const { data: users } = await supabase.from("profiles").select("*");
 
-      if (!cards || !cols) return;
+      if (!users) return;
 
       const newBoards = {};
-
-      // デフォルトカラムを設定
-      const allUsers = await supabase.from("profiles").select("*");
-      if (allUsers.data) {
-        allUsers.data.forEach((u) => {
-          const userCols = cols.filter((c) => c.user_id === u.id);
-          newBoards[u.id] = {
-            cols: userCols.length > 0
-  ? userCols.map((c) => ({ id: c.col_id, name: c.name }))
-  : await (async () => {
       const defaultCols = [
         { col_id: "todo", name: "未着手", position: 0 },
         { col_id: "prog", name: "進行中", position: 1 },
         { col_id: "done", name: "完了", position: 2 },
       ];
-      await supabase.from("kanban_cols").insert(
-        defaultCols.map((c) => ({ ...c, user_id: u.id }))
-      );
-      return defaultCols.map((c) => ({ id: c.col_id, name: c.name }));
-    })(),
-            cards: cards
-              .filter((c) => c.user_id === u.id)
-              .map((c) => ({
-                id: c.id,
-                col: c.col,
-                title: c.title,
-                desc: c.description,
-                prio: c.prio,
-                due: c.due,
-                comments: c.comments || [],
-              })),
-          };
-        });
+
+      for (const u of users) {
+        const userCols = (cols || []).filter((c) => c.user_id === u.id);
+
+        let finalCols;
+        if (userCols.length > 0) {
+          finalCols = userCols.map((c) => ({ id: c.col_id, name: c.name }));
+        } else if (u.id === currentUser.id) {
+          // 自分のカラムだけ自動作成
+          await supabase
+            .from("kanban_cols")
+            .insert(defaultCols.map((c) => ({ ...c, user_id: u.id })));
+          finalCols = defaultCols.map((c) => ({ id: c.col_id, name: c.name }));
+        } else {
+          finalCols = defaultCols.map((c) => ({ id: c.col_id, name: c.name }));
+        }
+
+        newBoards[u.id] = {
+          cols: finalCols,
+          cards: (cards || [])
+            .filter((c) => c.user_id === u.id)
+            .map((c) => ({
+              id: c.id,
+              col: c.col,
+              title: c.title,
+              desc: c.description,
+              prio: c.prio,
+              due: c.due,
+              comments: c.comments || [],
+            })),
+        };
       }
       setBoards(newBoards);
     };
