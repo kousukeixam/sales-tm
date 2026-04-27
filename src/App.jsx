@@ -255,9 +255,9 @@ const INITIAL_LOGS = generateLogs();
 function initBoards() {
   const b = {};
   const dc = [
-    { id: "todo", name: "Todo" },
-    { id: "prog", name: "In Progress" },
-    { id: "done", name: "Done" },
+    { id: "todo", name: "未着手" },
+    { id: "prog", name: "進行中" },
+    { id: "done", name: "完了" },
   ];
   const sc = {
     1: [
@@ -4593,8 +4593,18 @@ export default function App() {
           const userCols = cols.filter((c) => c.user_id === u.id);
           newBoards[u.id] = {
             cols: userCols.length > 0
-              ? userCols.map((c) => ({ id: c.col_id, name: c.name }))
-              : [{ id: "todo", name: "Todo" }, { id: "prog", name: "In Progress" }, { id: "done", name: "Done" }],
+  ? userCols.map((c) => ({ id: c.col_id, name: c.name }))
+  : await (async () => {
+      const defaultCols = [
+        { col_id: "todo", name: "未着手", position: 0 },
+        { col_id: "prog", name: "進行中", position: 1 },
+        { col_id: "done", name: "完了", position: 2 },
+      ];
+      await supabase.from("kanban_cols").insert(
+        defaultCols.map((c) => ({ ...c, user_id: u.id }))
+      );
+      return defaultCols.map((c) => ({ id: c.col_id, name: c.name }));
+    })(),
             cards: cards
               .filter((c) => c.user_id === u.id)
               .map((c) => ({
