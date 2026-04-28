@@ -4251,7 +4251,11 @@ function GroupForm({ groups, setGroups }) {
         .update({ name: name.trim(), color })
         .eq("id", editId);
       if (!error) {
-        setGroups((p) => p.map((g) => (g.id === editId ? { ...g, name: name.trim(), color } : g)));
+        setGroups((p) =>
+          p.map((g) =>
+            g.id === editId ? { ...g, name: name.trim(), color } : g,
+          ),
+        );
         setOk("更新しました！");
       }
     } else {
@@ -4265,7 +4269,9 @@ function GroupForm({ groups, setGroups }) {
         setOk("追加しました！");
       }
     }
-    setName(""); setColor("#3B82F6"); setEditId(null);
+    setName("");
+    setColor("#3B82F6");
+    setEditId(null);
     setTimeout(() => setOk(""), 2000);
   };
 
@@ -4277,28 +4283,164 @@ function GroupForm({ groups, setGroups }) {
 
   return (
     <div>
-      {ok && <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}><Icon name="check" size={14} />{ok}</div>}
-      <div style={{ display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
+      {ok && (
+        <div
+          style={{
+            background: "#DCFCE7",
+            border: "1px solid #BBF7D0",
+            borderRadius: 8,
+            padding: "10px 14px",
+            marginBottom: 14,
+            color: "#15803D",
+            fontSize: 13,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          <Icon name="check" size={14} />
+          {ok}
+        </div>
+      )}
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "flex-end",
+          flexWrap: "wrap",
+        }}
+      >
         <div style={{ flex: 1 }}>
-          <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>グループ名</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="例：営業第3グループ" style={I} onFocus={(e) => (e.target.style.borderColor = "#3B82F6")} onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")} />
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            グループ名
+          </label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="例：営業第3グループ"
+            style={I}
+            onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+            onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+          />
         </div>
         <div>
-          <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>カラー</label>
-          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ width: 48, height: 38, borderRadius: 8, border: "1px solid #e2e8f0", cursor: "pointer", padding: 2 }} />
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            カラー
+          </label>
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            style={{
+              width: 48,
+              height: 38,
+              borderRadius: 8,
+              border: "1px solid #e2e8f0",
+              cursor: "pointer",
+              padding: 2,
+            }}
+          />
         </div>
         <button onClick={handleSave} style={BP}>
-          <Icon name="save" size={14} />{editId ? "更新" : "追加"}
+          <Icon name="save" size={14} />
+          {editId ? "更新" : "追加"}
         </button>
-        {editId && <button onClick={() => { setEditId(null); setName(""); setColor("#3B82F6"); }} style={BB}>キャンセル</button>}
+        {editId && (
+          <button
+            onClick={() => {
+              setEditId(null);
+              setName("");
+              setColor("#3B82F6");
+            }}
+            style={BB}
+          >
+            キャンセル
+          </button>
+        )}
       </div>
-      <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+      <div
+        style={{
+          marginTop: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
         {groups.map((g) => (
-          <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0" }}>
-            <div style={{ width: 14, height: 14, borderRadius: "50%", background: g.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", flex: 1 }}>{g.name}</span>
-            <button onClick={() => { setEditId(g.id); setName(g.name); setColor(g.color); }} style={{ ...BB, padding: "5px 10px", fontSize: 12, gap: 4 }}><Icon name="edit" size={13} />編集</button>
-            <button onClick={() => handleDelete(g.id)} style={{ ...BB, padding: "5px 10px", fontSize: 12, gap: 4, color: "#EF4444", borderColor: "#FECACA" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#FEF2F2")} onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}><Icon name="trash" size={13} />削除</button>
+          <div
+            key={g.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "10px 14px",
+              background: "#f8fafc",
+              borderRadius: 10,
+              border: "1px solid #e2e8f0",
+            }}
+          >
+            <div
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                background: g.color,
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: "#1e293b",
+                flex: 1,
+              }}
+            >
+              {g.name}
+            </span>
+            <button
+              onClick={() => {
+                setEditId(g.id);
+                setName(g.name);
+                setColor(g.color);
+              }}
+              style={{ ...BB, padding: "5px 10px", fontSize: 12, gap: 4 }}
+            >
+              <Icon name="edit" size={13} />
+              編集
+            </button>
+            <button
+              onClick={() => handleDelete(g.id)}
+              style={{
+                ...BB,
+                padding: "5px 10px",
+                fontSize: 12,
+                gap: 4,
+                color: "#EF4444",
+                borderColor: "#FECACA",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#FEF2F2")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+            >
+              <Icon name="trash" size={13} />
+              削除
+            </button>
           </div>
         ))}
       </div>
@@ -4306,7 +4448,7 @@ function GroupForm({ groups, setGroups }) {
   );
 }
 
-function SuperAdminPage({ users, setUsers, groups, logs }) {
+function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
   const [tab, setTab] = useState("users");
   const [form, setForm] = useState({
     name: "",
@@ -4990,7 +5132,7 @@ export default function App() {
     if (currentUser) fetchLogs();
   }, [currentUser]);
   const [users, setUsers] = useState(INIT_USERS);
-  const [groups] = useState(INIT_GROUPS);
+  const [groups, setGroups] = useState(INIT_GROUPS);
   const [boards, setBoards] = useState({});
   useEffect(() => {
     const fetchBoards = async () => {
@@ -5468,6 +5610,7 @@ export default function App() {
             users={users}
             setUsers={setUsers}
             groups={groups}
+            setGroups={setGroups}
             logs={logs}
           />
         )}
