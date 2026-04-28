@@ -2524,7 +2524,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
     if (u.role === "superadmin") return false;
     if (u.id === currentUser.id) return false;
     if (isSA) return true;
-    return u.groupId === myGroupId && u.role === "member";
+return String(u.groupId) === String(myGroupId) && u.role === "member";
   });
   return (
     <div
@@ -3520,7 +3520,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   const myGroup = groups.find((g) => g.id === currentUser.groupId);
   const groupMembers = allUsers.filter(
     (u) =>
-      u.groupId === currentUser.groupId &&
+      String(u.groupId) === String(currentUser.groupId) &&
       u.role !== "superadmin" &&
       u.id !== currentUser.id,
   );
@@ -3541,7 +3541,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     const all = Object.entries(boards)
       .filter(([uid]) =>
         allUsers.find(
-          (u) => u.id === parseInt(uid) && u.groupId === currentUser.groupId,
+          (u) => u.id === parseInt(uid) && String(u.groupId) === String(currentUser.groupId),
         ),
       )
       .flatMap(([, b]) => b.cards);
@@ -3989,6 +3989,22 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
   const [role, setRole] = useState(currentUser.role || "member");
   const [ok, setOk] = useState("");
   const [err, setErr] = useState("");
+  useEffect(() => {
+    const fetchLatest = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+      if (data) {
+        setManagerId(data.manager_id || "");
+        setGroupId(data.group_id || "");
+        setName(data.name || "");
+        setRole(data.role || "member");
+      }
+    };
+    fetchLatest();
+  }, [currentUser.id]);
 
   const managers = allUsers.filter(
     (u) => u.role === "admin" && u.id !== currentUser.id,
@@ -4003,10 +4019,16 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
         .from("profiles")
         .update({
           name,
-          ...(isSA
-            ? { group_id: groupId ? parseInt(groupId) : null, role }
+          // superadminとadminはグループ変更可
+          ...(isSA || currentUser.role === "admin"
+            ? { group_id: groupId ? parseInt(groupId) : null }
             : {}),
-          manager_id: managerId || null,
+          // superadminのみロール変更可
+          ...(isSA ? { role } : {}),
+          // memberのみmanager_idを保持（adminとsuperadminはnullに）
+          ...(currentUser.role === "member"
+            ? { manager_id: managerId || null }
+            : { manager_id: null }),
         })
         .eq("id", currentUser.id);
       if (profileError) throw profileError;
@@ -4137,30 +4159,24 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
           />
         </div>
 
-        <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              fontSize: 12,
-              color: "#64748b",
-              display: "block",
-              marginBottom: 5,
-            }}
-          >
-            上司
-          </label>
-          <select
-            value={managerId}
-            onChange={(e) => setManagerId(e.target.value)}
-            style={I}
-          >
-            <option value="">未設定</option>
-            {managers.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* memberのみ上司を表示（読み取り専用） */}
+        {currentUser.role === "member" && (
+          <div style={{ marginBottom: 14 }}>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#64748b",
+                display: "block",
+                marginBottom: 5,
+              }}
+            >
+              上司
+            </label>
+            <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
+              {managers.find((u) => u.id === managerId)?.name || "未設定"}
+            </div>
+          </div>
+        )}
 
         <div style={{ marginBottom: 14 }}>
           <label
@@ -4173,36 +4189,27 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
           >
             所属グループ
           </label>
-          <div
-            style={{
-              ...I,
-              background: "#f1f5f9",
-              color: isSA ? "#1e293b" : "#94a3b8",
-            }}
-          >
-            {isSA ? (
-              <select
-                value={groupId}
-                onChange={(e) => setGroupId(e.target.value)}
-                style={{
-                  ...I,
-                  background: "transparent",
-                  border: "none",
-                  padding: 0,
-                }}
-              >
-                <option value="">未所属</option>
-                {groups.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              groups.find((g) => g.id === currentUser.group_id)?.name ||
-              "未所属"
-            )}
-          </div>
+          {/* superadmin と admin は自分でグループ変更可 */}
+          {isSA || currentUser.role === "admin" ? (
+            <select
+              value={groupId}
+              onChange={(e) => setGroupId(e.target.value)}
+              style={I}
+            >
+              <option value="">未所属</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            // memberは読み取り専用
+            <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
+              {groups.find((g) => g.id === currentUser.group_id)?.name ||
+                "未所属"}
+            </div>
+          )}
         </div>
 
         {isSA && (
@@ -4447,6 +4454,476 @@ function GroupForm({ groups, setGroups }) {
     </div>
   );
 }
+function InviteModal({ onClose, currentUserRole }) {
+  const INVITABLE_ROLES = {
+    admin: [
+      { value: "manager", label: "上司" },
+      { value: "member", label: "部下" },
+    ],
+    manager: [{ value: "member", label: "部下" }],
+    superadmin: [
+      { value: "admin", label: "管理者" },
+      { value: "manager", label: "上司" },
+      { value: "member", label: "部下" },
+    ],
+  };
+  const selectableRoles = INVITABLE_ROLES[currentUserRole] ?? [];
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState(selectableRoles[0]?.value ?? "");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  if (selectableRoles.length === 0) return null;
+
+  const handleInvite = async () => {
+    if (!email) return;
+    setLoading(true);
+    setMessage(null);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invite-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({ email, name, role }),
+        },
+      );
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
+      setMessage({
+        type: "success",
+        text: `${email} に招待メールを送信しました`,
+      });
+      setEmail("");
+      setName("");
+    } catch (err) {
+      setMessage({ type: "error", text: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.45)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 200,
+        fontFamily: "inherit",
+      }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 18,
+          padding: 28,
+          width: 440,
+          maxWidth: "95vw",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.22)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 700,
+              color: "#1e293b",
+            }}
+          >
+            ユーザーを招待
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#94a3b8",
+              display: "flex",
+              padding: 4,
+            }}
+          >
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            名前（任意）
+          </label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="山田 太郎"
+            style={I}
+          />
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            メールアドレス <span style={{ color: "#EF4444" }}>*</span>
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="example@email.com"
+            style={I}
+          />
+        </div>
+
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            ロール
+          </label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            style={I}
+          >
+            {selectableRoles.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {message && (
+          <div
+            style={{
+              padding: "10px 14px",
+              borderRadius: 8,
+              marginBottom: 16,
+              fontSize: 13,
+              background: message.type === "success" ? "#DCFCE7" : "#FEF2F2",
+              color: message.type === "success" ? "#15803D" : "#991B1B",
+              border: `1px solid ${message.type === "success" ? "#BBF7D0" : "#FECACA"}`,
+            }}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={BB}>
+            キャンセル
+          </button>
+          <button
+            onClick={handleInvite}
+            disabled={loading || !email}
+            style={{ ...BP, opacity: loading || !email ? 0.4 : 1 }}
+          >
+            {loading ? "送信中..." : "招待メールを送る"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
+  const [form, setForm] = useState({
+    name: user.name || "",
+    email: user.email || "",
+    role: user.role || "member",
+    group_id: user.group_id ? String(user.group_id) : "",
+    manager_id: user.manager_id || "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  const managers = allUsers.filter(
+    (u) => u.role === "admin" && u.id !== user.id,
+  );
+
+  const handleSave = async () => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: form.name,
+          role: form.role,
+          group_id: form.group_id ? parseInt(form.group_id) : null,
+          manager_id: form.manager_id || null,
+        })
+        .eq("id", user.id);
+      if (error) throw error;
+      onSave({
+        ...user,
+        ...form,
+        group_id: form.group_id ? parseInt(form.group_id) : null,
+      });
+      setMessage({ type: "success", text: "保存しました！" });
+      setTimeout(() => onClose(), 1000);
+    } catch (err) {
+      setMessage({ type: "error", text: "保存に失敗しました: " + err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.45)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 300,
+        fontFamily: "inherit",
+      }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 18,
+          padding: 28,
+          width: 480,
+          maxWidth: "95vw",
+          maxHeight: "90vh",
+          overflow: "auto",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.22)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 20,
+          }}
+        >
+          <h3
+            style={{
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 700,
+              color: "#1e293b",
+            }}
+          >
+            ユーザー編集
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#94a3b8",
+              display: "flex",
+              padding: 4,
+            }}
+          >
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+
+        {/* 名前 */}
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            名前
+          </label>
+          <input
+            value={form.name}
+            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+            style={I}
+          />
+        </div>
+
+        {/* メールアドレス（読み取り専用） */}
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            メールアドレス
+            <span
+              style={{
+                fontSize: 11,
+                color: "#94a3b8",
+                fontWeight: 400,
+                marginLeft: 6,
+              }}
+            >
+              （変更不可）
+            </span>
+          </label>
+          <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
+            {user.email}
+          </div>
+        </div>
+
+        {/* ロール */}
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            ロール
+          </label>
+          <select
+            value={form.role}
+            onChange={(e) => setForm((p) => ({ ...p, role: e.target.value }))}
+            style={I}
+          >
+            <option value="member">部下</option>
+            <option value="admin">上司</option>
+            <option value="superadmin">管理者</option>
+          </select>
+        </div>
+
+        {/* 所属グループ */}
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            所属グループ
+          </label>
+          <select
+            value={form.group_id}
+            onChange={(e) =>
+              setForm((p) => ({ ...p, group_id: e.target.value }))
+            }
+            style={I}
+          >
+            <option value="">未所属</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 上司（memberのみ表示） */}
+        {form.role === "member" && (
+          <div style={{ marginBottom: 20 }}>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#64748b",
+                display: "block",
+                marginBottom: 5,
+              }}
+            >
+              上司
+            </label>
+            <select
+              value={form.manager_id}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, manager_id: e.target.value }))
+              }
+              style={I}
+            >
+              <option value="">未設定</option>
+              {managers.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {message && (
+          <div
+            style={{
+              padding: "10px 14px",
+              borderRadius: 8,
+              marginBottom: 16,
+              fontSize: 13,
+              background: message.type === "success" ? "#DCFCE7" : "#FEF2F2",
+              color: message.type === "success" ? "#15803D" : "#991B1B",
+              border: `1px solid ${message.type === "success" ? "#BBF7D0" : "#FECACA"}`,
+            }}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={BB}>
+            キャンセル
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={loading || !form.name}
+            style={{ ...BP, opacity: loading || !form.name ? 0.4 : 1 }}
+          >
+            <Icon name="save" size={14} />
+            {loading ? "保存中..." : "保存"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
   const [tab, setTab] = useState("users");
@@ -4458,6 +4935,8 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
     groupId: "",
   });
   const [editId, setEditId] = useState(null);
+  const [editUser, setEditUser] = useState(null); // 編集対象ユーザー
+  const [editForm, setEditForm] = useState(null); // 編集フォームの値
   const [ok, setOk] = useState("");
   const saveUser = () => {
     if (!form.name || !form.email || !form.password) return;
@@ -4787,16 +5266,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
                     </span>
                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                       <button
-                        onClick={() => {
-                          setForm({
-                            name: u.name,
-                            email: u.email,
-                            password: u.password,
-                            role: u.role,
-                            groupId: u.groupId || "",
-                          });
-                          setEditId(u.id);
-                        }}
+                        onClick={() => setEditUser(u)}
                         style={{
                           ...BB,
                           padding: "5px 10px",
@@ -4858,7 +5328,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
             }}
           >
             {groups.map((g) => {
-              const members = users.filter((u) => u.groupId === g.id);
+              const members = users.filter((u) => String(u.groupId) === String(g.id));
               const admins = members.filter((u) => u.role === "admin");
               const mems = members.filter((u) => u.role === "member");
               return (
@@ -5096,6 +5566,19 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
           </button>
         </div>
       )}
+      {editUser && (
+        <EditUserModal
+          user={editUser}
+          groups={groups}
+          allUsers={users}
+          onClose={() => setEditUser(null)}
+          onSave={(updated) => {
+            setUsers((p) => p.map((u) => (u.id === updated.id ? updated : u)));
+            setEditUser(null);
+            refreshUsers();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -5131,9 +5614,36 @@ export default function App() {
     };
     if (currentUser) fetchLogs();
   }, [currentUser]);
-  const [users, setUsers] = useState(INIT_USERS);
-  const [groups, setGroups] = useState(INIT_GROUPS);
+  const [users, setUsers] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [boards, setBoards] = useState({});
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase.from("profiles").select("*");
+      if (!error && data) {
+        setUsers(
+          data.map((u) => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            role: u.role,
+            groupId: u.group_id,
+            group_id: u.group_id,
+            manager_id: u.manager_id,
+          })),
+        );
+      }
+    };
+    if (currentUser) fetchUsers();
+  }, [currentUser]);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      const { data, error } = await supabase.from("groups").select("*");
+      if (!error && data) setGroups(data);
+    };
+    if (currentUser) fetchGroups();
+  }, [currentUser]);
   useEffect(() => {
     const fetchBoards = async () => {
       const { data: cards } = await supabase.from("kanban_cards").select("*");
@@ -5188,15 +5698,35 @@ export default function App() {
     if (currentUser) fetchBoards();
   }, [currentUser]);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [showInvite, setShowInvite] = useState(false);
   const login = (u) => {
-    setCurrentUser(u);
-    setPage("dashboard");
-  };
+  setCurrentUser({
+    ...u,
+    groupId: u.group_id, // group_idをgroupIdにも設定
+  });
+  setPage("dashboard");
+};
   const logout = async () => {
     await supabase.auth.signOut();
     setCurrentUser(null);
     setPage("dashboard");
     setSelectedMember(null);
+  };
+  const refreshUsers = async () => {
+    const { data, error } = await supabase.from("profiles").select("*");
+    if (!error && data) {
+      setUsers(
+        data.map((u) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          groupId: u.group_id,
+          group_id: u.group_id,
+          manager_id: u.manager_id,
+        })),
+      );
+    }
   };
   const saveLogs = (nl) =>
     setLogs((p) => [
@@ -5265,6 +5795,10 @@ export default function App() {
       : []),
     { id: "mypage", label: "マイページ", icon: "person" },
     { id: "board", label: "ボード", icon: "board" },
+    // 👇 追加（管理者と上司のみ表示）
+    ...(isAdmin || isSA
+      ? [{ id: "invite", label: "ユーザー招待", icon: "plus" }]
+      : []),
   ];
   const titles = {
     dashboard: "ダッシュボード",
@@ -5390,6 +5924,10 @@ export default function App() {
               <button
                 key={item.id}
                 onClick={() => {
+                  if (item.id === "invite") {
+                    setShowInvite(true);
+                    return;
+                  }
                   setPage(item.id);
                   if (item.id !== "team") setSelectedMember(null);
                 }}
@@ -5612,6 +6150,13 @@ export default function App() {
             groups={groups}
             setGroups={setGroups}
             logs={logs}
+            onRefreshUsers={refreshUsers}
+          />
+        )}
+        {showInvite && ( // 👈 ここから追加
+          <InviteModal
+            onClose={() => setShowInvite(false)}
+            currentUserRole={currentUser.role}
           />
         )}
       </div>
