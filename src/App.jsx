@@ -2391,12 +2391,16 @@ function LogListPage({
       targetLogs
         .filter((l) => !fd || l.date === fd)
         .filter((l) => !fc || l.cat === fc)
-        .filter(
-          (l) =>
-            !fk ||
-            l.task?.toLowerCase().includes(fk.toLowerCase()) ||
-            l.detail?.toLowerCase().includes(fk.toLowerCase()),
-        )
+        .filter((l) => {
+          if (!fk) return true;
+          const normalize = (str) =>
+            (str || "").normalize("NFKC").toLowerCase();
+          const keyword = normalize(fk);
+          return (
+            normalize(l.task).includes(keyword) ||
+            normalize(l.detail).includes(keyword)
+          );
+        })
         .sort(
           (a, b) =>
             b.date.localeCompare(a.date) || a.start.localeCompare(b.start),
