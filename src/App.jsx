@@ -2394,7 +2394,12 @@ function LogListPage({
         .filter((l) => {
           if (!fk) return true;
           const normalize = (str) =>
-            (str || "").normalize("NFKC").toLowerCase();
+            (str || "")
+              .normalize("NFKC")
+              .replace(/[\u3041-\u3096]/g, (s) =>
+                String.fromCharCode(s.charCodeAt(0) + 0x60),
+              )
+              .toLowerCase();
           const keyword = normalize(fk);
           return (
             normalize(l.task).includes(keyword) ||
