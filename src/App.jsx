@@ -5186,7 +5186,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
               </div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={saveUser} style={BP}>
+              <button onClick={() => saveUser()} style={BP}>
                 <Icon name="save" size={14} />
                 {editId ? "更新" : "追加"}
               </button>
