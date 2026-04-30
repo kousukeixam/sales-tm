@@ -4940,6 +4940,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
   const [editForm, setEditForm] = useState(null); // 編集フォームの値
   const [ok, setOk] = useState("");
   const saveUser = async () => {
+  console.log("saveUser called", form); // 👈 追加
   if (!form.name || !form.email || !form.password) return;
   setOk("");
 
