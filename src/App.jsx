@@ -5812,7 +5812,12 @@ export default function App() {
       ...p,
       ...nl.map((l, i) => ({ ...l, id: p.length + i + 1 })),
     ]);
-  const deleteLog = (id) => setLogs((p) => p.filter((l) => l.id !== id));
+  const deleteLog = async (id) => {
+    const { error } = await supabase.from("logs").delete().eq("id", id);
+    if (!error) {
+      setLogs((p) => p.filter((l) => l.id !== id));
+    }
+  };
   const saveMgrComment = async (id, comment) => {
     const { error } = await supabase
       .from("logs")
