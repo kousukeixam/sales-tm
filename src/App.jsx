@@ -4974,7 +4974,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs, onRefreshUse
     setOk("追加しました");
     setTimeout(() => setOk(""), 2000);
 
-  } catch (err: any) {
+  } catch (err) {
     setOk("エラー: " + err.message);
   }
 };
