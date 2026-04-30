@@ -2384,17 +2384,24 @@ function LogListPage({
     ? logs.filter((l) => l.user === filterUser)
     : logs.filter((l) => l.user === currentUser.name);
   const [fd, setFd] = useState("");
+  const [fk, setFk] = useState("");
   const [fc, setFc] = useState("");
   const filtered = useMemo(
     () =>
       targetLogs
         .filter((l) => !fd || l.date === fd)
         .filter((l) => !fc || l.cat === fc)
+        .filter(
+          (l) =>
+            !fk ||
+            l.task?.toLowerCase().includes(fk.toLowerCase()) ||
+            l.detail?.toLowerCase().includes(fk.toLowerCase()),
+        )
         .sort(
           (a, b) =>
             b.date.localeCompare(a.date) || a.start.localeCompare(b.start),
         ),
-    [targetLogs, fd, fc],
+    [targetLogs, fd, fc, fk],
   );
   const grouped = useMemo(() => {
     const g = {};
@@ -2436,6 +2443,19 @@ function LogListPage({
         }}
       >
         <input
+          value={fk}
+          onChange={(e) => setFk(e.target.value)}
+          placeholder="🔍 キーワード検索..."
+          style={{
+            padding: "8px 12px",
+            borderRadius: 8,
+            border: "1px solid #e2e8f0",
+            fontSize: 13,
+            outline: "none",
+            minWidth: 200,
+          }}
+        />
+        <input
           type="date"
           value={fd}
           onChange={(e) => setFd(e.target.value)}
@@ -2465,11 +2485,12 @@ function LogListPage({
             </option>
           ))}
         </select>
-        {(fd || fc) && (
+        {(fd || fc || fk) && (
           <button
             onClick={() => {
               setFd("");
               setFc("");
+              setFk("");
             }}
             style={{
               padding: "8px 12px",
@@ -6035,81 +6056,392 @@ export default function App() {
     superadmin: "ユーザー・グループ管理・CSVエクスポート（管理者専用）",
   };
   return (
-    <div style={{ minHeight: "100vh", background: "#f1f5f9", fontFamily: "'Noto Sans JP','Helvetica Neue',-apple-system,sans-serif", display: "flex" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f1f5f9",
+        fontFamily: "'Noto Sans JP','Helvetica Neue',-apple-system,sans-serif",
+        display: "flex",
+      }}
+    >
       {sidebarOpen && (
-        <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 99 }} />
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 99,
+          }}
+        />
       )}
-      <div style={{ width: 224, background: "#0f172a", display: "flex", flexDirection: "column", position: "fixed", top: 0, left: 0, height: "100vh", zIndex: 100, transform: `translateX(${sidebarOpen || window.innerWidth >= 768 ? 0 : -224}px)`, transition: "transform 0.3s ease" }}>
-        <div style={{ padding: "22px 18px 18px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      <div
+        style={{
+          width: 224,
+          background: "#0f172a",
+          display: "flex",
+          flexDirection: "column",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          height: "100vh",
+          zIndex: 100,
+          transform: `translateX(${sidebarOpen || window.innerWidth >= 768 ? 0 : -224}px)`,
+          transition: "transform 0.3s ease",
+        }}
+      >
+        <div
+          style={{
+            padding: "22px 18px 18px",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#3B82F6,#8B5CF6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📊</div>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 18,
+                flexShrink: 0,
+              }}
+            >
+              📊
+            </div>
             <div>
-              <div style={{ color: "#fff", fontWeight: 700, fontSize: 15, lineHeight: 1 }}>Sales TM</div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, marginTop: 2 }}>営業生産性向上システム</div>
+              <div
+                style={{
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  lineHeight: 1,
+                }}
+              >
+                Sales TM
+              </div>
+              <div
+                style={{
+                  color: "rgba(255,255,255,0.35)",
+                  fontSize: 10,
+                  marginTop: 2,
+                }}
+              >
+                営業生産性向上システム
+              </div>
             </div>
           </div>
           {myGroup && (
-            <div style={{ marginTop: 10, padding: "3px 10px", borderRadius: 6, background: "rgba(255,255,255,0.06)", display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: myGroup.color }} />
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{myGroup.name}</span>
+            <div
+              style={{
+                marginTop: 10,
+                padding: "3px 10px",
+                borderRadius: 6,
+                background: "rgba(255,255,255,0.06)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <div
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: myGroup.color,
+                }}
+              />
+              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
+                {myGroup.name}
+              </span>
             </div>
           )}
         </div>
         <nav style={{ flex: 1, padding: "12px 10px" }}>
           {navItems.map((item) => {
-            const active = page === item.id || (item.id === "team" && page === "member_detail");
+            const active =
+              page === item.id ||
+              (item.id === "team" && page === "member_detail");
             return (
-              <button key={item.id} onClick={() => { if (item.id === "invite") { setShowInvite(true); setSidebarOpen(false); return; } setPage(item.id); if (item.id !== "team") setSelectedMember(null); setSidebarOpen(false); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, border: "none", cursor: "pointer", textAlign: "left", marginBottom: 2, background: active ? "rgba(59,130,246,0.15)" : "transparent", color: active ? "#60A5FA" : "rgba(255,255,255,0.55)", fontSize: 14, fontWeight: active ? 600 : 400, transition: "all 0.15s", fontFamily: "inherit" }}>
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.id === "invite") {
+                    setShowInvite(true);
+                    setSidebarOpen(false);
+                    return;
+                  }
+                  setPage(item.id);
+                  if (item.id !== "team") setSelectedMember(null);
+                  setSidebarOpen(false);
+                }}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 12px",
+                  borderRadius: 10,
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  marginBottom: 2,
+                  background: active ? "rgba(59,130,246,0.15)" : "transparent",
+                  color: active ? "#60A5FA" : "rgba(255,255,255,0.55)",
+                  fontSize: 14,
+                  fontWeight: active ? 600 : 400,
+                  transition: "all 0.15s",
+                  fontFamily: "inherit",
+                }}
+              >
                 <Icon name={item.icon} size={16} />
                 {item.label}
-                {active && <div style={{ marginLeft: "auto", width: 4, height: 4, borderRadius: "50%", background: "#60A5FA" }} />}
+                {active && (
+                  <div
+                    style={{
+                      marginLeft: "auto",
+                      width: 4,
+                      height: 4,
+                      borderRadius: "50%",
+                      background: "#60A5FA",
+                    }}
+                  />
+                )}
               </button>
             );
           })}
         </nav>
-        <div style={{ padding: "12px 10px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.05)" }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0, background: avatarBg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700 }}>{currentUser.name[0]}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: "#fff", fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{currentUser.name}</div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{roleLabel}</div>
+        <div
+          style={{
+            padding: "12px 10px",
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              padding: "10px 12px",
+              borderRadius: 10,
+              background: "rgba(255,255,255,0.05)",
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                flexShrink: 0,
+                background: avatarBg,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                fontSize: 13,
+                fontWeight: 700,
+              }}
+            >
+              {currentUser.name[0]}
             </div>
-            <button onClick={logout} style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", cursor: "pointer", color: "#FCA5A5", padding: "6px 10px", borderRadius: 8, display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.15s", fontFamily: "inherit" }}>
-              <Icon name="logout" size={14} />ログアウト
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div
+                style={{
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {currentUser.name}
+              </div>
+              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>
+                {roleLabel}
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              style={{
+                background: "rgba(239,68,68,0.15)",
+                border: "1px solid rgba(239,68,68,0.3)",
+                cursor: "pointer",
+                color: "#FCA5A5",
+                padding: "6px 10px",
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 11,
+                fontWeight: 600,
+                whiteSpace: "nowrap",
+                transition: "all 0.15s",
+                fontFamily: "inherit",
+              }}
+            >
+              <Icon name="logout" size={14} />
+              ログアウト
             </button>
           </div>
         </div>
       </div>
-      <div style={{ marginLeft: window.innerWidth >= 768 ? 224 : 0, flex: 1, padding: window.innerWidth >= 768 ? 24 : "16px 12px", minHeight: "100vh", maxWidth: window.innerWidth >= 768 ? "calc(100vw - 224px)" : "100vw", overflowX: "hidden" }}>
+      <div
+        style={{
+          marginLeft: window.innerWidth >= 768 ? 224 : 0,
+          flex: 1,
+          padding: window.innerWidth >= 768 ? 24 : "16px 12px",
+          minHeight: "100vh",
+          maxWidth: window.innerWidth >= 768 ? "calc(100vw - 224px)" : "100vw",
+          overflowX: "hidden",
+        }}
+      >
         {window.innerWidth < 768 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, padding: "10px 0" }}>
-            <button onClick={() => setSidebarOpen(true)} style={{ background: "#0f172a", border: "none", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 16,
+              padding: "10px 0",
+            }}
+          >
+            <button
+              onClick={() => setSidebarOpen(true)}
+              style={{
+                background: "#0f172a",
+                border: "none",
+                borderRadius: 10,
+                width: 40,
+                height: 40,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                {[0,1,2].map(i => <div key={i} style={{ width: 18, height: 2, background: "#fff", borderRadius: 2 }} />)}
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    style={{
+                      width: 18,
+                      height: 2,
+                      background: "#fff",
+                      borderRadius: 2,
+                    }}
+                  />
+                ))}
               </div>
             </button>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#1e293b" }}>{titles[page] || ""}</div>
-              <div style={{ fontSize: 11, color: "#94a3b8" }}>{subs[page] || ""}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+                {titles[page] || ""}
+              </div>
+              <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                {subs[page] || ""}
+              </div>
             </div>
           </div>
         )}
         {window.innerWidth >= 768 && (
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#1e293b" }}>{titles[page] || ""}</h1>
-            <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>{subs[page] || ""}</div>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 22,
+                fontWeight: 700,
+                color: "#1e293b",
+              }}
+            >
+              {titles[page] || ""}
+            </h1>
+            <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
+              {subs[page] || ""}
+            </div>
           </div>
         )}
-        {page === "dashboard" && <SummaryPanel logs={isSA ? logs : isAdmin ? logs : logs.filter((l) => l.user === currentUser.name)} subtitle={isAdmin ? "チーム全体" : null} />}
-        {page === "report" && <DailyReportPage currentUser={currentUser} onSave={saveLogs} />}
-        {page === "log" && <LogListPage logs={logs} currentUser={currentUser} onDelete={deleteLog} onSaveManagerComment={saveMgrComment} onSaveDayComment={saveDayComment} />}
-        {page === "board" && <BoardPage currentUser={currentUser} allUsers={users} groups={groups} boards={boards} setBoards={setBoards} />}
-        {page === "team" && isAdmin && !isSA && <TeamPage logs={logs} users={users} currentUser={currentUser} groups={groups} onSelectMember={selectMember} />}
-        {page === "member_detail" && isAdmin && selectedMember && <MemberDetailPage member={selectedMember} logs={logs} currentUser={currentUser} onBack={backToTeam} onSaveManagerComment={saveMgrComment} onSaveDayComment={saveDayComment} />}
-        {page === "mypage" && <MyPage currentUser={currentUser} allUsers={users} groups={groups} isSA={isSA} onUpdateUser={(updated) => setCurrentUser(updated)} />}
-        {page === "superadmin" && isSA && <SuperAdminPage users={users} setUsers={setUsers} groups={groups} setGroups={setGroups} logs={logs} onRefreshUsers={refreshUsers} />}
-        {showInvite && <InviteModal onClose={() => setShowInvite(false)} currentUserRole={currentUser.role} />}
+        {page === "dashboard" && (
+          <SummaryPanel
+            logs={
+              isSA
+                ? logs
+                : isAdmin
+                  ? logs
+                  : logs.filter((l) => l.user === currentUser.name)
+            }
+            subtitle={isAdmin ? "チーム全体" : null}
+          />
+        )}
+        {page === "report" && (
+          <DailyReportPage currentUser={currentUser} onSave={saveLogs} />
+        )}
+        {page === "log" && (
+          <LogListPage
+            logs={logs}
+            currentUser={currentUser}
+            onDelete={deleteLog}
+            onSaveManagerComment={saveMgrComment}
+            onSaveDayComment={saveDayComment}
+          />
+        )}
+        {page === "board" && (
+          <BoardPage
+            currentUser={currentUser}
+            allUsers={users}
+            groups={groups}
+            boards={boards}
+            setBoards={setBoards}
+          />
+        )}
+        {page === "team" && isAdmin && !isSA && (
+          <TeamPage
+            logs={logs}
+            users={users}
+            currentUser={currentUser}
+            groups={groups}
+            onSelectMember={selectMember}
+          />
+        )}
+        {page === "member_detail" && isAdmin && selectedMember && (
+          <MemberDetailPage
+            member={selectedMember}
+            logs={logs}
+            currentUser={currentUser}
+            onBack={backToTeam}
+            onSaveManagerComment={saveMgrComment}
+            onSaveDayComment={saveDayComment}
+          />
+        )}
+        {page === "mypage" && (
+          <MyPage
+            currentUser={currentUser}
+            allUsers={users}
+            groups={groups}
+            isSA={isSA}
+            onUpdateUser={(updated) => setCurrentUser(updated)}
+          />
+        )}
+        {page === "superadmin" && isSA && (
+          <SuperAdminPage
+            users={users}
+            setUsers={setUsers}
+            groups={groups}
+            setGroups={setGroups}
+            logs={logs}
+            onRefreshUsers={refreshUsers}
+          />
+        )}
+        {showInvite && (
+          <InviteModal
+            onClose={() => setShowInvite(false)}
+            currentUserRole={currentUser.role}
+          />
+        )}
       </div>
     </div>
   );
