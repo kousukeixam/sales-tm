@@ -2524,7 +2524,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
     if (u.role === "superadmin") return false;
     if (u.id === currentUser.id) return false;
     if (isSA) return true;
-return String(u.groupId) === String(myGroupId) && u.role === "member";
+    return String(u.groupId) === String(myGroupId) && u.role === "member";
   });
   return (
     <div
@@ -3541,7 +3541,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     const all = Object.entries(boards)
       .filter(([uid]) =>
         allUsers.find(
-          (u) => u.id === parseInt(uid) && String(u.groupId) === String(currentUser.groupId),
+          (u) =>
+            u.id === parseInt(uid) &&
+            String(u.groupId) === String(currentUser.groupId),
         ),
       )
       .flatMap(([, b]) => b.cards);
@@ -5328,7 +5330,9 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
             }}
           >
             {groups.map((g) => {
-              const members = users.filter((u) => String(u.groupId) === String(g.id));
+              const members = users.filter(
+                (u) => String(u.groupId) === String(g.id),
+              );
               const admins = members.filter((u) => u.role === "admin");
               const mems = members.filter((u) => u.role === "member");
               return (
@@ -5585,6 +5589,16 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [inviteSession, setInviteSession] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordSaved, setPasswordSaved] = useState(false);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.includes("type=invite") || hash.includes("type=recovery")) {
+      setInviteSession(true);
+    }
+  }, []);
   const [page, setPage] = useState("dashboard");
   const [logs, setLogs] = useState([]);
   useEffect(() => {
@@ -5700,12 +5714,12 @@ export default function App() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [showInvite, setShowInvite] = useState(false);
   const login = (u) => {
-  setCurrentUser({
-    ...u,
-    groupId: u.group_id, // group_idをgroupIdにも設定
-  });
-  setPage("dashboard");
-};
+    setCurrentUser({
+      ...u,
+      groupId: u.group_id, // group_idをgroupIdにも設定
+    });
+    setPage("dashboard");
+  };
   const logout = async () => {
     await supabase.auth.signOut();
     setCurrentUser(null);
@@ -5769,6 +5783,164 @@ export default function App() {
     setSelectedMember(null);
     setPage("team");
   };
+
+  if (inviteSession) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background:
+            "linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%)",
+          fontFamily: "'Noto Sans JP','Helvetica Neue',sans-serif",
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 20,
+            padding: "48px 44px",
+            width: 400,
+            boxShadow: "0 25px 60px rgba(0,0,0,0.4)",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: 36 }}>
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 16,
+                background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 16px",
+                fontSize: 24,
+              }}
+            >
+              📊
+            </div>
+            <h1
+              style={{
+                color: "#fff",
+                fontSize: 24,
+                fontWeight: 700,
+                margin: 0,
+              }}
+            >
+              Sales TM
+            </h1>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.45)",
+                fontSize: 13,
+                margin: "6px 0 0",
+              }}
+            >
+              パスワードを設定してください
+            </p>
+          </div>
+          {passwordSaved ? (
+            <div
+              style={{
+                background: "rgba(34,197,94,0.12)",
+                border: "1px solid rgba(34,197,94,0.3)",
+                borderRadius: 10,
+                padding: "10px 14px",
+                color: "#86efac",
+                fontSize: 13,
+                textAlign: "center",
+              }}
+            >
+              パスワードを設定しました！ログインページへ移動してください。
+              <br />
+              <button
+                onClick={() => {
+                  setInviteSession(false);
+                  window.location.hash = "";
+                }}
+                style={{
+                  marginTop: 12,
+                  padding: "8px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "linear-gradient(135deg,#3B82F6,#6366F1)",
+                  color: "#fff",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                ログインへ
+              </button>
+            </div>
+          ) : (
+            <>
+              <div style={{ marginBottom: 20 }}>
+                <label
+                  style={{
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: 12,
+                    display: "block",
+                    marginBottom: 6,
+                  }}
+                >
+                  新しいパスワード
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    padding: "12px 14px",
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: 10,
+                    color: "#fff",
+                    fontSize: 14,
+                    outline: "none",
+                    boxSizing: "border-box",
+                    fontFamily: "inherit",
+                  }}
+                />
+              </div>
+              <button
+                onClick={async () => {
+                  if (!newPassword) return;
+                  const { error } = await supabase.auth.updateUser({
+                    password: newPassword,
+                  });
+                  if (!error) setPasswordSaved(true);
+                  else alert("エラーが発生しました: " + error.message);
+                }}
+                style={{
+                  width: "100%",
+                  padding: 13,
+                  borderRadius: 10,
+                  border: "none",
+                  background: "linear-gradient(135deg,#3B82F6,#6366F1)",
+                  color: "#fff",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                パスワードを設定する
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (!currentUser) return <LoginPage onLogin={login} />;
   const isSA = currentUser.role === "superadmin";
   const isAdmin = currentUser.role === "admin" || isSA;

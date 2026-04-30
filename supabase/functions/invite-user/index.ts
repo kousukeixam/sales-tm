@@ -8,6 +8,7 @@ const corsHeaders = {
 const INVITABLE_ROLES: Record<string, string[]> = {
   admin:   ["manager", "member"],
   manager: ["member"],
+  superadmin: ["admin", "manager", "member"],
 };
 
 Deno.serve(async (req) => {
