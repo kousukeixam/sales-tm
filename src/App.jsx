@@ -1592,7 +1592,7 @@ function DailyReportPage({ currentUser, onSave }) {
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "#0d4ba1",
+                      color: "#94a3b8",
                       padding: "4px 6px",
                       borderRadius: 6,
                       display: "flex",
@@ -1602,7 +1602,7 @@ function DailyReportPage({ currentUser, onSave }) {
                       (e.currentTarget.style.color = "#EF4444")
                     }
                     onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = "#cbd5e1")
+                      (e.currentTarget.style.color = "#94a3b8")
                     }
                   >
                     <Icon name="trash" size={15} />
