@@ -4459,13 +4459,12 @@ function GroupForm({ groups, setGroups }) {
 function InviteModal({ onClose, currentUserRole }) {
   const INVITABLE_ROLES = {
     admin: [
-      { value: "manager", label: "上司" },
+      { value: "admin", label: "上司" },
       { value: "member", label: "部下" },
     ],
     manager: [{ value: "member", label: "部下" }],
     superadmin: [
-      { value: "admin", label: "管理者" },
-      { value: "manager", label: "上司" },
+      { value: "admin", label: "上司" },
       { value: "member", label: "部下" },
     ],
   };
