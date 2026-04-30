@@ -1589,23 +1589,19 @@ function DailyReportPage({ currentUser, onSave }) {
                     onClick={() => delRow(row.id)}
                     style={{
                       marginLeft: "auto",
-                      background: "none",
-                      border: "none",
+                      background: "#FEF2F2",
+                      border: "1px solid #FECACA",
                       cursor: "pointer",
-                      color: "#94a3b8",
-                      padding: "4px 6px",
+                      color: "#EF4444",
+                      padding: "4px 8px",
                       borderRadius: 6,
                       display: "flex",
                       flexShrink: 0,
+                      fontSize: 12,
+                      fontWeight: 700,
                     }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.color = "#EF4444")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = "#94a3b8")
-                    }
                   >
-                    <Icon name="trash" size={15} />
+                    ✕
                   </button>
                 )}
               </div>
