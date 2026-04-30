@@ -4939,21 +4939,44 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
   const [editUser, setEditUser] = useState(null); // 編集対象ユーザー
   const [editForm, setEditForm] = useState(null); // 編集フォームの値
   const [ok, setOk] = useState("");
-  const saveUser = () => {
-    if (!form.name || !form.email || !form.password) return;
-    const gid = form.groupId ? parseInt(form.groupId) : null;
-    if (editId) {
-      setUsers((p) =>
-        p.map((u) => (u.id === editId ? { ...u, ...form, groupId: gid } : u)),
-      );
-    } else {
-      setUsers((p) => [...p, { ...form, id: Date.now(), groupId: gid }]);
-    }
+  const saveUser = async () => {
+  if (!form.name || !form.email || !form.password) return;
+  setOk("");
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          name: form.name,
+          role: form.role,
+          group_id: form.groupId || null,
+        }),
+      }
+    );
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error);
+
+    await refreshUsers();
     setForm({ name: "", email: "", password: "", role: "member", groupId: "" });
     setEditId(null);
-    setOk(editId ? "更新しました" : "追加しました");
+    setOk("追加しました");
     setTimeout(() => setOk(""), 2000);
-  };
+
+  } catch (err: any) {
+    setOk("エラー: " + err.message);
+  }
+};
   const deleteUser = (id) => {
     if (window.confirm("このユーザーを削除しますか？"))
       setUsers((p) => p.filter((u) => u.id !== id));
