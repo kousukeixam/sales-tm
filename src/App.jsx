@@ -5650,6 +5650,272 @@ function SuperAdminPage({
   );
 }
 
+function FeedbackPage({ currentUser }) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [ok, setOk] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!title || !content) return;
+    setLoading(true);
+    const { error } = await supabase.from("feedback").insert({
+      user_id: currentUser.id,
+      user_name: currentUser.name,
+      title,
+      content,
+    });
+    if (!error) {
+      setTitle("");
+      setContent("");
+      setOk("送信しました！");
+      setTimeout(() => setOk(""), 3000);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ maxWidth: 600 }}>
+      <div style={C}>
+        <h3
+          style={{
+            margin: "0 0 20px",
+            fontSize: 15,
+            fontWeight: 700,
+            color: "#1e293b",
+          }}
+        >
+          管理者への意見・要望
+        </h3>
+        {ok && (
+          <div
+            style={{
+              background: "#DCFCE7",
+              border: "1px solid #BBF7D0",
+              borderRadius: 8,
+              padding: "10px 14px",
+              marginBottom: 14,
+              color: "#15803D",
+              fontSize: 13,
+            }}
+          >
+            {ok}
+          </div>
+        )}
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            タイトル
+          </label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="例：業務システムについて"
+            style={I}
+          />
+        </div>
+        <div style={{ marginBottom: 20 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            内容
+          </label>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="意見・要望・改善提案などを自由に入力してください..."
+            rows={6}
+            style={{
+              ...I,
+              resize: "vertical",
+              minHeight: 120,
+              lineHeight: 1.6,
+            }}
+          />
+        </div>
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !title || !content}
+          style={{ ...BP, opacity: loading || !title || !content ? 0.4 : 1 }}
+        >
+          <Icon name="msg" size={14} />
+          {loading ? "送信中..." : "送信する"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FeedbackAdminPage() {
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("feedback")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setFeedbacks(data);
+      setLoading(false);
+    };
+    fetch();
+  }, []);
+
+  const markAsRead = async (id) => {
+    await supabase.from("feedback").update({ is_read: true }).eq("id", id);
+    setFeedbacks((p) =>
+      p.map((f) => (f.id === id ? { ...f, is_read: true } : f)),
+    );
+  };
+
+  const unreadCount = feedbacks.filter((f) => !f.is_read).length;
+
+  return (
+    <div>
+      <div
+        style={{
+          ...C,
+          marginBottom: 16,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+            意見・要望一覧
+          </div>
+          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+            全{feedbacks.length}件
+          </div>
+        </div>
+        {unreadCount > 0 && (
+          <span
+            style={{
+              background: "#EF4444",
+              color: "#fff",
+              fontSize: 12,
+              fontWeight: 700,
+              padding: "2px 10px",
+              borderRadius: 20,
+            }}
+          >
+            未読 {unreadCount}件
+          </span>
+        )}
+      </div>
+      {loading ? (
+        <div
+          style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+        >
+          読み込み中...
+        </div>
+      ) : feedbacks.length === 0 ? (
+        <div
+          style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+        >
+          意見・要望はまだありません
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {feedbacks.map((f) => (
+            <div
+              key={f.id}
+              style={{
+                ...C,
+                borderLeft: `4px solid ${f.is_read ? "#e2e8f0" : "#3B82F6"}`,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                  }}
+                >
+                  {f.user_name?.[0]}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}
+                  >
+                    {f.user_name}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    {new Date(f.created_at).toLocaleString("ja-JP")}
+                  </div>
+                </div>
+                {!f.is_read && (
+                  <button
+                    onClick={() => markAsRead(f.id)}
+                    style={{ ...BB, fontSize: 12, padding: "4px 12px" }}
+                  >
+                    既読にする
+                  </button>
+                )}
+                {f.is_read && (
+                  <span style={{ fontSize: 11, color: "#94a3b8" }}>既読</span>
+                )}
+              </div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#1e293b",
+                  marginBottom: 8,
+                }}
+              >
+                {f.title}
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "#475569",
+                  lineHeight: 1.7,
+                  whiteSpace: "pre-wrap",
+                  background: "#f8fafc",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                }}
+              >
+                {f.content}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [inviteSession, setInviteSession] = useState(false);
@@ -6036,6 +6302,8 @@ export default function App() {
       ? [{ id: "superadmin", label: "システム管理", icon: "settings" }]
       : []),
     { id: "mypage", label: "マイページ", icon: "person" },
+    ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
+    ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
     { id: "board", label: "ボード", icon: "board" },
     // 👇 追加（管理者と上司のみ表示）
     ...(isAdmin || isSA
@@ -6051,6 +6319,8 @@ export default function App() {
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
     superadmin: "システム管理",
+    feedback: "意見・要望",
+    feedbackAdmin: "意見箱",
   };
   const subs = {
     dashboard: isAdmin
@@ -6064,6 +6334,8 @@ export default function App() {
     member_detail:
       "ダッシュボードと記録一覧・コメント入力を切り替えて確認できます",
     superadmin: "ユーザー・グループ管理・CSVエクスポート（管理者専用）",
+    feedback: "管理者への意見・要望を送信できます",
+    feedbackAdmin: "メンバーからの意見・要望を確認できます",
   };
   return (
     <div
@@ -6446,6 +6718,10 @@ export default function App() {
             onRefreshUsers={refreshUsers}
           />
         )}
+        {page === "feedback" && !isSA && (
+          <FeedbackPage currentUser={currentUser} />
+        )}
+        {page === "feedbackAdmin" && isSA && <FeedbackAdminPage />}
         {showInvite && (
           <InviteModal
             onClose={() => setShowInvite(false)}
