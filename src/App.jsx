@@ -4926,7 +4926,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
   );
 }
 
-function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
+function SuperAdminPage({ users, setUsers, groups, setGroups, logs, onRefreshUsers }) {
   const [tab, setTab] = useState("users");
   const [form, setForm] = useState({
     name: "",
@@ -4968,7 +4968,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
     const result = await res.json();
     if (!res.ok) throw new Error(result.error);
 
-    await refreshUsers();
+    await onRefreshUsers();
     setForm({ name: "", email: "", password: "", role: "member", groupId: "" });
     setEditId(null);
     setOk("追加しました");
@@ -5602,7 +5602,7 @@ function SuperAdminPage({ users, setUsers, groups, setGroups, logs }) {
           onSave={(updated) => {
             setUsers((p) => p.map((u) => (u.id === updated.id ? updated : u)));
             setEditUser(null);
-            refreshUsers();
+            onRefreshUsers();
           }}
         />
       )}
