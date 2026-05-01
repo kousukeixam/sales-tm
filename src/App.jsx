@@ -5018,9 +5018,13 @@ function SuperAdminPage({
       setOk("エラー: " + err.message);
     }
   };
-  const deleteUser = (id) => {
-    if (window.confirm("このユーザーを削除しますか？"))
-      setUsers((p) => p.filter((u) => u.id !== id));
+  const deleteUser = async (id) => {
+    if (window.confirm("このユーザーを削除しますか？")) {
+      const { error } = await supabase.from("profiles").delete().eq("id", id);
+      if (!error) {
+        setUsers((p) => p.filter((u) => u.id !== id));
+      }
+    }
   };
   const rm = {
     superadmin: { l: "管理者 ⚙️", bg: "#FEF2F2", c: "#991B1B", b: "#FECACA" },
