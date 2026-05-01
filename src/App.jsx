@@ -5021,9 +5021,8 @@ function SuperAdminPage({
   const deleteUser = async (id) => {
     if (window.confirm("このユーザーを削除しますか？")) {
       const { error } = await supabase.from("profiles").delete().eq("id", id);
-      console.log("delete result:", error);
       if (!error) {
-        setUsers((p) => p.filter((u) => u.id !== id));
+        await onRefreshUsers();
       }
     }
   };
