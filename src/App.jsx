@@ -5019,27 +5019,13 @@ function SuperAdminPage({
     }
   };
   const deleteUser = async (id) => {
-    if (window.confirm("このユーザーを削除しますか？")) {
-      const { error } = await supabase.from("profiles").delete().eq("id", id);
-      console.log("delete error:", error);
-      if (!error) {
-        const { data } = await supabase.from("profiles").select("*");
-        if (data) {
-          setUsers(
-            data.map((u) => ({
-              id: u.id,
-              name: u.name,
-              email: u.email,
-              role: u.role,
-              groupId: u.group_id,
-              group_id: u.group_id,
-              manager_id: u.manager_id,
-            })),
-          );
-        }
-      }
+  if (window.confirm("このユーザーを削除しますか？")) {
+    const { error } = await supabase.from("profiles").delete().eq("id", id);
+    if (!error) {
+      await onRefreshUsers();
     }
-  };
+  }
+};
   const rm = {
     superadmin: { l: "管理者 ⚙️", bg: "#FEF2F2", c: "#991B1B", b: "#FECACA" },
     admin: { l: "上司 👑", bg: "#FEF3C7", c: "#D97706", b: "#FDE68A" },
