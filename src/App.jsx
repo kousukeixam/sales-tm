@@ -5925,9 +5925,46 @@ function FeedbackAdminPage() {
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true); // ← 追加
   const [inviteSession, setInviteSession] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [passwordSaved, setPasswordSaved] = useState(false);
+
+  // ▼ 追加：セッション自動復元
+  useEffect(() => {
+    const restoreSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (profile) {
+          setCurrentUser({
+            ...profile,
+            email: session.user.email,
+            groupId: profile.group_id,
+          });
+        }
+      }
+      setAuthLoading(false);
+    };
+    restoreSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === "SIGNED_OUT") {
+        setCurrentUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+  // ▲ 追加ここまで
 
   useEffect(() => {
     const hash = window.location.hash;
