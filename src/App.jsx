@@ -982,12 +982,12 @@ function MonthBar({ monthlyData }) {
 
 function SummaryPanel({ logs, subtitle }) {
   const today = new Date();
-  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-    .toISOString()
-    .slice(0, 10);
-  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
-    .toISOString()
-    .slice(0, 10);
+  const pad = (n) => String(n).padStart(2, "0");
+  const firstDay = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-01`;
+  const lastDay = (() => {
+    const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return `${last.getFullYear()}-${pad(last.getMonth() + 1)}-${pad(last.getDate())}`;
+  })();
   const [df, setDf] = useState(firstDay);
   const [dt, setDt] = useState(lastDay);
   const { cs, md, totM, totC } = useMemo(() => {
