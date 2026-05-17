@@ -1854,6 +1854,221 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     </div>
   );
 }
+function EditLogForm({ rec, onSave, onCancel }) {
+  const [task, setTask] = useState(rec.task);
+  const [detail, setDetail] = useState(rec.detail || "");
+  const [start, setStart] = useState(rec.start);
+  const [end, setEnd] = useState(rec.end);
+  const [cat, setCat] = useState(rec.cat);
+  const [showCat, setShowCat] = useState(false);
+  const getMins = (s, e) => {
+    if (!s || !e) return 0;
+    const [sh, sm] = s.split(":").map(Number),
+      [eh, em] = e.split(":").map(Number);
+    const v = eh * 60 + em - (sh * 60 + sm);
+    return v > 0 ? v : 0;
+  };
+  const handleSave = async () => {
+    const minutes = getMins(start, end);
+    const { error } = await supabase
+      .from("logs")
+      .update({
+        task,
+        detail,
+        start_time: start,
+        end_time: end,
+        cat,
+        minutes,
+      })
+      .eq("id", rec.id);
+    if (!error) onSave({ ...rec, task, detail, start, end, cat, minutes });
+    else alert("保存に失敗しました");
+  };
+  return (
+    <div>
+      <div style={{ marginBottom: 14 }}>
+        <label
+          style={{
+            fontSize: 12,
+            color: "#64748b",
+            display: "block",
+            marginBottom: 5,
+          }}
+        >
+          業務タイトル
+        </label>
+        <input
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+          style={I}
+        />
+      </div>
+      <div style={{ marginBottom: 14 }}>
+        <label
+          style={{
+            fontSize: 12,
+            color: "#64748b",
+            display: "block",
+            marginBottom: 5,
+          }}
+        >
+          詳細
+        </label>
+        <textarea
+          value={detail}
+          onChange={(e) => setDetail(e.target.value)}
+          rows={4}
+          style={{ ...I, resize: "vertical", minHeight: 80, lineHeight: 1.6 }}
+        />
+      </div>
+      <div
+        style={{ display: "flex", gap: 12, marginBottom: 14, flexWrap: "wrap" }}
+      >
+        <div>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            開始時間
+          </label>
+          <input
+            type="time"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+            style={{ ...I, width: "auto" }}
+          />
+        </div>
+        <div>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            終了時間
+          </label>
+          <input
+            type="time"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+            style={{ ...I, width: "auto" }}
+          />
+        </div>
+        {getMins(start, end) > 0 && (
+          <div
+            style={{
+              alignSelf: "flex-end",
+              paddingBottom: 9,
+              fontSize: 13,
+              color: "#64748b",
+            }}
+          >
+            {getMins(start, end)}分
+          </div>
+        )}
+      </div>
+      <div style={{ marginBottom: 20 }}>
+        <label
+          style={{
+            fontSize: 12,
+            color: "#64748b",
+            display: "block",
+            marginBottom: 5,
+          }}
+        >
+          区分
+        </label>
+        <div style={{ position: "relative" }}>
+          <button
+            type="button"
+            onClick={() => setShowCat(!showCat)}
+            style={{
+              padding: "9px 12px",
+              borderRadius: 8,
+              border: `1px solid ${cat ? CATEGORIES[cat].color : "#e2e8f0"}`,
+              fontSize: 13,
+              color: cat ? CATEGORIES[cat].color : "#94a3b8",
+              fontWeight: cat ? 700 : 400,
+              background: cat ? CATEGORIES[cat].bg : "#fff",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              minWidth: 160,
+              textAlign: "left",
+            }}
+          >
+            {cat ? `${cat}: ${CATEGORIES[cat].label}` : "区分を選択 ▼"}
+          </button>
+          {showCat && (
+            <div
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                zIndex: 50,
+                background: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: 10,
+                boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                overflow: "hidden",
+                minWidth: 180,
+              }}
+            >
+              {Object.entries(CATEGORIES).map(([k, v]) => (
+                <div
+                  key={k}
+                  onClick={() => {
+                    setCat(k);
+                    setShowCat(false);
+                  }}
+                  style={{
+                    padding: "10px 14px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    background: cat === k ? v.bg : "#fff",
+                    borderLeft: `3px solid ${cat === k ? v.color : "transparent"}`,
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = v.bg)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background =
+                      cat === k ? v.bg : "#fff")
+                  }
+                >
+                  <span
+                    style={{ fontSize: 13, fontWeight: 600, color: v.color }}
+                  >
+                    {k}
+                  </span>
+                  <span style={{ fontSize: 12, color: "#64748b" }}>
+                    {v.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+        <button onClick={onCancel} style={BB}>
+          キャンセル
+        </button>
+        <button onClick={handleSave} style={BP}>
+          <Icon name="save" size={14} />
+          保存
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function LogCard({
   rec,
