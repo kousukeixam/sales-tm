@@ -1230,12 +1230,19 @@ function SummaryPanel({ logs, subtitle }) {
   );
 }
 
-function DailyReportPage({ currentUser, onSave }) {
-  const today = new Date().toISOString().split("T")[0];
-  const [date, setDate] = useState(today);
-  const [dayComment, setDayComment] = useState("");
+function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState(draft?.date ?? today);
+  const [dayComment, setDayComment] = useState(draft?.dayComment ?? "");
   const [saved, setSaved] = useState(false);
-  const [rows, setRows] = useState(() => [newRow(), newRow(), newRow()]);
+  const [rows, setRows] = useState(
+    () => draft?.rows ?? [newRow(), newRow(), newRow()],
+  );
+
+  // ページ移動時にドラフトを保存
+  useEffect(() => {
+    onDraftChange?.({ date, dayComment, rows });
+  }, [date, dayComment, rows]);
   const getMins = (s, e) => {
     if (!s || !e) return 0;
     const [sh, sm] = s.split(":").map(Number),
@@ -5974,6 +5981,7 @@ export default function App() {
   }, []);
   const [page, setPage] = useState("dashboard");
   const [logs, setLogs] = useState([]);
+  const [reportDraft, setReportDraft] = useState(null); // ← ここに追加
   useEffect(() => {
     const fetchLogs = async () => {
       const { data, error } = await supabase
@@ -6100,6 +6108,7 @@ export default function App() {
     setCurrentUser(null);
     setPage("dashboard");
     setSelectedMember(null);
+    setReportDraft(null); // ← ここに追加
   };
   const refreshUsers = async () => {
     const { data, error } = await supabase.from("profiles").select("*");
@@ -6320,6 +6329,37 @@ export default function App() {
       </div>
     );
   }
+
+  // ▼ 追加：認証確認中はローディング表示
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          background: "#f8fafc",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        <div
+          style={{
+            width: 40,
+            height: 40,
+            border: "3px solid #e2e8f0",
+            borderTop: "3px solid #3B82F6",
+            borderRadius: "50%",
+            animation: "spin 0.8s linear infinite",
+          }}
+        />
+        <div style={{ color: "#64748b", fontSize: 14 }}>読み込み中...</div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+  // ▲ 追加ここまで
 
   if (!currentUser) return <LoginPage onLogin={login} />;
   const isSA = currentUser.role === "superadmin";
@@ -6704,7 +6744,12 @@ export default function App() {
           />
         )}
         {page === "report" && (
-          <DailyReportPage currentUser={currentUser} onSave={saveLogs} />
+          <DailyReportPage
+            currentUser={currentUser}
+            onSave={saveLogs}
+            draft={reportDraft}
+            onDraftChange={setReportDraft}
+          />
         )}
         {page === "log" && (
           <LogListPage
