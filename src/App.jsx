@@ -4054,16 +4054,15 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
         .from("profiles")
         .update({
           name,
-          // superadminとadminはグループ変更可
-          ...(isSA || currentUser.role === "admin"
-            ? { group_id: groupId ? parseInt(groupId) : null }
+          // 全員グループ変更可（superadminへのロール変更は不可）
+          group_id: groupId ? parseInt(groupId) : null,
+          // superadmin以外は member ↔ admin を自由に変更可
+          // superadmin自身のロールは変更不可
+          ...(!isSA
+            ? { role: role === "superadmin" ? currentUser.role : role }
             : {}),
-          // superadminのみロール変更可
-          ...(isSA ? { role } : {}),
-          // memberのみmanager_idを保持（adminとsuperadminはnullに）
-          ...(currentUser.role === "member"
-            ? { manager_id: managerId || null }
-            : { manager_id: null }),
+          // ロールがmemberのときのみmanager_idを保持
+          manager_id: role === "member" ? managerId || null : null,
         })
         .eq("id", currentUser.id);
       if (profileError) throw profileError;
@@ -4076,7 +4075,7 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
         if (passError) throw passError;
       }
 
-      onUpdateUser({ ...currentUser, name, manager_id: managerId || null });
+      onUpdateUser({ ...currentUser, name, role, group_id: groupId ? parseInt(groupId) : null, groupId: groupId ? parseInt(groupId) : null, manager_id: role === "member" ? (managerId || null) : null });
       setOk("保存しました！");
       setNewPassword("");
       setTimeout(() => setOk(""), 3000);
@@ -4168,6 +4167,108 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
             {currentUser.email}
           </div>
         </div>
+
+        {/* ロール選択 */}
+        {!isSA && (
+          <div style={{ marginBottom: 14 }}>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#64748b",
+                display: "block",
+                marginBottom: 5,
+              }}
+            >
+              ロール
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "9px 12px",
+                borderRadius: 8,
+                border: "1px solid #e2e8f0",
+                fontSize: 14,
+                background: "#fff",
+                color: "#1e293b",
+              }}
+            >
+              <option value="member">部下（member）</option>
+              <option value="admin">上司（admin）</option>
+            </select>
+          </div>
+        )}
+
+        {/* グループ選択 */}
+        <div style={{ marginBottom: 14 }}>
+          <label
+            style={{
+              fontSize: 12,
+              color: "#64748b",
+              display: "block",
+              marginBottom: 5,
+            }}
+          >
+            所属グループ
+          </label>
+          <select
+            value={groupId}
+            onChange={(e) => setGroupId(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "9px 12px",
+              borderRadius: 8,
+              border: "1px solid #e2e8f0",
+              fontSize: 14,
+              background: "#fff",
+              color: "#1e293b",
+            }}
+          >
+            <option value="">未所属</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 上司選択（memberのみ表示） */}
+        {role === "member" && (
+          <div style={{ marginBottom: 14 }}>
+            <label
+              style={{
+                fontSize: 12,
+                color: "#64748b",
+                display: "block",
+                marginBottom: 5,
+              }}
+            >
+              上司
+            </label>
+            <select
+              value={managerId}
+              onChange={(e) => setManagerId(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "9px 12px",
+                borderRadius: 8,
+                border: "1px solid #e2e8f0",
+                fontSize: 14,
+                background: "#fff",
+                color: "#1e293b",
+              }}
+            >
+              <option value="">未設定</option>
+              {managers.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div style={{ marginBottom: 14 }}>
           <label
