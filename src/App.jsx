@@ -1855,7 +1855,15 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   );
 }
 
-function LogCard({ rec, canEdit, isAdmin, onDelete, onSaveManagerComment }) {
+function LogCard({
+  rec,
+  canEdit,
+  isAdmin,
+  onDelete,
+  onSaveManagerComment,
+  onEditLog,
+}) {
+  const [editModal, setEditModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(rec.managerComment || "");
@@ -2124,7 +2132,30 @@ function LogCard({ rec, canEdit, isAdmin, onDelete, onSaveManagerComment }) {
             )}
           </div>
           {canEdit && (
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div
+              style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}
+            >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditModal(true);
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  fontSize: 12,
+                  color: "#3B82F6",
+                  background: "#EFF6FF",
+                  border: "1px solid #BFDBFE",
+                  borderRadius: 7,
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                }}
+              >
+                <Icon name="edit" size={13} />
+                編集
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -2148,6 +2179,74 @@ function LogCard({ rec, canEdit, isAdmin, onDelete, onSaveManagerComment }) {
               </button>
             </div>
           )}
+          {editModal && (
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.45)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 200,
+              }}
+              onClick={(e) =>
+                e.target === e.currentTarget && setEditModal(false)
+              }
+            >
+              <div
+                style={{
+                  background: "#fff",
+                  borderRadius: 18,
+                  padding: 28,
+                  width: 520,
+                  maxWidth: "95vw",
+                  maxHeight: "88vh",
+                  overflow: "auto",
+                  boxShadow: "0 24px 64px rgba(0,0,0,0.22)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 20,
+                  }}
+                >
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: "#1e293b",
+                    }}
+                  >
+                    業務を編集
+                  </h3>
+                  <button
+                    onClick={() => setEditModal(false)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#94a3b8",
+                    }}
+                  >
+                    <Icon name="x" size={18} />
+                  </button>
+                </div>
+                <EditLogForm
+                  rec={rec}
+                  onSave={(updated) => {
+                    onEditLog(updated);
+                    setEditModal(false);
+                  }}
+                  onCancel={() => setEditModal(false)}
+                />
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -2161,6 +2260,7 @@ function DateGroup({
   onDelete,
   onSaveManagerComment,
   onSaveDayComment,
+  onEditLog,
 }) {
   const [editDay, setEditDay] = useState(false);
   const [dayDraft, setDayDraft] = useState(recs[0]?.managerDayComment || "");
@@ -2204,6 +2304,7 @@ function DateGroup({
             canEdit={isAdmin || rec.user === currentUser.name}
             onDelete={onDelete}
             onSaveManagerComment={onSaveManagerComment}
+            onEditLog={onEditLog}
           />
         ))}
       </div>
@@ -2388,6 +2489,7 @@ function LogListPage({
   onDelete,
   onSaveManagerComment,
   onSaveDayComment,
+  onEditLog,
   filterUser,
 }) {
   const targetLogs = filterUser
@@ -2550,6 +2652,7 @@ function LogListPage({
             onDelete={onDelete}
             onSaveManagerComment={onSaveManagerComment}
             onSaveDayComment={onSaveDayComment}
+            onEditLog={onEditLog}
           />
         ))
       )}
@@ -2848,6 +2951,7 @@ function MemberDetailPage({
           onDelete={() => {}}
           onSaveManagerComment={onSaveManagerComment}
           onSaveDayComment={onSaveDayComment}
+          onEditLog={() => {}}
           filterUser={member.name}
         />
       )}
@@ -6252,6 +6356,9 @@ export default function App() {
       setLogs((p) => p.filter((l) => l.id !== id));
     }
   };
+  const editLog = (updated) => {
+    setLogs((p) => p.map((l) => (l.id === updated.id ? updated : l)));
+  };
   const saveMgrComment = async (id, comment) => {
     const { error } = await supabase
       .from("logs")
@@ -6873,6 +6980,7 @@ export default function App() {
             onDelete={deleteLog}
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
+            onEditLog={editlog}
           />
         )}
         {page === "board" && (
