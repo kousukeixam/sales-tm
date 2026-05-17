@@ -981,8 +981,15 @@ function MonthBar({ monthlyData }) {
 }
 
 function SummaryPanel({ logs, subtitle }) {
-  const [df, setDf] = useState("2025-01-01");
-  const [dt, setDt] = useState("2025-12-31");
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+    .toISOString()
+    .slice(0, 10);
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    .toISOString()
+    .slice(0, 10);
+  const [df, setDf] = useState(firstDay);
+  const [dt, setDt] = useState(lastDay);
   const { cs, md, totM, totC } = useMemo(() => {
     const f = logs.filter((l) => l.date >= df && l.date <= dt);
     const cs = {};
@@ -4075,7 +4082,14 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
         if (passError) throw passError;
       }
 
-      onUpdateUser({ ...currentUser, name, role, group_id: groupId ? parseInt(groupId) : null, groupId: groupId ? parseInt(groupId) : null, manager_id: role === "member" ? (managerId || null) : null });
+      onUpdateUser({
+        ...currentUser,
+        name,
+        role,
+        group_id: groupId ? parseInt(groupId) : null,
+        groupId: groupId ? parseInt(groupId) : null,
+        manager_id: role === "member" ? managerId || null : null,
+      });
       setOk("保存しました！");
       setNewPassword("");
       setTimeout(() => setOk(""), 3000);
