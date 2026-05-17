@@ -1269,10 +1269,12 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     setRows((r) => (r.length > 1 ? r.filter((row) => row.id !== id) : r));
   const totalMins = rows.reduce((s, r) => s + getMins(r.start, r.end), 0);
   const handleSave = async () => {
+    const handleSave = async () => {
     const valid = rows.filter(
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
     );
-    if (!valid.length) return;
+    // 業務行もコメントも何もない場合のみ弾く
+    if (!valid.length && !dayComment.trim()) return;
 
     const newLogs = valid.map((r) => ({
       user_id: currentUser.id,
