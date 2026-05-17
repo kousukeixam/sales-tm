@@ -6980,7 +6980,7 @@ export default function App() {
             onDelete={deleteLog}
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
-            onEditLog={editlog}
+            onEditLog={editLog}
           />
         )}
         {page === "board" && (
