@@ -995,6 +995,7 @@ function SummaryPanel({ logs, subtitle }) {
     const cs = {};
     Object.keys(CATEGORIES).forEach((k) => (cs[k] = { minutes: 0, count: 0 }));
     f.forEach((l) => {
+      if (!cs[l.cat]) return;
       cs[l.cat].minutes += l.minutes;
       cs[l.cat].count += 1;
     });
@@ -1004,6 +1005,7 @@ function SummaryPanel({ logs, subtitle }) {
       return o;
     });
     f.forEach((l) => {
+      if (!CATEGORIES[l.cat]) return;
       const mi = parseInt(l.date.split("-")[1]) - 1;
       md[mi][l.cat] += l.minutes;
       md[mi].total += l.minutes;
