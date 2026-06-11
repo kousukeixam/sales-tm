@@ -2152,7 +2152,7 @@ function LogCard({
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(rec.managerComment || "");
-  const cat = CATEGORIES[rec.cat];
+  const cat = CATEGORIES[rec.cat] || { color: "#94a3b8", bg: "#f8fafc", label: "その他" };
   return (
     <div
       style={{
