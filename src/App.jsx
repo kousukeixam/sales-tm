@@ -1291,7 +1291,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     }));
 
     const { error } = await supabase.from("logs").insert(newLogs);
-    if (error) { alert("保存に失敗しました: " + error.message); return; }
+    if (error) {
+      alert("保存に失敗しました: " + error.message);
+      return;
+    }
 
     onSave(
       valid.map((r) => ({
@@ -1330,7 +1333,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         .update({ day_comment: dayComment })
         .eq("user_id", currentUser.id)
         .eq("date", date);
-      if (error) { alert("保存に失敗しました: " + error.message); return; }
+      if (error) {
+        alert("保存に失敗しました: " + error.message);
+        return;
+      }
     } else {
       // レコードがなければコメントのみのレコードを新規作成
       const { error } = await supabase.from("logs").insert({
@@ -1342,7 +1348,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         cat: "other",
         day_comment: dayComment,
       });
-      if (error) { alert("保存に失敗しました: " + error.message); return; }
+      if (error) {
+        alert("保存に失敗しました: " + error.message);
+        return;
+      }
     }
     setSavedComment(true);
     setTimeout(() => setSavedComment(false), 2000);
@@ -1428,44 +1437,44 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
           )}
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button
-          onClick={handleSave}
-          style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)" }}
-        >
-          {saved ? (
-            <>
-              <Icon name="check" size={16} />
-              保存しました！
-            </>
-          ) : (
-            <>
-              <Icon name="save" size={16} />
-              記録を転記
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleSaveCommentOnly}
-          style={{
-            ...BP,
-            background: savedComment
-              ? "linear-gradient(135deg,#10B981,#059669)"
-              : "linear-gradient(135deg,#8B5CF6,#6366F1)",
-            boxShadow: "0 2px 8px rgba(139,92,246,0.3)",
-          }}
-        >
-          {savedComment ? (
-            <>
-              <Icon name="check" size={16} />
-              保存しました！
-            </>
-          ) : (
-            <>
-              <Icon name="msg" size={16} />
-              コメントのみ転記
-            </>
-          )}
-        </button>
+          <button
+            onClick={handleSave}
+            style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)" }}
+          >
+            {saved ? (
+              <>
+                <Icon name="check" size={16} />
+                保存しました！
+              </>
+            ) : (
+              <>
+                <Icon name="save" size={16} />
+                記録を転記
+              </>
+            )}
+          </button>
+          <button
+            onClick={handleSaveCommentOnly}
+            style={{
+              ...BP,
+              background: savedComment
+                ? "linear-gradient(135deg,#10B981,#059669)"
+                : "linear-gradient(135deg,#8B5CF6,#6366F1)",
+              boxShadow: "0 2px 8px rgba(139,92,246,0.3)",
+            }}
+          >
+            {savedComment ? (
+              <>
+                <Icon name="check" size={16} />
+                保存しました！
+              </>
+            ) : (
+              <>
+                <Icon name="msg" size={16} />
+                コメントのみ転記
+              </>
+            )}
+          </button>
         </div>
       </div>
       <div
@@ -6435,7 +6444,11 @@ export default function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+      if (
+        event === "INITIAL_SESSION" ||
+        event === "SIGNED_IN" ||
+        event === "TOKEN_REFRESHED"
+      ) {
         if (session?.user) {
           const { data: profile } = await supabase
             .from("profiles")
@@ -6457,6 +6470,14 @@ export default function App() {
     });
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  // タイムアウト保険：5秒経ってもauthLoadingが解除されなければ強制解除
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAuthLoading(false);
+    }, 5000);
+    return () => clearTimeout(timer);
   }, []);
   // ▲ セッション自動復元ここまで
 
@@ -7222,28 +7243,30 @@ export default function App() {
             </div>
           </div>
         )}
-        {page === "dashboard" && (() => {
-          // 自分の部署に所属するユーザーIDセットを作成
-          const myGroupUserIds = new Set(
-            users
-              .filter((u) => String(u.groupId) === String(currentUser.groupId))
-              .map((u) => u.id)
-          );
-          const dashboardLogs = isSA
-            ? logs  // superadminは全件
-            : logs.filter((l) => myGroupUserIds.has(l.userId));
-          const dashboardSubtitle = (() => {
-            if (isSA) return "全体";
-            const grp = groups.find((g) => String(g.id) === String(currentUser.groupId));
-            return grp ? grp.name : (isAdmin ? "チーム" : null);
-          })();
-          return (
-            <SummaryPanel
-              logs={dashboardLogs}
-              subtitle={dashboardSubtitle}
-            />
-          );
-        })()}
+        {page === "dashboard" &&
+          (() => {
+            // 自分の部署に所属するユーザーIDセットを作成
+            const myGroupUserIds = new Set(
+              users
+                .filter(
+                  (u) => String(u.groupId) === String(currentUser.groupId),
+                )
+                .map((u) => u.id),
+            );
+            const dashboardLogs = isSA
+              ? logs // superadminは全件
+              : logs.filter((l) => myGroupUserIds.has(l.userId));
+            const dashboardSubtitle = (() => {
+              if (isSA) return "全体";
+              const grp = groups.find(
+                (g) => String(g.id) === String(currentUser.groupId),
+              );
+              return grp ? grp.name : isAdmin ? "チーム" : null;
+            })();
+            return (
+              <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
+            );
+          })()}
         {page === "report" && (
           <DailyReportPage
             currentUser={currentUser}
