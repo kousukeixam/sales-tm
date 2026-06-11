@@ -1268,12 +1268,13 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   const delRow = (id) =>
     setRows((r) => (r.length > 1 ? r.filter((row) => row.id !== id) : r));
   const totalMins = rows.reduce((s, r) => s + getMins(r.start, r.end), 0);
+  const [savedComment, setSavedComment] = useState(false);
+
+  // 業務行＋振り返りコメントをまとめて転記
   const handleSave = async () => {
-    const handleSave = async () => {
     const valid = rows.filter(
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
     );
-    // 業務行もコメントも何もない場合のみ弾く
     if (!valid.length && !dayComment.trim()) return;
 
     const newLogs = valid.map((r) => ({
@@ -1290,11 +1291,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     }));
 
     const { error } = await supabase.from("logs").insert(newLogs);
-
-    if (error) {
-      alert("保存に失敗しました: " + error.message);
-      return;
-    }
+    if (error) { alert("保存に失敗しました: " + error.message); return; }
 
     onSave(
       valid.map((r) => ({
@@ -1313,6 +1310,42 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     );
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  // 振り返りコメントだけ転記（業務行なしでもOK）
+  const handleSaveCommentOnly = async () => {
+    if (!dayComment.trim()) return;
+    // 同じ日付・同ユーザーの既存レコードを確認
+    const { data: existing } = await supabase
+      .from("logs")
+      .select("id")
+      .eq("user_id", currentUser.id)
+      .eq("date", date)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      // 既存レコードがあればday_commentだけ更新
+      const { error } = await supabase
+        .from("logs")
+        .update({ day_comment: dayComment })
+        .eq("user_id", currentUser.id)
+        .eq("date", date);
+      if (error) { alert("保存に失敗しました: " + error.message); return; }
+    } else {
+      // レコードがなければコメントのみのレコードを新規作成
+      const { error } = await supabase.from("logs").insert({
+        user_id: currentUser.id,
+        user_name: currentUser.name,
+        date,
+        task: "（コメントのみ）",
+        minutes: 0,
+        cat: "other",
+        day_comment: dayComment,
+      });
+      if (error) { alert("保存に失敗しました: " + error.message); return; }
+    }
+    setSavedComment(true);
+    setTimeout(() => setSavedComment(false), 2000);
   };
   return (
     <div>
@@ -1394,6 +1427,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
             </div>
           )}
         </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button
           onClick={handleSave}
           style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)" }}
@@ -1410,6 +1444,29 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
             </>
           )}
         </button>
+        <button
+          onClick={handleSaveCommentOnly}
+          style={{
+            ...BP,
+            background: savedComment
+              ? "linear-gradient(135deg,#10B981,#059669)"
+              : "linear-gradient(135deg,#8B5CF6,#6366F1)",
+            boxShadow: "0 2px 8px rgba(139,92,246,0.3)",
+          }}
+        >
+          {savedComment ? (
+            <>
+              <Icon name="check" size={16} />
+              保存しました！
+            </>
+          ) : (
+            <>
+              <Icon name="msg" size={16} />
+              コメントのみ転記
+            </>
+          )}
+        </button>
+        </div>
       </div>
       <div
         style={{
@@ -6373,41 +6430,37 @@ export default function App() {
   const [newPassword, setNewPassword] = useState("");
   const [passwordSaved, setPasswordSaved] = useState(false);
 
-  // ▼ 追加：セッション自動復元
+  // ▼ セッション自動復元（onAuthStateChange で一本化）
   useEffect(() => {
-    const restoreSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        if (profile) {
-          setCurrentUser({
-            ...profile,
-            email: session.user.email,
-            groupId: profile.group_id,
-          });
-        }
-      }
-      setAuthLoading(false);
-    };
-    restoreSession();
-
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === "SIGNED_OUT") {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        // ログイン済みセッションがある場合はプロフィールを取得してログイン状態にする
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          if (profile) {
+            setCurrentUser({
+              ...profile,
+              email: session.user.email,
+              groupId: profile.group_id,
+            });
+          }
+        }
+        setAuthLoading(false);
+      } else if (event === "SIGNED_OUT") {
         setCurrentUser(null);
+        setAuthLoading(false);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
-  // ▲ 追加ここまで
+  // ▲ セッション自動復元ここまで
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -6436,6 +6489,7 @@ export default function App() {
             minutes: l.minutes,
             cat: l.cat,
             user: l.user_name,
+            userId: l.user_id,
             managerComment: l.manager_comment || "",
             managerDayComment: l.manager_day_comment || "",
             dayComment: l.day_comment || "",
@@ -7170,18 +7224,28 @@ export default function App() {
             </div>
           </div>
         )}
-        {page === "dashboard" && (
-          <SummaryPanel
-            logs={
-              isSA
-                ? logs
-                : isAdmin
-                  ? logs
-                  : logs.filter((l) => l.user === currentUser.name)
-            }
-            subtitle={isAdmin ? "チーム全体" : null}
-          />
-        )}
+        {page === "dashboard" && (() => {
+          // 自分の部署に所属するユーザーIDセットを作成
+          const myGroupUserIds = new Set(
+            users
+              .filter((u) => String(u.groupId) === String(currentUser.groupId))
+              .map((u) => u.id)
+          );
+          const dashboardLogs = isSA
+            ? logs  // superadminは全件
+            : logs.filter((l) => myGroupUserIds.has(l.userId));
+          const dashboardSubtitle = (() => {
+            if (isSA) return "全体";
+            const grp = groups.find((g) => String(g.id) === String(currentUser.groupId));
+            return grp ? grp.name : (isAdmin ? "チーム" : null);
+          })();
+          return (
+            <SummaryPanel
+              logs={dashboardLogs}
+              subtitle={dashboardSubtitle}
+            />
+          );
+        })()}
         {page === "report" && (
           <DailyReportPage
             currentUser={currentUser}
