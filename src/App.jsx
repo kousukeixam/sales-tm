@@ -6436,7 +6436,6 @@ export default function App() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // ログイン済みセッションがある場合はプロフィールを取得してログイン状態にする
         if (session?.user) {
           const { data: profile } = await supabase
             .from("profiles")
@@ -6451,11 +6450,10 @@ export default function App() {
             });
           }
         }
-        setAuthLoading(false);
       } else if (event === "SIGNED_OUT") {
         setCurrentUser(null);
-        setAuthLoading(false);
       }
+      setAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
