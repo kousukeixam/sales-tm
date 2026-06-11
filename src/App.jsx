@@ -6444,11 +6444,7 @@ export default function App() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (
-        event === "INITIAL_SESSION" ||
-        event === "SIGNED_IN" ||
-        event === "TOKEN_REFRESHED"
-      ) {
+      if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") {
         if (session?.user) {
           const { data: profile } = await supabase
             .from("profiles")
