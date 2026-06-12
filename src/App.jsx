@@ -983,40 +983,92 @@ function WeatherWidget() {
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState("");
   useEffect(() => {
-    if (!navigator.geolocation) { setError("位置情報非対応"); return; }
+    if (!navigator.geolocation) {
+      setError("位置情報非対応");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
           const res = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric&lang=ja`
+            `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric&lang=ja`,
           );
           const d = await res.json();
-          if (String(d.cod) !== "200") { setError("天気APIキーを有効化中..."); return; }
+          if (String(d.cod) !== "200") {
+            setError("天気APIキーを有効化中...");
+            return;
+          }
           setWeather(d);
-        } catch (e) { setError("取得失敗"); }
+        } catch (e) {
+          setError("取得失敗");
+        }
       },
-      () => setError("位置情報の取得を許可してください")
+      () => setError("位置情報の取得を許可してください"),
     );
   }, []);
-  const icons = { "01d":"☀️","01n":"🌙","02d":"🌤","02n":"🌤","03d":"☁️","03n":"☁️","04d":"☁️","04n":"☁️","09d":"🌧","09n":"🌧","10d":"🌦","10n":"🌦","11d":"⛈","11n":"⛈","13d":"❄️","13n":"❄️","50d":"🌫","50n":"🌫" };
+  const icons = {
+    "01d": "☀️",
+    "01n": "🌙",
+    "02d": "🌤",
+    "02n": "🌤",
+    "03d": "☁️",
+    "03n": "☁️",
+    "04d": "☁️",
+    "04n": "☁️",
+    "09d": "🌧",
+    "09n": "🌧",
+    "10d": "🌦",
+    "10n": "🌦",
+    "11d": "⛈",
+    "11n": "⛈",
+    "13d": "❄️",
+    "13n": "❄️",
+    "50d": "🌫",
+    "50n": "🌫",
+  };
   return (
     <div style={{ ...C, flex: 1, minWidth: 200 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>🌤 今日の天気</div>
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#64748b",
+          marginBottom: 10,
+        }}
+      >
+        🌤 今日の天気
+      </div>
       {error ? (
         <div style={{ fontSize: 12, color: "#94a3b8" }}>{error}</div>
       ) : !weather ? (
         <div style={{ fontSize: 12, color: "#94a3b8" }}>取得中...</div>
       ) : (
         <div>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>{weather.name}</div>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
+            {weather.name}
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 36 }}>{icons[weather.weather[0].icon] || "🌡"}</span>
+            <span style={{ fontSize: 36 }}>
+              {icons[weather.weather[0].icon] || "🌡"}
+            </span>
             <div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: "#1e293b" }}>{Math.round(weather.main.temp)}°C</div>
-              <div style={{ fontSize: 12, color: "#64748b" }}>{weather.weather[0].description}</div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "#1e293b" }}>
+                {Math.round(weather.main.temp)}°C
+              </div>
+              <div style={{ fontSize: 12, color: "#64748b" }}>
+                {weather.weather[0].description}
+              </div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 12, marginTop: 10, fontSize: 12, color: "#64748b" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              marginTop: 10,
+              fontSize: 12,
+              color: "#64748b",
+            }}
+          >
             <span>💧 湿度 {weather.main.humidity}%</span>
             <span>🌡 体感 {Math.round(weather.main.feels_like)}°C</span>
             <span>💨 {Math.round(weather.wind.speed * 3.6)}km/h</span>
@@ -1028,57 +1080,155 @@ function WeatherWidget() {
 }
 
 const QUOTES = [
-  { text: "成功とは、失敗を重ねても熱意を失わない能力である。", author: "ウィンストン・チャーチル" },
+  {
+    text: "成功とは、失敗を重ねても熱意を失わない能力である。",
+    author: "ウィンストン・チャーチル",
+  },
   { text: "どんなに遠い道のりも、一歩から始まる。", author: "老子" },
-  { text: "今日できることを明日に延ばすな。", author: "ベンジャミン・フランクリン" },
+  {
+    text: "今日できることを明日に延ばすな。",
+    author: "ベンジャミン・フランクリン",
+  },
   { text: "夢を見るからこそ、人生は輝く。", author: "モーツァルト" },
   { text: "困難な状況は、強い人間を作る。", author: "ロイ・T・ベネット" },
   { text: "行動こそが、成功への唯一の道である。", author: "パブロ・ピカソ" },
-  { text: "小さな機会から、偉大なことが始まることが多い。", author: "デモステネス" },
-  { text: "人生で大切なのは、どこにいるかではなく、どこへ向かっているかだ。", author: "オリバー・ウェンデル・ホームズ" },
+  {
+    text: "小さな機会から、偉大なことが始まることが多い。",
+    author: "デモステネス",
+  },
+  {
+    text: "人生で大切なのは、どこにいるかではなく、どこへ向かっているかだ。",
+    author: "オリバー・ウェンデル・ホームズ",
+  },
   { text: "失敗は成功のもと。", author: "ことわざ" },
-  { text: "あなたの時間は限られている。他人の人生を生きて無駄にするな。", author: "スティーブ・ジョブズ" },
-  { text: "最大のリスクは、リスクを取らないことだ。", author: "マーク・ザッカーバーグ" },
-  { text: "やってみなければ、何もわからない。", author: "テオドア・ルーズベルト" },
+  {
+    text: "あなたの時間は限られている。他人の人生を生きて無駄にするな。",
+    author: "スティーブ・ジョブズ",
+  },
+  {
+    text: "最大のリスクは、リスクを取らないことだ。",
+    author: "マーク・ザッカーバーグ",
+  },
+  {
+    text: "やってみなければ、何もわからない。",
+    author: "テオドア・ルーズベルト",
+  },
 ];
 
 function QuoteWidget() {
   const quote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
   return (
     <div style={{ ...C, flex: 1, minWidth: 200 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>💬 今日の名言</div>
-      <div style={{ fontSize: 14, color: "#1e293b", lineHeight: 1.7, fontStyle: "italic", marginBottom: 8 }}>
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#64748b",
+          marginBottom: 10,
+        }}
+      >
+        💬 今日の名言
+      </div>
+      <div
+        style={{
+          fontSize: 14,
+          color: "#1e293b",
+          lineHeight: 1.7,
+          fontStyle: "italic",
+          marginBottom: 8,
+        }}
+      >
         「{quote.text}」
       </div>
-      <div style={{ fontSize: 12, color: "#94a3b8", textAlign: "right" }}>— {quote.author}</div>
+      <div style={{ fontSize: 12, color: "#94a3b8", textAlign: "right" }}>
+        — {quote.author}
+      </div>
     </div>
   );
 }
 
 const TODAY_FACTS = [
   { month: 1, day: 1, text: "元日。1872年、日本で太陽暦が採用された日。" },
-  { month: 1, day: 15, text: "1999年、Wikipediaの前身プロジェクトが開始された日。" },
-  { month: 2, day: 14, text: "バレンタインデー。269年、聖バレンタインが処刑された日とされる。" },
-  { month: 3, day: 3, text: "ひな祭り。女の子の健やかな成長を祈る日本の伝統行事。" },
-  { month: 4, day: 1, text: "エイプリルフール。嘘をついてもいい日として世界中で親しまれている。" },
-  { month: 5, day: 5, text: "こどもの日。1948年に国民の祝日として制定された。" },
-  { month: 6, day: 1, text: "気象記念日。1875年、東京気象台（現・気象庁）が設立された日。" },
-  { month: 7, day: 7, text: "七夕。織姫と彦星が年に一度会えるという日本の伝統行事。" },
-  { month: 8, day: 6, text: "広島平和記念日。1945年、広島に原子爆弾が投下された日。" },
-  { month: 9, day: 9, text: "重陽の節句。菊の節句とも呼ばれる中国由来の伝統行事。" },
-  { month: 10, day: 1, text: "コーヒーの日。国際コーヒー機関が制定した世界共通のコーヒーの記念日。" },
+  {
+    month: 1,
+    day: 15,
+    text: "1999年、Wikipediaの前身プロジェクトが開始された日。",
+  },
+  {
+    month: 2,
+    day: 14,
+    text: "バレンタインデー。269年、聖バレンタインが処刑された日とされる。",
+  },
+  {
+    month: 3,
+    day: 3,
+    text: "ひな祭り。女の子の健やかな成長を祈る日本の伝統行事。",
+  },
+  {
+    month: 4,
+    day: 1,
+    text: "エイプリルフール。嘘をついてもいい日として世界中で親しまれている。",
+  },
+  {
+    month: 5,
+    day: 5,
+    text: "こどもの日。1948年に国民の祝日として制定された。",
+  },
+  {
+    month: 6,
+    day: 1,
+    text: "気象記念日。1875年、東京気象台（現・気象庁）が設立された日。",
+  },
+  {
+    month: 7,
+    day: 7,
+    text: "七夕。織姫と彦星が年に一度会えるという日本の伝統行事。",
+  },
+  {
+    month: 8,
+    day: 6,
+    text: "広島平和記念日。1945年、広島に原子爆弾が投下された日。",
+  },
+  {
+    month: 9,
+    day: 9,
+    text: "重陽の節句。菊の節句とも呼ばれる中国由来の伝統行事。",
+  },
+  {
+    month: 10,
+    day: 1,
+    text: "コーヒーの日。国際コーヒー機関が制定した世界共通のコーヒーの記念日。",
+  },
   { month: 11, day: 3, text: "文化の日。1946年、日本国憲法が公布された日。" },
-  { month: 12, day: 25, text: "クリスマス。キリストの降誕を祝うキリスト教の祝祭日。" },
+  {
+    month: 12,
+    day: 25,
+    text: "クリスマス。キリストの降誕を祝うキリスト教の祝祭日。",
+  },
 ];
 
 function TodayFactWidget() {
   const today = new Date();
-  const fact = TODAY_FACTS.find(f => f.month === today.getMonth() + 1 && f.day === today.getDate())
-    || { text: `今日は${today.getMonth() + 1}月${today.getDate()}日。今日も一日頑張りましょう！` };
+  const fact = TODAY_FACTS.find(
+    (f) => f.month === today.getMonth() + 1 && f.day === today.getDate(),
+  ) || {
+    text: `今日は${today.getMonth() + 1}月${today.getDate()}日。今日も一日頑張りましょう！`,
+  };
   return (
     <div style={{ ...C, flex: 1, minWidth: 200 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>📅 今日は何の日？</div>
-      <div style={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>{fact.text}</div>
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#64748b",
+          marginBottom: 10,
+        }}
+      >
+        📅 今日は何の日？
+      </div>
+      <div style={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
+        {fact.text}
+      </div>
     </div>
   );
 }
@@ -1386,6 +1536,14 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     if (!valid.length && !dayComment.trim()) return;
 
     if (valid.length > 0) {
+      // 同日の「（コメントのみ）」レコードがあれば削除
+      await supabase
+        .from("logs")
+        .delete()
+        .eq("user_id", currentUser.id)
+        .eq("date", date)
+        .eq("task", "（コメントのみ）");
+
       const newLogs = valid.map((r) => ({
         user_id: currentUser.id,
         user_name: currentUser.name,
@@ -1436,8 +1594,16 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
           .update({ day_comment: dayComment })
           .eq("user_id", currentUser.id)
           .eq("date", date);
-        if (error) { alert("保存に失敗しました: " + error.message); return; }
-        onSave([], { date, dayComment, userId: currentUser.id, user: currentUser.name });
+        if (error) {
+          alert("保存に失敗しました: " + error.message);
+          return;
+        }
+        onSave([], {
+          date,
+          dayComment,
+          userId: currentUser.id,
+          user: currentUser.name,
+        });
       } else {
         const { data: inserted, error } = await supabase
           .from("logs")
@@ -2922,10 +3088,9 @@ function LogListPage({
   onEditLog,
   filterUser,
 }) {
-  const targetLogs = (filterUser
+  const targetLogs = filterUser
     ? logs.filter((l) => l.user === filterUser)
-    : logs.filter((l) => l.user === currentUser.name)
-  ).filter((l) => l.task !== "（コメントのみ）");
+    : logs.filter((l) => l.user === currentUser.name);
   const [fd, setFd] = useState("");
   const [fk, setFk] = useState("");
   const [fc, setFc] = useState("");
@@ -6728,11 +6893,24 @@ export default function App() {
       );
     }
   };
-  const saveLogs = (nl) =>
-    setLogs((p) => [
-      ...p,
-      ...nl.map((l, i) => ({ ...l, id: p.length + i + 1 })),
-    ]);
+  const saveLogs = (nl, commentUpdate) => {
+    if (commentUpdate) {
+      // コメントのみ更新の場合、既存ログのdayCommentを更新
+      setLogs((p) =>
+        p.map((l) =>
+          l.date === commentUpdate.date && l.userId === commentUpdate.userId
+            ? { ...l, dayComment: commentUpdate.dayComment }
+            : l,
+        ),
+      );
+    }
+    if (nl.length > 0) {
+      setLogs((p) => [
+        ...p,
+        ...nl.map((l, i) => ({ ...l, id: p.length + i + 1 })),
+      ]);
+    }
+  };
   const deleteLog = async (id) => {
     const { error } = await supabase.from("logs").delete().eq("id", id);
     if (!error) {
@@ -7358,8 +7536,18 @@ export default function App() {
             })();
             return (
               <div>
-                <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
-                <div style={{ display: "flex", gap: 16, marginTop: 20, flexWrap: "wrap" }}>
+                <SummaryPanel
+                  logs={dashboardLogs}
+                  subtitle={dashboardSubtitle}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 16,
+                    marginTop: 20,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <WeatherWidget />
                   <QuoteWidget />
                   <TodayFactWidget />
