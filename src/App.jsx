@@ -1083,85 +1083,6 @@ function TodayFactWidget() {
   );
 }
 
-function NewsWidget() {
-  const [tab, setTab] = useState("business");
-  const [news, setNews] = useState({});
-  const [loading, setLoading] = useState(false);
-  const tabs = [
-    { id: "business", label: "💼 ビジネス", q: "ビジネス 経済" },
-    { id: "sales", label: "🛒 営業・小売", q: "営業 小売 販売" },
-    { id: "okinawa", label: "🌺 沖縄", q: "沖縄" },
-  ];
-  useEffect(() => {
-    if (news[tab]) return;
-    setLoading(true);
-    const rssUrls = {
-      business: "https://news.google.com/rss/search?q=ビジネス+経済&hl=ja&gl=JP&ceid=JP:ja",
-      sales: "https://news.google.com/rss/search?q=営業+小売+販売&hl=ja&gl=JP&ceid=JP:ja",
-      okinawa: "https://news.google.com/rss/search?q=沖縄&hl=ja&gl=JP&ceid=JP:ja",
-    };
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrls[tab])}`;
-    fetch(proxyUrl)
-      .then(r => r.json())
-      .then(d => {
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(d.contents, "text/xml");
-        const items = Array.from(xml.querySelectorAll("item")).slice(0, 5);
-        const articles = items.map(item => ({
-          title: item.querySelector("title")?.textContent || "",
-          url: item.querySelector("link")?.textContent || "",
-          publishedAt: item.querySelector("pubDate")?.textContent || "",
-          source: { name: "" },
-        }));
-        setNews(p => ({ ...p, [tab]: articles }));
-        setLoading(false);
-      })
-      .catch(() => {
-        setNews(p => ({ ...p, [tab]: [] }));
-        setLoading(false);
-      });
-  }, [tab]);
-  return (
-    <div style={{ ...C, marginBottom: 20 }}>
-      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 12 }}>📰 ビジネスニュース</div>
-      <div style={{ display: "flex", gap: 4, marginBottom: 14, flexWrap: "wrap" }}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: "5px 12px", borderRadius: 20, border: "none", cursor: "pointer",
-            fontSize: 12, fontWeight: tab === t.id ? 600 : 400, fontFamily: "inherit",
-            background: tab === t.id ? "#3B82F6" : "#f1f5f9",
-            color: tab === t.id ? "#fff" : "#64748b",
-          }}>{t.label}</button>
-        ))}
-      </div>
-      {loading ? (
-        <div style={{ fontSize: 12, color: "#94a3b8", padding: "16px 0" }}>読み込み中...</div>
-      ) : (news[tab] || []).length === 0 ? (
-        <div style={{ fontSize: 12, color: "#94a3b8", padding: "16px 0" }}>ニュースを取得できませんでした</div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {(news[tab] || []).map((a, i) => (
-            <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
-              <div style={{
-                padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0",
-                background: "#fafafa", transition: "all 0.15s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.background = "#fafafa"; }}
-              >
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", lineHeight: 1.5, marginBottom: 4 }}>{a.title}</div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                  {a.source?.name} · {new Date(a.publishedAt).toLocaleDateString("ja-JP")}
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function SummaryPanel({ logs, subtitle }) {
   const today = new Date();
   const pad = (n) => String(n).padStart(2, "0");
@@ -7442,7 +7363,6 @@ export default function App() {
                   <QuoteWidget />
                   <TodayFactWidget />
                 </div>
-                <NewsWidget />
                 <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
               </div>
             );
