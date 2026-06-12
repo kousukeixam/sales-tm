@@ -1248,9 +1248,12 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     () => draft?.rows ?? [newRow(), newRow(), newRow()],
   );
 
-  // ページ移動時にドラフトを保存
+  // ページ移動時にドラフトを保存（debounceで連続実行を防ぐ）
   useEffect(() => {
-    onDraftChange?.({ date, dayComment, rows });
+    const timer = setTimeout(() => {
+      onDraftChange?.({ date, dayComment, rows });
+    }, 300);
+    return () => clearTimeout(timer);
   }, [date, dayComment, rows]);
   const getMins = (s, e) => {
     if (!s || !e) return 0;
