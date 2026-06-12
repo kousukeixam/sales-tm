@@ -991,7 +991,7 @@ function WeatherWidget() {
             `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric&lang=ja`
           );
           const d = await res.json();
-          if (d.cod !== 200) { setError("APIキーを確認中..."); return; }
+          if (String(d.cod) !== "200") { setError("天気APIキーを有効化中..."); return; }
           setWeather(d);
         } catch (e) { setError("取得失敗"); }
       },
@@ -1095,12 +1095,21 @@ function NewsWidget() {
   useEffect(() => {
     if (news[tab]) return;
     setLoading(true);
-    const query = tabs.find(t => t.id === tab).q;
-    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=ja&max=5&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`)}`)
+    const rssUrls = {
+      business: "https://rss.itmedia.co.jp/rss/2.0/business.xml",
+      sales: "https://rss.itmedia.co.jp/rss/2.0/enterprise.xml",
+      okinawa: "https://www.okinawatimes.co.jp/rss/index.rdf",
+    };
+    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[tab])}&count=5`)
       .then(r => r.json())
       .then(d => {
-        const parsed = JSON.parse(d.contents);
-        setNews(p => ({ ...p, [tab]: parsed.articles || [] }));
+        const articles = (d.items || []).map(item => ({
+          title: item.title,
+          url: item.link,
+          publishedAt: item.pubDate,
+          source: { name: item.author || d.feed?.title || "" },
+        }));
+        setNews(p => ({ ...p, [tab]: articles }));
         setLoading(false);
       })
       .catch(() => {
