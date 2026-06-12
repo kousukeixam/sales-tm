@@ -991,8 +991,9 @@ function WeatherWidget() {
             `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric&lang=ja`
           );
           const d = await res.json();
+          if (d.cod !== 200) { setError("APIキーを確認中..."); return; }
           setWeather(d);
-        } catch { setError("取得失敗"); }
+        } catch (e) { setError("取得失敗"); }
       },
       () => setError("位置情報の取得を許可してください")
     );
@@ -1094,13 +1095,18 @@ function NewsWidget() {
   useEffect(() => {
     if (news[tab]) return;
     setLoading(true);
-    fetch(`https://gnews.io/api/v4/search?q=${encodeURIComponent(tabs.find(t => t.id === tab).q)}&lang=ja&max=5&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`)
+    const query = tabs.find(t => t.id === tab).q;
+    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=ja&max=5&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`)}`)
       .then(r => r.json())
       .then(d => {
-        setNews(p => ({ ...p, [tab]: d.articles || [] }));
+        const parsed = JSON.parse(d.contents);
+        setNews(p => ({ ...p, [tab]: parsed.articles || [] }));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setNews(p => ({ ...p, [tab]: [] }));
+        setLoading(false);
+      });
   }, [tab]);
   return (
     <div style={{ ...C, marginBottom: 20 }}>
