@@ -1643,7 +1643,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     setRows([newRow(), newRow(), newRow()]);
     setDayComment("");
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => {
+      setSaved(false);
+      window.location.reload();
+    }, 1500);
   };
 
   // 振り返りコメントだけ転記（業務行なしでもOK）
