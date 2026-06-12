@@ -1543,17 +1543,14 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         .eq("user_id", currentUser.id)
         .eq("date", date)
         .eq("task", "（コメントのみ）")
-        .limit(1)
-        .single();
-      const existingComment = commentOnlyRec?.day_comment || "";
+        .maybeSingle();
+      const finalComment = dayComment || commentOnlyRec?.day_comment || "";
       await supabase
         .from("logs")
         .delete()
         .eq("user_id", currentUser.id)
         .eq("date", date)
         .eq("task", "（コメントのみ）");
-      // コメントを引き継ぐ（入力欄のコメントを優先）
-      const finalComment = dayComment || existingComment;
 
       const newLogs = valid.map((r) => ({
         user_id: currentUser.id,
@@ -1571,10 +1568,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         .from("logs")
         .insert(newLogs)
         .select();
-      if (error) {
-        alert("保存に失敗しました: " + error.message);
-        return;
-      }
+      if (error) { alert("保存に失敗しました: " + error.message); return; }
       onSave(
         (inserted || []).map((l) => ({
           id: l.id,
@@ -1593,6 +1587,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         })),
       );
     } else {
+      // 業務行なし → コメントのみ転記
       const { data: existing } = await supabase
         .from("logs")
         .select("id")
@@ -1605,16 +1600,8 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
           .update({ day_comment: dayComment })
           .eq("user_id", currentUser.id)
           .eq("date", date);
-        if (error) {
-          alert("保存に失敗しました: " + error.message);
-          return;
-        }
-        onSave([], {
-          date,
-          dayComment,
-          userId: currentUser.id,
-          user: currentUser.name,
-        });
+        if (error) { alert("保存に失敗しました: " + error.message); return; }
+        onSave([]);
       } else {
         const { data: inserted, error } = await supabase
           .from("logs")
@@ -1628,10 +1615,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
             day_comment: dayComment,
           })
           .select();
-        if (error) {
-          alert("保存に失敗しました: " + error.message);
-          return;
-        }
+        if (error) { alert("保存に失敗しました: " + error.message); return; }
         onSave(
           (inserted || []).map((l) => ({
             id: l.id,
