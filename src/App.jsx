@@ -1096,18 +1096,19 @@ function NewsWidget() {
     if (news[tab]) return;
     setLoading(true);
     const rssUrls = {
-      business: "https://feeds.reuters.com/reuters/JPBusinessNews",
-      sales: "https://rss.itmedia.co.jp/rss/2.0/topstory.xml",
-      okinawa: "https://www.okinawatimes.co.jp/rss/index.rdf",
+      business: "https://news.google.com/rss/search?q=ビジネス+経済&hl=ja&gl=JP&ceid=JP:ja",
+      sales: "https://news.google.com/rss/search?q=営業+小売+販売&hl=ja&gl=JP&ceid=JP:ja",
+      okinawa: "https://news.google.com/rss/search?q=沖縄&hl=ja&gl=JP&ceid=JP:ja",
     };
-    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[tab])}&count=5`)
+    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[tab])}&api_key=&count=5`)
       .then(r => r.json())
       .then(d => {
+        if (d.status !== "ok") throw new Error("fetch failed");
         const articles = (d.items || []).map(item => ({
           title: item.title,
           url: item.link,
           publishedAt: item.pubDate,
-          source: { name: item.author || d.feed?.title || "" },
+          source: { name: item.author || "" },
         }));
         setNews(p => ({ ...p, [tab]: articles }));
         setLoading(false);
