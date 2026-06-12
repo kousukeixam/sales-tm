@@ -4016,7 +4016,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
       .filter(([uid]) =>
         allUsers.find(
           (u) =>
-            u.id === parseInt(uid) &&
+            String(u.id) === String(uid) &&
             String(u.groupId) === String(currentUser.groupId),
         ),
       )
