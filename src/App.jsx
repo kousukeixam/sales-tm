@@ -2152,7 +2152,11 @@ function LogCard({
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(rec.managerComment || "");
-  const cat = CATEGORIES[rec.cat] || { color: "#94a3b8", bg: "#f8fafc", label: "その他" };
+  const cat = CATEGORIES[rec.cat] || {
+    color: "#94a3b8",
+    bg: "#f8fafc",
+    label: "その他",
+  };
   return (
     <div
       style={{
@@ -2970,7 +2974,9 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
         const recentCount = ml.filter((l) => new Date(l.date) >= since).length;
         const catCount = {};
         Object.keys(CATEGORIES).forEach((k) => (catCount[k] = 0));
-        ml.forEach((l) => { if (catCount[l.cat] !== undefined) catCount[l.cat]++; });
+        ml.forEach((l) => {
+          if (catCount[l.cat] !== undefined) catCount[l.cat]++;
+        });
         const topCat = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0];
         const g = groups.find((g) => g.id === member.groupId);
         return (
@@ -4696,59 +4702,6 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
             onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
             onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
           />
-        </div>
-
-        {/* memberのみ上司を表示（読み取り専用） */}
-        {currentUser.role === "member" && (
-          <div style={{ marginBottom: 14 }}>
-            <label
-              style={{
-                fontSize: 12,
-                color: "#64748b",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              上司
-            </label>
-            <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
-              {managers.find((u) => u.id === managerId)?.name || "未設定"}
-            </div>
-          </div>
-        )}
-
-        <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              fontSize: 12,
-              color: "#64748b",
-              display: "block",
-              marginBottom: 5,
-            }}
-          >
-            所属グループ
-          </label>
-          {/* superadmin と admin は自分でグループ変更可 */}
-          {isSA || currentUser.role === "admin" ? (
-            <select
-              value={groupId}
-              onChange={(e) => setGroupId(e.target.value)}
-              style={I}
-            >
-              <option value="">未所属</option>
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-          ) : (
-            // memberは読み取り専用
-            <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
-              {groups.find((g) => g.id === currentUser.group_id)?.name ||
-                "未所属"}
-            </div>
-          )}
         </div>
 
         {isSA && (
