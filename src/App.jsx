@@ -1536,13 +1536,24 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     if (!valid.length && !dayComment.trim()) return;
 
     if (valid.length > 0) {
-      // 同日の「（コメントのみ）」レコードがあれば削除
+      // 同日の「（コメントのみ）」レコードのコメントを取得してから削除
+      const { data: commentOnlyRec } = await supabase
+        .from("logs")
+        .select("day_comment")
+        .eq("user_id", currentUser.id)
+        .eq("date", date)
+        .eq("task", "（コメントのみ）")
+        .limit(1)
+        .single();
+      const existingComment = commentOnlyRec?.day_comment || "";
       await supabase
         .from("logs")
         .delete()
         .eq("user_id", currentUser.id)
         .eq("date", date)
         .eq("task", "（コメントのみ）");
+      // コメントを引き継ぐ（入力欄のコメントを優先）
+      const finalComment = dayComment || existingComment;
 
       const newLogs = valid.map((r) => ({
         user_id: currentUser.id,
@@ -1554,7 +1565,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         end_time: r.end,
         minutes: getMins(r.start, r.end),
         cat: r.cat,
-        day_comment: dayComment,
+        day_comment: finalComment,
       }));
       const { data: inserted, error } = await supabase
         .from("logs")
@@ -3119,7 +3130,7 @@ function LogListPage({
         })
         .sort(
           (a, b) =>
-            b.date.localeCompare(a.date) || a.start.localeCompare(b.start),
+            b.date.localeCompare(a.date) || (a.start || "").localeCompare(b.start || ""),
         ),
     [targetLogs, fd, fc, fk],
   );
