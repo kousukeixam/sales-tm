@@ -979,6 +979,169 @@ function MonthBar({ monthlyData }) {
     </div>
   );
 }
+function WeatherWidget() {
+  const [weather, setWeather] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (!navigator.geolocation) { setError("位置情報非対応"); return; }
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric&lang=ja`
+          );
+          const d = await res.json();
+          setWeather(d);
+        } catch { setError("取得失敗"); }
+      },
+      () => setError("位置情報の取得を許可してください")
+    );
+  }, []);
+  const icons = { "01d":"☀️","01n":"🌙","02d":"🌤","02n":"🌤","03d":"☁️","03n":"☁️","04d":"☁️","04n":"☁️","09d":"🌧","09n":"🌧","10d":"🌦","10n":"🌦","11d":"⛈","11n":"⛈","13d":"❄️","13n":"❄️","50d":"🌫","50n":"🌫" };
+  return (
+    <div style={{ ...C, flex: 1, minWidth: 200 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>🌤 今日の天気</div>
+      {error ? (
+        <div style={{ fontSize: 12, color: "#94a3b8" }}>{error}</div>
+      ) : !weather ? (
+        <div style={{ fontSize: 12, color: "#94a3b8" }}>取得中...</div>
+      ) : (
+        <div>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>{weather.name}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 36 }}>{icons[weather.weather[0].icon] || "🌡"}</span>
+            <div>
+              <div style={{ fontSize: 28, fontWeight: 700, color: "#1e293b" }}>{Math.round(weather.main.temp)}°C</div>
+              <div style={{ fontSize: 12, color: "#64748b" }}>{weather.weather[0].description}</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12, marginTop: 10, fontSize: 12, color: "#64748b" }}>
+            <span>💧 湿度 {weather.main.humidity}%</span>
+            <span>🌡 体感 {Math.round(weather.main.feels_like)}°C</span>
+            <span>💨 {Math.round(weather.wind.speed * 3.6)}km/h</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const QUOTES = [
+  { text: "成功とは、失敗を重ねても熱意を失わない能力である。", author: "ウィンストン・チャーチル" },
+  { text: "どんなに遠い道のりも、一歩から始まる。", author: "老子" },
+  { text: "今日できることを明日に延ばすな。", author: "ベンジャミン・フランクリン" },
+  { text: "夢を見るからこそ、人生は輝く。", author: "モーツァルト" },
+  { text: "困難な状況は、強い人間を作る。", author: "ロイ・T・ベネット" },
+  { text: "行動こそが、成功への唯一の道である。", author: "パブロ・ピカソ" },
+  { text: "小さな機会から、偉大なことが始まることが多い。", author: "デモステネス" },
+  { text: "人生で大切なのは、どこにいるかではなく、どこへ向かっているかだ。", author: "オリバー・ウェンデル・ホームズ" },
+  { text: "失敗は成功のもと。", author: "ことわざ" },
+  { text: "あなたの時間は限られている。他人の人生を生きて無駄にするな。", author: "スティーブ・ジョブズ" },
+  { text: "最大のリスクは、リスクを取らないことだ。", author: "マーク・ザッカーバーグ" },
+  { text: "やってみなければ、何もわからない。", author: "テオドア・ルーズベルト" },
+];
+
+function QuoteWidget() {
+  const quote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
+  return (
+    <div style={{ ...C, flex: 1, minWidth: 200 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>💬 今日の名言</div>
+      <div style={{ fontSize: 14, color: "#1e293b", lineHeight: 1.7, fontStyle: "italic", marginBottom: 8 }}>
+        「{quote.text}」
+      </div>
+      <div style={{ fontSize: 12, color: "#94a3b8", textAlign: "right" }}>— {quote.author}</div>
+    </div>
+  );
+}
+
+const TODAY_FACTS = [
+  { month: 1, day: 1, text: "元日。1872年、日本で太陽暦が採用された日。" },
+  { month: 1, day: 15, text: "1999年、Wikipediaの前身プロジェクトが開始された日。" },
+  { month: 2, day: 14, text: "バレンタインデー。269年、聖バレンタインが処刑された日とされる。" },
+  { month: 3, day: 3, text: "ひな祭り。女の子の健やかな成長を祈る日本の伝統行事。" },
+  { month: 4, day: 1, text: "エイプリルフール。嘘をついてもいい日として世界中で親しまれている。" },
+  { month: 5, day: 5, text: "こどもの日。1948年に国民の祝日として制定された。" },
+  { month: 6, day: 1, text: "気象記念日。1875年、東京気象台（現・気象庁）が設立された日。" },
+  { month: 7, day: 7, text: "七夕。織姫と彦星が年に一度会えるという日本の伝統行事。" },
+  { month: 8, day: 6, text: "広島平和記念日。1945年、広島に原子爆弾が投下された日。" },
+  { month: 9, day: 9, text: "重陽の節句。菊の節句とも呼ばれる中国由来の伝統行事。" },
+  { month: 10, day: 1, text: "コーヒーの日。国際コーヒー機関が制定した世界共通のコーヒーの記念日。" },
+  { month: 11, day: 3, text: "文化の日。1946年、日本国憲法が公布された日。" },
+  { month: 12, day: 25, text: "クリスマス。キリストの降誕を祝うキリスト教の祝祭日。" },
+];
+
+function TodayFactWidget() {
+  const today = new Date();
+  const fact = TODAY_FACTS.find(f => f.month === today.getMonth() + 1 && f.day === today.getDate())
+    || { text: `今日は${today.getMonth() + 1}月${today.getDate()}日。今日も一日頑張りましょう！` };
+  return (
+    <div style={{ ...C, flex: 1, minWidth: 200 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>📅 今日は何の日？</div>
+      <div style={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>{fact.text}</div>
+    </div>
+  );
+}
+
+function NewsWidget() {
+  const [tab, setTab] = useState("business");
+  const [news, setNews] = useState({});
+  const [loading, setLoading] = useState(false);
+  const tabs = [
+    { id: "business", label: "💼 ビジネス", q: "ビジネス 経済" },
+    { id: "sales", label: "🛒 営業・小売", q: "営業 小売 販売" },
+    { id: "okinawa", label: "🌺 沖縄", q: "沖縄" },
+  ];
+  useEffect(() => {
+    if (news[tab]) return;
+    setLoading(true);
+    fetch(`https://gnews.io/api/v4/search?q=${encodeURIComponent(tabs.find(t => t.id === tab).q)}&lang=ja&max=5&apikey=${import.meta.env.VITE_GNEWS_API_KEY}`)
+      .then(r => r.json())
+      .then(d => {
+        setNews(p => ({ ...p, [tab]: d.articles || [] }));
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [tab]);
+  return (
+    <div style={{ ...C, marginBottom: 20 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 12 }}>📰 ビジネスニュース</div>
+      <div style={{ display: "flex", gap: 4, marginBottom: 14, flexWrap: "wrap" }}>
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)} style={{
+            padding: "5px 12px", borderRadius: 20, border: "none", cursor: "pointer",
+            fontSize: 12, fontWeight: tab === t.id ? 600 : 400, fontFamily: "inherit",
+            background: tab === t.id ? "#3B82F6" : "#f1f5f9",
+            color: tab === t.id ? "#fff" : "#64748b",
+          }}>{t.label}</button>
+        ))}
+      </div>
+      {loading ? (
+        <div style={{ fontSize: 12, color: "#94a3b8", padding: "16px 0" }}>読み込み中...</div>
+      ) : (news[tab] || []).length === 0 ? (
+        <div style={{ fontSize: 12, color: "#94a3b8", padding: "16px 0" }}>ニュースを取得できませんでした</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {(news[tab] || []).map((a, i) => (
+            <a key={i} href={a.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+              <div style={{
+                padding: "10px 12px", borderRadius: 10, border: "1px solid #e2e8f0",
+                background: "#fafafa", transition: "all 0.15s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "#3B82F6"; e.currentTarget.style.background = "#EFF6FF"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.background = "#fafafa"; }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", lineHeight: 1.5, marginBottom: 4 }}>{a.title}</div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                  {a.source?.name} · {new Date(a.publishedAt).toLocaleDateString("ja-JP")}
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SummaryPanel({ logs, subtitle }) {
   const today = new Date();
@@ -7254,7 +7417,15 @@ export default function App() {
               return grp ? grp.name : isAdmin ? "チーム" : null;
             })();
             return (
-              <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
+              <div>
+                <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+                  <WeatherWidget />
+                  <QuoteWidget />
+                  <TodayFactWidget />
+                </div>
+                <NewsWidget />
+                <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
+              </div>
             );
           })()}
         {page === "report" && (
