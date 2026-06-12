@@ -1436,11 +1436,8 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
           .update({ day_comment: dayComment })
           .eq("user_id", currentUser.id)
           .eq("date", date);
-        if (error) {
-          alert("保存に失敗しました: " + error.message);
-          return;
-        }
-        onSave([]);
+        if (error) { alert("保存に失敗しました: " + error.message); return; }
+        onSave([], { date, dayComment, userId: currentUser.id, user: currentUser.name });
       } else {
         const { data: inserted, error } = await supabase
           .from("logs")
