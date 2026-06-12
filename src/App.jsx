@@ -1100,15 +1100,18 @@ function NewsWidget() {
       sales: "https://news.google.com/rss/search?q=営業+小売+販売&hl=ja&gl=JP&ceid=JP:ja",
       okinawa: "https://news.google.com/rss/search?q=沖縄&hl=ja&gl=JP&ceid=JP:ja",
     };
-    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[tab])}&api_key=&count=5`)
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrls[tab])}`;
+    fetch(proxyUrl)
       .then(r => r.json())
       .then(d => {
-        if (d.status !== "ok") throw new Error("fetch failed");
-        const articles = (d.items || []).map(item => ({
-          title: item.title,
-          url: item.link,
-          publishedAt: item.pubDate,
-          source: { name: item.author || "" },
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(d.contents, "text/xml");
+        const items = Array.from(xml.querySelectorAll("item")).slice(0, 5);
+        const articles = items.map(item => ({
+          title: item.querySelector("title")?.textContent || "",
+          url: item.querySelector("link")?.textContent || "",
+          publishedAt: item.querySelector("pubDate")?.textContent || "",
+          source: { name: "" },
         }));
         setNews(p => ({ ...p, [tab]: articles }));
         setLoading(false);
