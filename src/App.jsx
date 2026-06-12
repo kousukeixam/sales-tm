@@ -2970,7 +2970,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
         const recentCount = ml.filter((l) => new Date(l.date) >= since).length;
         const catCount = {};
         Object.keys(CATEGORIES).forEach((k) => (catCount[k] = 0));
-        ml.forEach((l) => catCount[l.cat]++);
+        ml.forEach((l) => { if (catCount[l.cat] !== undefined) catCount[l.cat]++; });
         const topCat = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0];
         const g = groups.find((g) => g.id === member.groupId);
         return (
