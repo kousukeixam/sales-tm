@@ -7358,12 +7358,12 @@ export default function App() {
             })();
             return (
               <div>
-                <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+                <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
+                <div style={{ display: "flex", gap: 16, marginTop: 20, flexWrap: "wrap" }}>
                   <WeatherWidget />
                   <QuoteWidget />
                   <TodayFactWidget />
                 </div>
-                <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
               </div>
             );
           })()}
