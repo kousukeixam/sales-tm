@@ -1096,8 +1096,8 @@ function NewsWidget() {
     if (news[tab]) return;
     setLoading(true);
     const rssUrls = {
-      business: "https://rss.itmedia.co.jp/rss/2.0/business.xml",
-      sales: "https://rss.itmedia.co.jp/rss/2.0/enterprise.xml",
+      business: "https://feeds.reuters.com/reuters/JPBusinessNews",
+      sales: "https://rss.itmedia.co.jp/rss/2.0/topstory.xml",
       okinawa: "https://www.okinawatimes.co.jp/rss/index.rdf",
     };
     fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrls[tab])}&count=5`)
