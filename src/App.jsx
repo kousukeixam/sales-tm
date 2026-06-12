@@ -1477,6 +1477,8 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         );
       }
     }
+    setRows([newRow(), newRow(), newRow()]);
+    setDayComment("");
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
