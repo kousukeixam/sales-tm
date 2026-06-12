@@ -1275,47 +1275,105 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   const totalMins = rows.reduce((s, r) => s + getMins(r.start, r.end), 0);
   const [savedComment, setSavedComment] = useState(false);
 
-  // 業務行＋振り返りコメントをまとめて転記
+  // 転記（業務行があれば行＋コメント、なければコメントのみ）
   const handleSave = async () => {
     const valid = rows.filter(
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
     );
     if (!valid.length && !dayComment.trim()) return;
 
-    const newLogs = valid.map((r) => ({
-      user_id: currentUser.id,
-      user_name: currentUser.name,
-      date,
-      task: r.task,
-      detail: r.detail,
-      start_time: r.start,
-      end_time: r.end,
-      minutes: getMins(r.start, r.end),
-      cat: r.cat,
-      day_comment: dayComment,
-    }));
-
-    const { error } = await supabase.from("logs").insert(newLogs);
-    if (error) {
-      alert("保存に失敗しました: " + error.message);
-      return;
-    }
-
-    onSave(
-      valid.map((r) => ({
+    if (valid.length > 0) {
+      const newLogs = valid.map((r) => ({
+        user_id: currentUser.id,
+        user_name: currentUser.name,
         date,
         task: r.task,
         detail: r.detail,
-        start: r.start,
-        end: r.end,
+        start_time: r.start,
+        end_time: r.end,
         minutes: getMins(r.start, r.end),
         cat: r.cat,
-        user: currentUser.name,
-        managerComment: "",
-        managerDayComment: "",
-        dayComment,
-      })),
-    );
+        day_comment: dayComment,
+      }));
+      const { data: inserted, error } = await supabase
+        .from("logs")
+        .insert(newLogs)
+        .select();
+      if (error) {
+        alert("保存に失敗しました: " + error.message);
+        return;
+      }
+      onSave(
+        (inserted || []).map((l) => ({
+          id: l.id,
+          date: l.date,
+          task: l.task,
+          detail: l.detail,
+          start: l.start_time,
+          end: l.end_time,
+          minutes: l.minutes,
+          cat: l.cat,
+          user: l.user_name,
+          userId: l.user_id,
+          managerComment: "",
+          managerDayComment: "",
+          dayComment: l.day_comment || "",
+        })),
+      );
+    } else {
+      const { data: existing } = await supabase
+        .from("logs")
+        .select("id")
+        .eq("user_id", currentUser.id)
+        .eq("date", date)
+        .limit(1);
+      if (existing && existing.length > 0) {
+        const { error } = await supabase
+          .from("logs")
+          .update({ day_comment: dayComment })
+          .eq("user_id", currentUser.id)
+          .eq("date", date);
+        if (error) {
+          alert("保存に失敗しました: " + error.message);
+          return;
+        }
+        onSave([]);
+      } else {
+        const { data: inserted, error } = await supabase
+          .from("logs")
+          .insert({
+            user_id: currentUser.id,
+            user_name: currentUser.name,
+            date,
+            task: "（コメントのみ）",
+            minutes: 0,
+            cat: "other",
+            day_comment: dayComment,
+          })
+          .select();
+        if (error) {
+          alert("保存に失敗しました: " + error.message);
+          return;
+        }
+        onSave(
+          (inserted || []).map((l) => ({
+            id: l.id,
+            date: l.date,
+            task: l.task,
+            detail: l.detail || "",
+            start: l.start_time || "",
+            end: l.end_time || "",
+            minutes: l.minutes,
+            cat: l.cat,
+            user: l.user_name,
+            userId: l.user_id,
+            managerComment: "",
+            managerDayComment: "",
+            dayComment: l.day_comment || "",
+          })),
+        );
+      }
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -1454,29 +1512,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
             ) : (
               <>
                 <Icon name="save" size={16} />
-                記録を転記
-              </>
-            )}
-          </button>
-          <button
-            onClick={handleSaveCommentOnly}
-            style={{
-              ...BP,
-              background: savedComment
-                ? "linear-gradient(135deg,#10B981,#059669)"
-                : "linear-gradient(135deg,#8B5CF6,#6366F1)",
-              boxShadow: "0 2px 8px rgba(139,92,246,0.3)",
-            }}
-          >
-            {savedComment ? (
-              <>
-                <Icon name="check" size={16} />
-                保存しました！
-              </>
-            ) : (
-              <>
-                <Icon name="msg" size={16} />
-                コメントのみ転記
+                転記する
               </>
             )}
           </button>
@@ -4149,9 +4185,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           </div>
         </div>
         {[
-          ["Todo", totalByStatus.todo, "#64748b"],
-          ["In Progress", totalByStatus.prog, "#3B82F6"],
-          ["Done", totalByStatus.done, "#10B981"],
+          ["未着手", totalByStatus.todo, "#64748b"],
+          ["進行中", totalByStatus.prog, "#3B82F6"],
+          ["完了", totalByStatus.done, "#10B981"],
           ["合計", totalByStatus.total, "#1e293b"],
         ].map(([l, v, c]) => (
           <div
