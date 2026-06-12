@@ -2925,9 +2925,10 @@ function LogListPage({
   onEditLog,
   filterUser,
 }) {
-  const targetLogs = filterUser
+  const targetLogs = (filterUser
     ? logs.filter((l) => l.user === filterUser)
-    : logs.filter((l) => l.user === currentUser.name);
+    : logs.filter((l) => l.user === currentUser.name)
+  ).filter((l) => l.task !== "（コメントのみ）");
   const [fd, setFd] = useState("");
   const [fk, setFk] = useState("");
   const [fc, setFc] = useState("");
