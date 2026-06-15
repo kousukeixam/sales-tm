@@ -8129,6 +8129,7 @@ export default function App() {
         {page === "announcement" && (
           <AnnouncementPage currentUser={currentUser} groups={groups} isSA={isSA} />
         )}
+        {page === "ranking" && (
           <RankingPage logs={logs} users={users} currentUser={currentUser} />
         )}
         {page === "feedback" && !isSA && (
