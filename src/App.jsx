@@ -1568,7 +1568,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         .from("logs")
         .insert(newLogs)
         .select();
-      if (error) { alert("保存に失敗しました: " + error.message); return; }
+      if (error) {
+        alert("保存に失敗しました: " + error.message);
+        return;
+      }
       onSave(
         (inserted || []).map((l) => ({
           id: l.id,
@@ -1600,7 +1603,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
           .update({ day_comment: dayComment })
           .eq("user_id", currentUser.id)
           .eq("date", date);
-        if (error) { alert("保存に失敗しました: " + error.message); return; }
+        if (error) {
+          alert("保存に失敗しました: " + error.message);
+          return;
+        }
         onSave([]);
       } else {
         const { data: inserted, error } = await supabase
@@ -1615,7 +1621,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
             day_comment: dayComment,
           })
           .select();
-        if (error) { alert("保存に失敗しました: " + error.message); return; }
+        if (error) {
+          alert("保存に失敗しました: " + error.message);
+          return;
+        }
         onSave(
           (inserted || []).map((l) => ({
             id: l.id,
@@ -3114,7 +3123,8 @@ function LogListPage({
         })
         .sort(
           (a, b) =>
-            b.date.localeCompare(a.date) || (a.start || "").localeCompare(b.start || ""),
+            b.date.localeCompare(a.date) ||
+            (a.start || "").localeCompare(b.start || ""),
         ),
     [targetLogs, fd, fc, fk],
   );
@@ -6425,6 +6435,235 @@ function SuperAdminPage({
     </div>
   );
 }
+function RankingPage({ logs, users, currentUser }) {
+  const [period, setPeriod] = useState("month");
+
+  const getRange = () => {
+    const today = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const todayStr = today.toISOString().split("T")[0];
+    if (period === "day") return { from: todayStr, to: todayStr };
+    if (period === "week") {
+      const dow = today.getDay();
+      const mon = new Date(today);
+      mon.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+      const sun = new Date(mon);
+      sun.setDate(mon.getDate() + 6);
+      return {
+        from: mon.toISOString().split("T")[0],
+        to: sun.toISOString().split("T")[0],
+      };
+    }
+    const first = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-01`;
+    const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return {
+      from: first,
+      to: `${last.getFullYear()}-${pad(last.getMonth() + 1)}-${pad(last.getDate())}`,
+    };
+  };
+
+  const ranking = useMemo(() => {
+    const { from, to } = getRange();
+    const filtered = logs.filter(
+      (l) => l.date >= from && l.date <= to && l.task !== "（コメントのみ）",
+    );
+    const countMap = {};
+    filtered.forEach((l) => {
+      if (!countMap[l.userId]) countMap[l.userId] = 0;
+      countMap[l.userId]++;
+    });
+    return users
+      .filter((u) => u.role !== "superadmin")
+      .map((u) => ({ ...u, count: countMap[u.id] || 0 }))
+      .sort((a, b) => b.count - a.count);
+  }, [logs, users, period]);
+
+  const medals = ["🥇", "🥈", "🥉"];
+  const periodLabel = { day: "今日", week: "今週", month: "今月" };
+
+  return (
+    <div style={{ maxWidth: 640 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 4,
+          marginBottom: 20,
+          background: "#fff",
+          borderRadius: 12,
+          padding: 6,
+          border: "1px solid #e2e8f0",
+          width: "fit-content",
+        }}
+      >
+        {[
+          ["day", "今日"],
+          ["week", "今週"],
+          ["month", "今月"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            onClick={() => setPeriod(id)}
+            style={{
+              padding: "7px 20px",
+              borderRadius: 8,
+              border: "none",
+              cursor: "pointer",
+              fontSize: 13,
+              fontWeight: period === id ? 600 : 400,
+              fontFamily: "inherit",
+              background: period === id ? "#3B82F6" : "transparent",
+              color: period === id ? "#fff" : "#64748b",
+              transition: "all 0.15s",
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {ranking.map((u, i) => {
+          const isMe = u.id === currentUser.id;
+          const rank = i + 1;
+          const medal = medals[i] || null;
+          const avatarBg =
+            u.role === "admin"
+              ? "linear-gradient(135deg,#F59E0B,#EF4444)"
+              : "linear-gradient(135deg,#3B82F6,#8B5CF6)";
+          const maxCount = ranking[0]?.count || 1;
+
+          return (
+            <div
+              key={u.id}
+              style={{
+                background: isMe ? "#EFF6FF" : "#fff",
+                borderRadius: 14,
+                border: `1px solid ${isMe ? "#BFDBFE" : "#e2e8f0"}`,
+                padding: "14px 18px",
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                boxShadow:
+                  rank <= 3 && u.count > 0
+                    ? "0 2px 8px rgba(0,0,0,0.07)"
+                    : "none",
+              }}
+            >
+              <div style={{ width: 32, textAlign: "center", flexShrink: 0 }}>
+                {medal && u.count > 0 ? (
+                  <span style={{ fontSize: 22 }}>{medal}</span>
+                ) : (
+                  <span
+                    style={{ fontSize: 15, fontWeight: 700, color: "#94a3b8" }}
+                  >
+                    {rank}
+                  </span>
+                )}
+              </div>
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  flexShrink: 0,
+                  background: avatarBg,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontSize: 15,
+                  fontWeight: 700,
+                }}
+              >
+                {u.name[0]}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 6,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 14,
+                      fontWeight: isMe ? 700 : 600,
+                      color: "#1e293b",
+                    }}
+                  >
+                    {u.name}
+                  </span>
+                  {isMe && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        background: "#3B82F6",
+                        color: "#fff",
+                        padding: "1px 7px",
+                        borderRadius: 10,
+                        fontWeight: 600,
+                      }}
+                    >
+                      あなた
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    height: 6,
+                    background: "#f1f5f9",
+                    borderRadius: 3,
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      borderRadius: 3,
+                      background:
+                        rank === 1
+                          ? "#F59E0B"
+                          : rank === 2
+                            ? "#94a3b8"
+                            : rank === 3
+                              ? "#CD7F32"
+                              : isMe
+                                ? "#3B82F6"
+                                : "#cbd5e1",
+                      width: `${maxCount > 0 ? (u.count / maxCount) * 100 : 0}%`,
+                      transition: "width 0.6s",
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 700,
+                    color: rank === 1 && u.count > 0 ? "#F59E0B" : "#1e293b",
+                  }}
+                >
+                  {u.count}
+                </div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>件</div>
+              </div>
+            </div>
+          );
+        })}
+        {ranking.length === 0 && (
+          <div
+            style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+          >
+            データがありません
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function FeedbackPage({ currentUser }) {
   const [title, setTitle] = useState("");
@@ -7169,6 +7408,7 @@ export default function App() {
     { id: "mypage", label: "マイページ", icon: "person" },
     ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
     ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
+    { id: "ranking", label: "🏆 ランキング", icon: "chart" },
     { id: "board", label: "ボード", icon: "board" },
     // 👇 追加（管理者と上司のみ表示）
     ...(isAdmin || isSA
@@ -7184,6 +7424,7 @@ export default function App() {
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
     superadmin: "システム管理",
+    ranking: "ランキング",
     feedback: "意見・要望",
     feedbackAdmin: "意見箱",
   };
@@ -7199,6 +7440,7 @@ export default function App() {
     member_detail:
       "ダッシュボードと記録一覧・コメント入力を切り替えて確認できます",
     superadmin: "ユーザー・グループ管理・CSVエクスポート（管理者専用）",
+    ranking: "今日・今週・今月の活動ランキング",
     feedback: "管理者への意見・要望を送信できます",
     feedbackAdmin: "メンバーからの意見・要望を確認できます",
   };
@@ -7518,36 +7760,92 @@ export default function App() {
               const [dashFilter, setDashFilter] = useState("self");
               const filterTabs = [
                 { id: "self", label: "自分" },
-                { id: "mygroup", label: groups.find(g => String(g.id) === String(currentUser.groupId))?.name || "所属部署" },
-                ...groups.filter(g => String(g.id) !== String(currentUser.groupId)).map(g => ({ id: `group_${g.id}`, label: g.name })),
+                {
+                  id: "mygroup",
+                  label:
+                    groups.find(
+                      (g) => String(g.id) === String(currentUser.groupId),
+                    )?.name || "所属部署",
+                },
+                ...groups
+                  .filter((g) => String(g.id) !== String(currentUser.groupId))
+                  .map((g) => ({ id: `group_${g.id}`, label: g.name })),
                 { id: "all", label: "全体" },
               ];
               const dashboardLogs = (() => {
-                if (dashFilter === "self") return logs.filter(l => l.userId === currentUser.id);
+                if (dashFilter === "self")
+                  return logs.filter((l) => l.userId === currentUser.id);
                 if (dashFilter === "all") return logs;
                 if (dashFilter === "mygroup") {
-                  const ids = new Set(users.filter(u => String(u.groupId) === String(currentUser.groupId)).map(u => u.id));
-                  return logs.filter(l => ids.has(l.userId));
+                  const ids = new Set(
+                    users
+                      .filter(
+                        (u) =>
+                          String(u.groupId) === String(currentUser.groupId),
+                      )
+                      .map((u) => u.id),
+                  );
+                  return logs.filter((l) => ids.has(l.userId));
                 }
                 const gid = dashFilter.replace("group_", "");
-                const ids = new Set(users.filter(u => String(u.groupId) === gid).map(u => u.id));
-                return logs.filter(l => ids.has(l.userId));
+                const ids = new Set(
+                  users
+                    .filter((u) => String(u.groupId) === gid)
+                    .map((u) => u.id),
+                );
+                return logs.filter((l) => ids.has(l.userId));
               })();
-              const dashboardSubtitle = filterTabs.find(t => t.id === dashFilter)?.label || "";
+              const dashboardSubtitle =
+                filterTabs.find((t) => t.id === dashFilter)?.label || "";
               return (
                 <div>
-                  <div style={{ display: "flex", gap: 4, marginBottom: 20, flexWrap: "wrap", background: "#fff", borderRadius: 12, padding: 6, border: "1px solid #e2e8f0", width: "fit-content" }}>
-                    {filterTabs.map(t => (
-                      <button key={t.id} onClick={() => setDashFilter(t.id)} style={{
-                        padding: "7px 16px", borderRadius: 8, border: "none", cursor: "pointer",
-                        fontSize: 13, fontWeight: dashFilter === t.id ? 600 : 400, fontFamily: "inherit",
-                        background: dashFilter === t.id ? "#3B82F6" : "transparent",
-                        color: dashFilter === t.id ? "#fff" : "#64748b", transition: "all 0.15s",
-                      }}>{t.label}</button>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 4,
+                      marginBottom: 20,
+                      flexWrap: "wrap",
+                      background: "#fff",
+                      borderRadius: 12,
+                      padding: 6,
+                      border: "1px solid #e2e8f0",
+                      width: "fit-content",
+                    }}
+                  >
+                    {filterTabs.map((t) => (
+                      <button
+                        key={t.id}
+                        onClick={() => setDashFilter(t.id)}
+                        style={{
+                          padding: "7px 16px",
+                          borderRadius: 8,
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: 13,
+                          fontWeight: dashFilter === t.id ? 600 : 400,
+                          fontFamily: "inherit",
+                          background:
+                            dashFilter === t.id ? "#3B82F6" : "transparent",
+                          color: dashFilter === t.id ? "#fff" : "#64748b",
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        {t.label}
+                      </button>
                     ))}
                   </div>
-                  <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
-                  <div style={{ display: "flex", gap: 16, marginTop: 20, flexWrap: "wrap" }}>
+                  <SummaryPanel
+                    logs={dashboardLogs}
+                    subtitle={dashboardSubtitle}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 16,
+                      marginTop: 20,
+                      flexWrap: "wrap",
+                    }}
+                  >
                     <WeatherWidget />
                     <QuoteWidget />
                     <TodayFactWidget />
@@ -7621,6 +7919,9 @@ export default function App() {
             logs={logs}
             onRefreshUsers={refreshUsers}
           />
+        )}
+        {page === "ranking" && (
+          <RankingPage logs={logs} users={users} currentUser={currentUser} />
         )}
         {page === "feedback" && !isSA && (
           <FeedbackPage currentUser={currentUser} />
