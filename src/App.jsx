@@ -7608,7 +7608,7 @@ export default function App() {
       : []),
     { id: "board", label: "ボード", icon: "board" },
     { id: "announcement", label: "📣 お知らせ", icon: "msg" },
-    { id: "ranking", label: "🏆 ランキング", icon: "chart" },{ id: "ranking", label: "🏆 ランキング", icon: "chart" },
+    { id: "ranking", label: "🏆 ランキング", icon: "chart" },
     { id: "mypage", label: "マイページ", icon: "person" },
     ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
     ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
