@@ -6665,6 +6665,210 @@ function RankingPage({ logs, users, currentUser }) {
   );
 }
 
+function AnnouncementPage({ currentUser, groups, isSA }) {
+  const [announcements, setAnnouncements] = useState([]);
+  const [reads, setReads] = useState(new Set());
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ title: "", content: "", priority: "normal", target_group_id: "" });
+  const [posting, setPosting] = useState(false);
+  const [ok, setOk] = useState("");
+  const [editId, setEditId] = useState(null);
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      const { data: ann } = await supabase.from("announcements").select("*").order("created_at", { ascending: false });
+      const { data: rd } = await supabase.from("announcement_reads").select("announcement_id").eq("user_id", currentUser.id);
+      if (ann) setAnnouncements(ann);
+      if (rd) setReads(new Set(rd.map(r => r.announcement_id)));
+      setLoading(false);
+    };
+    fetchAll();
+  }, []);
+
+  const markRead = async (id) => {
+    if (reads.has(id)) return;
+    await supabase.from("announcement_reads").insert({ announcement_id: id, user_id: currentUser.id });
+    setReads(p => new Set([...p, id]));
+  };
+
+  const handlePost = async () => {
+    if (!form.title || !form.content) return;
+    setPosting(true);
+    if (editId) {
+      const { error } = await supabase.from("announcements").update({
+        title: form.title, content: form.content,
+        priority: form.priority,
+        target_group_id: form.target_group_id ? parseInt(form.target_group_id) : null,
+      }).eq("id", editId);
+      if (!error) {
+        setAnnouncements(p => p.map(a => a.id === editId ? { ...a, ...form, target_group_id: form.target_group_id ? parseInt(form.target_group_id) : null } : a));
+        setOk("更新しました！");
+      }
+      setEditId(null);
+    } else {
+      const { data, error } = await supabase.from("announcements").insert({
+        title: form.title, content: form.content,
+        priority: form.priority,
+        target_group_id: form.target_group_id ? parseInt(form.target_group_id) : null,
+        created_by: currentUser.id,
+      }).select().single();
+      if (!error && data) {
+        setAnnouncements(p => [data, ...p]);
+        setOk("投稿しました！");
+      }
+    }
+    setForm({ title: "", content: "", priority: "normal", target_group_id: "" });
+    setPosting(false);
+    setTimeout(() => setOk(""), 2000);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("このお知らせを削除しますか？")) return;
+    await supabase.from("announcements").delete().eq("id", id);
+    setAnnouncements(p => p.filter(a => a.id !== id));
+  };
+
+  const priorityStyle = {
+    normal: { bg: "#EFF6FF", color: "#1D4ED8", border: "#BFDBFE", label: "通常" },
+    important: { bg: "#FEF3C7", color: "#D97706", border: "#FDE68A", label: "重要" },
+    urgent: { bg: "#FEF2F2", color: "#991B1B", border: "#FECACA", label: "🚨 緊急" },
+  };
+
+  const visibleAnnouncements = announcements.filter(a => {
+    if (!a.target_group_id) return true;
+    return String(a.target_group_id) === String(currentUser.groupId) || isSA;
+  });
+
+  const unreadCount = visibleAnnouncements.filter(a => !reads.has(a.id)).length;
+
+  return (
+    <div>
+      {isSA && (
+        <div style={{ ...C, marginBottom: 20 }}>
+          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#1e293b" }}>
+            {editId ? "お知らせを編集" : "お知らせを投稿"}
+          </h3>
+          {ok && (
+            <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13 }}>
+              {ok}
+            </div>
+          )}
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>タイトル</label>
+            <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="お知らせのタイトル" style={I} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>本文</label>
+            <textarea value={form.content} onChange={e => setForm(p => ({ ...p, content: e.target.value }))} rows={4} placeholder="お知らせの内容を入力..." style={{ ...I, resize: "vertical", minHeight: 80, lineHeight: 1.6 }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+            <div>
+              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>重要度</label>
+              <select value={form.priority} onChange={e => setForm(p => ({ ...p, priority: e.target.value }))} style={I}>
+                <option value="normal">通常</option>
+                <option value="important">重要</option>
+                <option value="urgent">🚨 緊急</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>対象グループ</label>
+              <select value={form.target_group_id} onChange={e => setForm(p => ({ ...p, target_group_id: e.target.value }))} style={I}>
+                <option value="">全員</option>
+                {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={handlePost} disabled={posting || !form.title || !form.content} style={{ ...BP, opacity: posting || !form.title || !form.content ? 0.4 : 1 }}>
+              <Icon name="msg" size={14} />
+              {editId ? "更新する" : "投稿する"}
+            </button>
+            {editId && (
+              <button onClick={() => { setEditId(null); setForm({ title: "", content: "", priority: "normal", target_group_id: "" }); }} style={BB}>
+                キャンセル
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div style={{ ...C, marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>お知らせ一覧</div>
+        {unreadCount > 0 && (
+          <span style={{ background: "#EF4444", color: "#fff", fontSize: 12, fontWeight: 700, padding: "2px 10px", borderRadius: 20 }}>
+            未読 {unreadCount}件
+          </span>
+        )}
+      </div>
+
+      {loading ? (
+        <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>読み込み中...</div>
+      ) : visibleAnnouncements.length === 0 ? (
+        <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>お知らせはありません</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {visibleAnnouncements.map(a => {
+            const ps = priorityStyle[a.priority] || priorityStyle.normal;
+            const isRead = reads.has(a.id);
+            const targetGroup = groups.find(g => g.id === a.target_group_id);
+            return (
+              <div key={a.id} onClick={() => markRead(a.id)} style={{
+                ...C,
+                borderLeft: `4px solid ${isRead ? "#e2e8f0" : ps.border}`,
+                cursor: "pointer",
+                opacity: isRead ? 0.85 : 1,
+              }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 9px", borderRadius: 20, background: ps.bg, color: ps.color, border: `1px solid ${ps.border}` }}>
+                        {ps.label}
+                      </span>
+                      {targetGroup && (
+                        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 20, background: "#f1f5f9", color: "#64748b", border: "1px solid #e2e8f0" }}>
+                          🏢 {targetGroup.name}
+                        </span>
+                      )}
+                      {!targetGroup && (
+                        <span style={{ fontSize: 11, padding: "2px 9px", borderRadius: 20, background: "#f1f5f9", color: "#64748b", border: "1px solid #e2e8f0" }}>
+                          👥 全員
+                        </span>
+                      )}
+                      {!isRead && (
+                        <span style={{ fontSize: 10, background: "#EF4444", color: "#fff", padding: "1px 7px", borderRadius: 10, fontWeight: 700 }}>NEW</span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1e293b", marginBottom: 8 }}>{a.title}</div>
+                    <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{a.content}</div>
+                  </div>
+                  {isSA && (
+                    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                      <button onClick={e => { e.stopPropagation(); setEditId(a.id); setForm({ title: a.title, content: a.content, priority: a.priority, target_group_id: a.target_group_id ? String(a.target_group_id) : "" }); }}
+                        style={{ ...BB, padding: "4px 10px", fontSize: 12, gap: 4 }}>
+                        <Icon name="edit" size={12} />編集
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); handleDelete(a.id); }}
+                        style={{ ...BB, padding: "4px 10px", fontSize: 12, gap: 4, color: "#EF4444", borderColor: "#FECACA" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "#FEF2F2"}
+                        onMouseLeave={e => e.currentTarget.style.background = "#fff"}>
+                        <Icon name="trash" size={12} />削除
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div style={{ fontSize: 11, color: "#94a3b8", textAlign: "right" }}>
+                  {new Date(a.created_at).toLocaleString("ja-JP")}
+                  {isRead && <span style={{ marginLeft: 8 }}>✓ 既読</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FeedbackPage({ currentUser }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -7403,7 +7607,8 @@ export default function App() {
       ? [{ id: "team", label: "部下の記録", icon: "users" }]
       : []),
     { id: "board", label: "ボード", icon: "board" },
-    { id: "ranking", label: "🏆 ランキング", icon: "chart" },
+    { id: "announcement", label: "📣 お知らせ", icon: "msg" },
+    { id: "ranking", label: "🏆 ランキング", icon: "chart" },{ id: "ranking", label: "🏆 ランキング", icon: "chart" },
     { id: "mypage", label: "マイページ", icon: "person" },
     ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
     ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
@@ -7423,6 +7628,7 @@ export default function App() {
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
     superadmin: "システム管理",
+    announcement: "お知らせ",
     ranking: "ランキング",
     feedback: "意見・要望",
     feedbackAdmin: "意見箱",
@@ -7439,6 +7645,7 @@ export default function App() {
     member_detail:
       "ダッシュボードと記録一覧・コメント入力を切り替えて確認できます",
     superadmin: "ユーザー・グループ管理・CSVエクスポート（管理者専用）",
+    announcement: "お知らせを確認できます",
     ranking: "今日・今週・今月の活動ランキング",
     feedback: "管理者への意見・要望を送信できます",
     feedbackAdmin: "メンバーからの意見・要望を確認できます",
@@ -7919,7 +8126,9 @@ export default function App() {
             onRefreshUsers={refreshUsers}
           />
         )}
-        {page === "ranking" && (
+        {page === "announcement" && (
+          <AnnouncementPage currentUser={currentUser} groups={groups} isSA={isSA} />
+        )}
           <RankingPage logs={logs} users={users} currentUser={currentUser} />
         )}
         {page === "feedback" && !isSA && (
