@@ -7514,44 +7514,48 @@ export default function App() {
         )}
         {page === "dashboard" &&
           (() => {
-            // 自分の部署に所属するユーザーIDセットを作成
-            const myGroupUserIds = new Set(
-              users
-                .filter(
-                  (u) => String(u.groupId) === String(currentUser.groupId),
-                )
-                .map((u) => u.id),
-            );
-            const dashboardLogs = isSA
-              ? logs // superadminは全件
-              : logs.filter((l) => myGroupUserIds.has(l.userId));
-            const dashboardSubtitle = (() => {
-              if (isSA) return "全体";
-              const grp = groups.find(
-                (g) => String(g.id) === String(currentUser.groupId),
-              );
-              return grp ? grp.name : isAdmin ? "チーム" : null;
-            })();
-            return (
-              <div>
-                <SummaryPanel
-                  logs={dashboardLogs}
-                  subtitle={dashboardSubtitle}
-                />
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 16,
-                    marginTop: 20,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <WeatherWidget />
-                  <QuoteWidget />
-                  <TodayFactWidget />
+            const DashboardWithFilter = () => {
+              const [dashFilter, setDashFilter] = useState("self");
+              const filterTabs = [
+                { id: "self", label: "自分" },
+                { id: "mygroup", label: groups.find(g => String(g.id) === String(currentUser.groupId))?.name || "所属部署" },
+                ...groups.filter(g => String(g.id) !== String(currentUser.groupId)).map(g => ({ id: `group_${g.id}`, label: g.name })),
+                { id: "all", label: "全体" },
+              ];
+              const dashboardLogs = (() => {
+                if (dashFilter === "self") return logs.filter(l => l.userId === currentUser.id);
+                if (dashFilter === "all") return logs;
+                if (dashFilter === "mygroup") {
+                  const ids = new Set(users.filter(u => String(u.groupId) === String(currentUser.groupId)).map(u => u.id));
+                  return logs.filter(l => ids.has(l.userId));
+                }
+                const gid = dashFilter.replace("group_", "");
+                const ids = new Set(users.filter(u => String(u.groupId) === gid).map(u => u.id));
+                return logs.filter(l => ids.has(l.userId));
+              })();
+              const dashboardSubtitle = filterTabs.find(t => t.id === dashFilter)?.label || "";
+              return (
+                <div>
+                  <div style={{ display: "flex", gap: 4, marginBottom: 20, flexWrap: "wrap", background: "#fff", borderRadius: 12, padding: 6, border: "1px solid #e2e8f0", width: "fit-content" }}>
+                    {filterTabs.map(t => (
+                      <button key={t.id} onClick={() => setDashFilter(t.id)} style={{
+                        padding: "7px 16px", borderRadius: 8, border: "none", cursor: "pointer",
+                        fontSize: 13, fontWeight: dashFilter === t.id ? 600 : 400, fontFamily: "inherit",
+                        background: dashFilter === t.id ? "#3B82F6" : "transparent",
+                        color: dashFilter === t.id ? "#fff" : "#64748b", transition: "all 0.15s",
+                      }}>{t.label}</button>
+                    ))}
+                  </div>
+                  <SummaryPanel logs={dashboardLogs} subtitle={dashboardSubtitle} />
+                  <div style={{ display: "flex", gap: 16, marginTop: 20, flexWrap: "wrap" }}>
+                    <WeatherWidget />
+                    <QuoteWidget />
+                    <TodayFactWidget />
+                  </div>
                 </div>
-              </div>
-            );
+              );
+            };
+            return <DashboardWithFilter />;
           })()}
         {page === "report" && (
           <DailyReportPage
