@@ -7402,15 +7402,14 @@ export default function App() {
     ...(isAdmin && !isSA
       ? [{ id: "team", label: "部下の記録", icon: "users" }]
       : []),
-    ...(isSA
-      ? [{ id: "superadmin", label: "システム管理", icon: "settings" }]
-      : []),
+    { id: "board", label: "ボード", icon: "board" },
+    { id: "ranking", label: "🏆 ランキング", icon: "chart" },
     { id: "mypage", label: "マイページ", icon: "person" },
     ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
     ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
-    { id: "ranking", label: "🏆 ランキング", icon: "chart" },
-    { id: "board", label: "ボード", icon: "board" },
-    // 👇 追加（管理者と上司のみ表示）
+    ...(isSA
+      ? [{ id: "superadmin", label: "システム管理", icon: "settings" }]
+      : []),
     ...(isAdmin || isSA
       ? [{ id: "invite", label: "ユーザー招待", icon: "plus" }]
       : []),
