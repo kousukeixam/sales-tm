@@ -1504,7 +1504,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [templateName, setTemplateName] = useState("");
+  const [templateType, setTemplateType] = useState("report"); // "report" or "row"
+  const [templateRowTarget, setTemplateRowTarget] = useState(null); // 業務行テンプレート保存時の対象行
   const [templateSaved, setTemplateSaved] = useState(false);
+  const [templateTab, setTemplateTab] = useState("report"); // 呼び出しモーダルのタブ
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -1520,17 +1523,23 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
 
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) return;
-    const validRows = rows
-      .filter((r) => r.task)
-      .map((r) => ({ task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
-    if (validRows.length === 0) return;
+    let saveRows;
+    if (templateType === "row" && templateRowTarget) {
+      // 業務行1行だけ保存
+      saveRows = [{ task: templateRowTarget.task, detail: templateRowTarget.detail, start: templateRowTarget.start, end: templateRowTarget.end, cat: templateRowTarget.cat }];
+    } else {
+      // 日報全体保存
+      saveRows = rows.filter((r) => r.task).map((r) => ({ task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
+    }
+    if (saveRows.length === 0) return;
     const { data, error } = await supabase
       .from("log_templates")
-      .insert({ user_id: currentUser.id, name: templateName.trim(), rows: validRows })
+      .insert({ user_id: currentUser.id, name: templateName.trim(), rows: saveRows, type: templateType })
       .select().single();
     if (!error && data) {
       setTemplates((p) => [data, ...p]);
       setTemplateName("");
+      setTemplateRowTarget(null);
       setShowSaveTemplate(false);
       setTemplateSaved(true);
       setTimeout(() => setTemplateSaved(false), 2000);
@@ -1538,7 +1547,19 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   };
 
   const handleLoadTemplate = (tmpl) => {
-    setRows(tmpl.rows.map((r) => ({ ...newRow(), ...r })));
+    if (tmpl.type === "row") {
+      // 業務行テンプレート → 既存行に追加
+      setRows((p) => [...p, ...tmpl.rows.map((r) => ({ ...newRow(), ...r }))]);
+    } else {
+      // 日報テンプレート → 既存行に追加（上書きしない）
+      setRows((p) => {
+        const empty = p.filter((r) => !r.task);
+        const nonEmpty = p.filter((r) => r.task);
+        const newRows = tmpl.rows.map((r) => ({ ...newRow(), ...r }));
+        // 空行を置き換えつつ追加
+        return [...nonEmpty, ...newRows, ...(empty.length > newRows.length ? [] : [newRow()])];
+      });
+    }
     setShowTemplateModal(false);
   };
 
@@ -1865,45 +1886,61 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
         {showTemplateModal && (
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
             onClick={(e) => e.target === e.currentTarget && setShowTemplateModal(false)}>
-            <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 480, maxWidth: "95vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 500, maxWidth: "95vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>📋 テンプレートを選択</h3>
                 <button onClick={() => setShowTemplateModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
                   <Icon name="x" size={18} />
                 </button>
               </div>
-              {templates.length === 0 ? (
-                <div style={{ textAlign: "center", color: "#94a3b8", padding: "32px 0", fontSize: 13 }}>
-                  保存済みのテンプレートがありません
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {templates.map((t) => (
-                    <div key={t.id} style={{ background: "#f8fafc", borderRadius: 10, padding: "12px 14px", border: "1px solid #e2e8f0" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b", flex: 1 }}>{t.name}</span>
-                        <button onClick={() => handleLoadTemplate(t)} style={{ ...BP, padding: "5px 14px", fontSize: 12 }}>
-                          適用
-                        </button>
-                        <button onClick={() => handleDeleteTemplate(t.id)} style={{ ...BB, padding: "5px 10px", fontSize: 12, color: "#EF4444", borderColor: "#FECACA" }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = "#FEF2F2"}
-                          onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}>
-                          <Icon name="trash" size={13} />
-                        </button>
+              {/* タブ切り替え */}
+              <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "#f1f5f9", borderRadius: 10, padding: 4 }}>
+                {[["report", "📋 日報テンプレート"], ["row", "📌 業務行テンプレート"]].map(([tab, label]) => (
+                  <button key={tab} onClick={() => setTemplateTab(tab)} style={{
+                    flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                    fontSize: 13, fontWeight: templateTab === tab ? 600 : 400, fontFamily: "inherit",
+                    background: templateTab === tab ? "#fff" : "transparent",
+                    color: templateTab === tab ? "#1e293b" : "#64748b",
+                    boxShadow: templateTab === tab ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  }}>{label}</button>
+                ))}
+              </div>
+              {(() => {
+                const filtered = templates.filter((t) => (t.type || "report") === templateTab);
+                if (filtered.length === 0) return (
+                  <div style={{ textAlign: "center", color: "#94a3b8", padding: "32px 0", fontSize: 13 }}>
+                    保存済みのテンプレートがありません
+                  </div>
+                );
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {filtered.map((t) => (
+                      <div key={t.id} style={{ background: "#f8fafc", borderRadius: 10, padding: "12px 14px", border: "1px solid #e2e8f0" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b", flex: 1 }}>{t.name}</span>
+                          <button onClick={() => handleLoadTemplate(t)} style={{ ...BP, padding: "5px 14px", fontSize: 12 }}>
+                            追加
+                          </button>
+                          <button onClick={() => handleDeleteTemplate(t.id)} style={{ ...BB, padding: "5px 10px", fontSize: 12, color: "#EF4444", borderColor: "#FECACA" }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "#FEF2F2"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}>
+                            <Icon name="trash" size={13} />
+                          </button>
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          {t.rows.map((r, i) => (
+                            <div key={i} style={{ fontSize: 12, color: "#64748b", display: "flex", gap: 8 }}>
+                              <span style={{ color: r.cat ? CATEGORIES[r.cat]?.color : "#94a3b8", fontWeight: 600 }}>{r.cat || "-"}</span>
+                              <span>{r.task}</span>
+                              {r.start && r.end && <span style={{ color: "#94a3b8" }}>{r.start}〜{r.end}</span>}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                        {t.rows.map((r, i) => (
-                          <div key={i} style={{ fontSize: 12, color: "#64748b", display: "flex", gap: 8 }}>
-                            <span style={{ color: r.cat ? CATEGORIES[r.cat]?.color : "#94a3b8", fontWeight: 600 }}>{r.cat || "-"}</span>
-                            <span>{r.task}</span>
-                            {r.start && r.end && <span style={{ color: "#94a3b8" }}>{r.start}〜{r.end}</span>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
@@ -1919,11 +1956,35 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
                   <Icon name="x" size={18} />
                 </button>
               </div>
-              <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 16px" }}>現在の入力内容をテンプレートとして保存します。</p>
+              <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "#f1f5f9", borderRadius: 10, padding: 4 }}>
+                {[["report", "📋 日報全体"], ["row", "📌 業務行1行"]].map(([type, label]) => (
+                  <button key={type} onClick={() => setTemplateType(type)} style={{
+                    flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                    fontSize: 13, fontWeight: templateType === type ? 600 : 400, fontFamily: "inherit",
+                    background: templateType === type ? "#fff" : "transparent",
+                    color: templateType === type ? "#1e293b" : "#64748b",
+                    boxShadow: templateType === type ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                  }}>{label}</button>
+                ))}
+              </div>
+              {templateType === "row" && (
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>保存する業務行を選択</label>
+                  <select onChange={(e) => {
+                    const row = rows.find((r) => r.id === e.target.value);
+                    setTemplateRowTarget(row || null);
+                  }} style={I}>
+                    <option value="">選択してください</option>
+                    {rows.filter((r) => r.task).map((r) => (
+                      <option key={r.id} value={r.id}>{r.cat ? `[${r.cat}] ` : ""}{r.task}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div style={{ marginBottom: 16 }}>
                 <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>テンプレート名</label>
                 <input value={templateName} onChange={(e) => setTemplateName(e.target.value)}
-                  placeholder="例：定期訪問ルート、社内作業デー"
+                  placeholder="例：定期訪問ルート、週次社内作業"
                   style={I} autoFocus
                   onKeyDown={(e) => e.key === "Enter" && handleSaveTemplate()} />
               </div>
@@ -2126,26 +2187,29 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
                     </div>
                   )}
                 </div>
-                {rows.length > 1 && (
-                  <button
-                    onClick={() => delRow(row.id)}
-                    style={{
-                      marginLeft: "auto",
-                      background: "#FEF2F2",
-                      border: "1px solid #FECACA",
-                      cursor: "pointer",
-                      color: "#EF4444",
-                      padding: "4px 8px",
-                      borderRadius: 6,
-                      display: "flex",
-                      flexShrink: 0,
-                      fontSize: 12,
-                      fontWeight: 700,
-                    }}
-                  >
-                    ✕
-                  </button>
-                )}
+                <div style={{ marginLeft: "auto", display: "flex", gap: 6, flexShrink: 0 }}>
+                  {row.task && (
+                    <>
+                      <button onClick={() => {
+                        setRows((p) => [...p, { ...newRow(), task: row.task, detail: row.detail, start: row.start, end: row.end, cat: row.cat }]);
+                      }} style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", cursor: "pointer", color: "#3B82F6", padding: "4px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: "inherit" }}>
+                        複製
+                      </button>
+                      <button onClick={() => {
+                        setTemplateType("row");
+                        setTemplateRowTarget(row);
+                        setShowSaveTemplate(true);
+                      }} style={{ background: "#F5F3FF", border: "1px solid #DDD6FE", cursor: "pointer", color: "#8B5CF6", padding: "4px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: "inherit" }}>
+                        保存
+                      </button>
+                    </>
+                  )}
+                  {rows.length > 1 && (
+                    <button onClick={() => delRow(row.id)} style={{ background: "#FEF2F2", border: "1px solid #FECACA", cursor: "pointer", color: "#EF4444", padding: "4px 8px", borderRadius: 6, display: "flex", flexShrink: 0, fontSize: 12, fontWeight: 700 }}>
+                      ✕
+                    </button>
+                  )}
+                </div>
               </div>
               <div
                 style={{
@@ -2605,6 +2669,7 @@ function LogCard({
   onDelete,
   onSaveManagerComment,
   onEditLog,
+  onDuplicateRow,
 }) {
   const [editModal, setEditModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -2879,9 +2944,18 @@ function LogCard({
             )}
           </div>
           {canEdit && (
-            <div
-              style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}
-            >
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+              {rec.task !== "（コメントのみ）" && onDuplicateRow && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDuplicateRow(rec);
+                  }}
+                  style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#3B82F6", background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 7, padding: "5px 10px", cursor: "pointer" }}
+                >
+                  📋 この行を複製
+                </button>
+              )}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -3052,6 +3126,7 @@ function DateGroup({
             onDelete={onDelete}
             onSaveManagerComment={onSaveManagerComment}
             onEditLog={onEditLog}
+            onDuplicateRow={onDuplicate ? (r) => onDuplicate(recs, r) : null}
           />
         ))}
       </div>
@@ -8647,14 +8722,20 @@ export default function App() {
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
             onEditLog={editLog}
-            onDuplicate={(recs) => {
+            onDuplicate={(recs, singleRow) => {
               const today = new Date().toISOString().slice(0, 10);
-              setReportDraft({
-                date: today,
-                dayComment: "",
-                rows: recs
-                  .filter((r) => r.user === currentUser.name && r.task !== "（コメントのみ）")
-                  .map((r) => ({ ...newRow(), task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat })),
+              const addRows = singleRow
+                ? [{ ...newRow(), task: singleRow.task, detail: singleRow.detail, start: singleRow.start, end: singleRow.end, cat: singleRow.cat }]
+                : recs.filter((r) => r.user === currentUser.name && r.task !== "（コメントのみ）")
+                    .map((r) => ({ ...newRow(), task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
+              setReportDraft((prev) => {
+                const existingRows = prev?.rows ?? [newRow(), newRow(), newRow()];
+                const nonEmpty = existingRows.filter((r) => r.task);
+                return {
+                  date: today,
+                  dayComment: prev?.dayComment ?? "",
+                  rows: [...nonEmpty, ...addRows, newRow()],
+                };
               });
               setPage("report");
             }}
