@@ -1528,9 +1528,13 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
 
   const handleTagInput = (rowId, field, val) => {
     upd(rowId, field, val);
-    const match = val.match(/#(\S*)$/);
-    if (match) {
-      const word = match[1];
+    // 改行にも対応するため行末($)ではなく空白・改行の前の#にマッチ
+    const match = val.match(/#(\S*)(?:\s|$)/g)
+      ? val.match(/#(\S*)$/) || val.match(/#(\S*)\n?$/)
+      : val.match(/#(\S*)$/m);
+    const lastHash = val.match(/#(\S*)$/m);
+    if (lastHash) {
+      const word = lastHash[1];
       const candidates = allPastTags.filter((t) =>
         t.toLowerCase().startsWith(word.toLowerCase()) && t !== word
       );
@@ -1541,7 +1545,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   };
 
   const applyTag = (rowId, field, currentVal, tag) => {
-    const newVal = currentVal.replace(/#(\S*)$/, `#${tag} `);
+    const newVal = currentVal.replace(/#(\S*)$/m, `#${tag} `);
     upd(rowId, field, newVal);
     setTagSuggest({ rowId: null, field: null, candidates: [], word: "" });
   };
@@ -2328,6 +2332,17 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                         ))}
                       </div>
                     )}
+                    {extractTags(row.task).length > 0 && (
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                        {extractTags(row.task).map((tag) => (
+                          <span key={tag} style={{
+                            display: "inline-block", padding: "2px 8px", borderRadius: 10,
+                            background: "#F5F3FF", color: "#6D28D9", fontSize: 11, fontWeight: 600,
+                            border: "1px solid #DDD6FE",
+                          }}>#{tag}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -2387,6 +2402,17 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                           >
                             <span style={{ color: "#8B5CF6", fontWeight: 600 }}>#{tag}</span>
                           </div>
+                        ))}
+                      </div>
+                    )}
+                    {extractTags(row.detail).length > 0 && (
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                        {extractTags(row.detail).map((tag) => (
+                          <span key={tag} style={{
+                            display: "inline-block", padding: "2px 8px", borderRadius: 10,
+                            background: "#F5F3FF", color: "#6D28D9", fontSize: 11, fontWeight: 600,
+                            border: "1px solid #DDD6FE",
+                          }}>#{tag}</span>
                         ))}
                       </div>
                     )}
