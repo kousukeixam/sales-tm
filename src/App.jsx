@@ -1498,7 +1498,7 @@ function SummaryPanel({ logs, subtitle }) {
   );
 }
 
-function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
+function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(draft?.date ?? today);
   const [dayComment, setDayComment] = useState(draft?.dayComment ?? "");
@@ -1518,12 +1518,13 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
 
   const allPastTags = useMemo(() => {
     const tagSet = new Set();
-    rows.forEach((r) => {
-      extractTags(r.task).forEach((t) => tagSet.add(t));
-      extractTags(r.detail).forEach((t) => tagSet.add(t));
+    (logs || []).filter((l) => l.userId === currentUser.id).forEach((l) => {
+      extractTags(l.task).forEach((t) => tagSet.add(t));
+      extractTags(l.detail).forEach((t) => tagSet.add(t));
+      extractTags(l.dayComment).forEach((t) => tagSet.add(t));
     });
     return Array.from(tagSet);
-  }, [rows]);
+  }, [logs]);
 
   const handleTagInput = (rowId, field, val) => {
     upd(rowId, field, val);
@@ -8886,6 +8887,7 @@ export default function App() {
             onSave={saveLogs}
             draft={reportDraft}
             onDraftChange={setReportDraft}
+            logs={logs}
           />
         )}
         {page === "log" && (
