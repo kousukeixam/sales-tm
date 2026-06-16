@@ -1528,13 +1528,11 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
 
   const handleTagInput = (rowId, field, val) => {
     upd(rowId, field, val);
-    // 改行にも対応するため行末($)ではなく空白・改行の前の#にマッチ
-    const match = val.match(/#(\S*)(?:\s|$)/g)
-      ? val.match(/#(\S*)$/) || val.match(/#(\S*)\n?$/)
-      : val.match(/#(\S*)$/m);
-    const lastHash = val.match(/#(\S*)$/m);
-    if (lastHash) {
-      const word = lastHash[1];
+    // 各行の末尾にある#タグにマッチ（textareaの改行対応）
+    const lastLine = val.split("\n").pop() || "";
+    const match = lastLine.match(/#(\S*)$/);
+    if (match) {
+      const word = match[1];
       const candidates = allPastTags.filter((t) =>
         t.toLowerCase().startsWith(word.toLowerCase()) && t !== word
       );
@@ -1545,7 +1543,9 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   };
 
   const applyTag = (rowId, field, currentVal, tag) => {
-    const newVal = currentVal.replace(/#(\S*)$/m, `#${tag} `);
+    const lines = currentVal.split("\n");
+    lines[lines.length - 1] = lines[lines.length - 1].replace(/#(\S*)$/, `#${tag} `);
+    const newVal = lines.join("\n");
     upd(rowId, field, newVal);
     setTagSuggest({ rowId: null, field: null, candidates: [], word: "" });
   };
