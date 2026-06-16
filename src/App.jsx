@@ -2364,7 +2364,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                     <textarea
                       value={row.detail}
                       onChange={(e) => handleTagInput(row.id, "detail", e.target.value)}
-                      placeholder="場所・相手・内容・目的など詳細を入力..."
+                      placeholder="場所・相手・内容・目的など詳細を入力...(#タグで分類できます)"
                       style={{
                         width: "100%",
                         padding: "8px 10px",
