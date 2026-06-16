@@ -76,8 +76,9 @@ const addDays = (n) => {
   d.setDate(d.getDate() + n);
   return d.toISOString().split("T")[0];
 };
+let _rowId = 0;
 const newRow = () => ({
-  id: Date.now() + Math.random(),
+  id: ++_rowId,
   task: "",
   detail: "",
   start: "",
@@ -1618,7 +1619,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onDraftChange?.({ date, dayComment, rows });
-    }, 300);
+    }, 1000);
     return () => clearTimeout(timer);
   }, [date, dayComment, rows]);
   const getMins = (s, e) => {
