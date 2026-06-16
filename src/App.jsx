@@ -4580,8 +4580,8 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
         setBoards((p) => ({
           ...p,
           [viewId]: {
-            ...board,
-            cards: [...board.cards, { ...updated, id: data.id }],
+            ...p[viewId],
+            cards: [...(p[viewId]?.cards || []), { ...updated, id: data.id }],
           },
         }));
       }
@@ -4601,8 +4601,8 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
         setBoards((p) => ({
           ...p,
           [viewId]: {
-            ...board,
-            cards: board.cards.map((c) => (c.id === updated.id ? updated : c)),
+            ...p[viewId],
+            cards: (p[viewId]?.cards || []).map((c) => (c.id === updated.id ? updated : c)),
           },
         }));
       }
