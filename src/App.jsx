@@ -1961,7 +1961,13 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
                   const isActive = templateRowTarget ? type === "row" : type === "report";
                   return (
                     <button key={type} onClick={() => {
-                      if (type === "report") setTemplateRowTarget(null);
+                      if (type === "report") {
+                        setTemplateRowTarget(null);
+                      } else {
+                        // 業務行タブを押したとき、入力済みの最初の行をデフォルトでセット
+                        const firstRow = rows.find((r) => r.task);
+                        setTemplateRowTarget(firstRow || null);
+                      }
                     }} style={{
                       flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
                       fontSize: 13, fontWeight: isActive ? 600 : 400, fontFamily: "inherit",
@@ -1975,10 +1981,12 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
               {templateRowTarget && (
                 <div style={{ marginBottom: 12 }}>
                   <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>保存する業務行を選択</label>
-                  <select onChange={(e) => {
-                    const row = rows.find((r) => r.id === e.target.value);
-                    setTemplateRowTarget(row || null);
-                  }} style={I}>
+                  <select
+                    value={templateRowTarget?.id || ""}
+                    onChange={(e) => {
+                      const row = rows.find((r) => r.id === e.target.value);
+                      setTemplateRowTarget(row || null);
+                    }} style={I}>
                     <option value="">選択してください</option>
                     {rows.filter((r) => r.task).map((r) => (
                       <option key={r.id} value={r.id}>{r.cat ? `[${r.cat}] ` : ""}{r.task}</option>
