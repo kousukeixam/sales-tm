@@ -86,6 +86,12 @@ const newRow = () => ({
   managerComment: "",
 });
 
+const extractTags = (text) => {
+  if (!text) return [];
+  const matches = text.match(/#([^\s#]+)/g) || [];
+  return matches.map((t) => t.slice(1));
+};
+
 function generateLogs() {
   const taskDetails = {
     A: [
@@ -1507,7 +1513,37 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   const [templateType, setTemplateType] = useState("report"); // "report" or "row"
   const [templateRowTarget, setTemplateRowTarget] = useState(null); // 業務行テンプレート保存時の対象行
   const [templateSaved, setTemplateSaved] = useState(false);
-  const [templateTab, setTemplateTab] = useState("report"); // 呼び出しモーダルのタブ
+  const [templateTab, setTemplateTab] = useState("report");
+  const [tagSuggest, setTagSuggest] = useState({ rowId: null, field: null, candidates: [], word: "" });
+
+  const allPastTags = useMemo(() => {
+    const tagSet = new Set();
+    rows.forEach((r) => {
+      extractTags(r.task).forEach((t) => tagSet.add(t));
+      extractTags(r.detail).forEach((t) => tagSet.add(t));
+    });
+    return Array.from(tagSet);
+  }, [rows]);
+
+  const handleTagInput = (rowId, field, val) => {
+    upd(rowId, field, val);
+    const match = val.match(/#(\S*)$/);
+    if (match) {
+      const word = match[1];
+      const candidates = allPastTags.filter((t) =>
+        t.toLowerCase().startsWith(word.toLowerCase()) && t !== word
+      );
+      setTagSuggest({ rowId, field, candidates, word });
+    } else {
+      setTagSuggest({ rowId: null, field: null, candidates: [], word: "" });
+    }
+  };
+
+  const applyTag = (rowId, field, currentVal, tag) => {
+    const newVal = currentVal.replace(/#(\S*)$/, `#${tag} `);
+    upd(rowId, field, newVal);
+    setTagSuggest({ rowId: null, field: null, candidates: [], word: "" });
+  };
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -2247,24 +2283,51 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
                   >
                     タイトル <span style={{ color: "#ef4444" }}>*</span>
                   </label>
-                  <input
-                    value={row.task}
-                    onChange={(e) => upd(row.id, "task", e.target.value)}
-                    placeholder="業務タイトル"
-                    style={{
-                      width: "100%",
-                      padding: "8px 10px",
-                      borderRadius: 7,
-                      border: "1px solid #e2e8f0",
-                      fontSize: 13,
-                      color: "#1e293b",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      fontWeight: 500,
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
-                    onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <input
+                      value={row.task}
+                      onChange={(e) => handleTagInput(row.id, "task", e.target.value)}
+                      placeholder="業務タイトル（#タグで分類できます）"
+                      style={{
+                        width: "100%",
+                        padding: "8px 10px",
+                        borderRadius: 7,
+                        border: "1px solid #e2e8f0",
+                        fontSize: 13,
+                        color: "#1e293b",
+                        outline: "none",
+                        boxSizing: "border-box",
+                        fontWeight: 500,
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "#e2e8f0";
+                        setTimeout(() => setTagSuggest({ rowId: null, field: null, candidates: [], word: "" }), 150);
+                      }}
+                    />
+                    {tagSuggest.rowId === row.id && tagSuggest.field === "task" && tagSuggest.candidates.length > 0 && (
+                      <div style={{
+                        position: "absolute", top: "100%", left: 0, zIndex: 50,
+                        background: "#fff", border: "1px solid #e2e8f0",
+                        borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                        overflow: "hidden", minWidth: 180, marginTop: 2,
+                      }}>
+                        {tagSuggest.candidates.map((tag) => (
+                          <div key={tag}
+                            onMouseDown={() => applyTag(row.id, "task", row.task, tag)}
+                            style={{
+                              padding: "8px 14px", cursor: "pointer", fontSize: 13,
+                              color: "#6D28D9", display: "flex", alignItems: "center", gap: 6,
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "#F5F3FF"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
+                          >
+                            <span style={{ color: "#8B5CF6", fontWeight: 600 }}>#{tag}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label
@@ -2281,28 +2344,52 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
                       （右下をドラッグして高さを調整できます）
                     </span>
                   </label>
-                  <textarea
-                    value={row.detail}
-                    onChange={(e) => upd(row.id, "detail", e.target.value)}
-                    placeholder="場所・相手・内容・目的など詳細を入力..."
-                    style={{
-                      width: "100%",
-                      padding: "8px 10px",
-                      borderRadius: 7,
-                      border: "1px solid #e2e8f0",
-                      fontSize: 13,
-                      color: "#1e293b",
-                      outline: "none",
-                      resize: "vertical",
-                      minHeight: 60,
-                      maxHeight: 320,
-                      boxSizing: "border-box",
-                      fontFamily: "inherit",
-                      lineHeight: 1.7,
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
-                    onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <textarea
+                      value={row.detail}
+                      onChange={(e) => handleTagInput(row.id, "detail", e.target.value)}
+                      placeholder="場所・相手・内容・目的など詳細を入力..."
+                      style={{
+                        width: "100%",
+                        padding: "8px 10px",
+                        borderRadius: 7,
+                        border: "1px solid #e2e8f0",
+                        fontSize: 13,
+                        color: "#1e293b",
+                        outline: "none",
+                        resize: "vertical",
+                        minHeight: 60,
+                        maxHeight: 320,
+                        boxSizing: "border-box",
+                        fontFamily: "inherit",
+                        lineHeight: 1.7,
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "#e2e8f0";
+                        setTimeout(() => setTagSuggest({ rowId: null, field: null, candidates: [], word: "" }), 150);
+                      }}
+                    />
+                    {tagSuggest.rowId === row.id && tagSuggest.field === "detail" && tagSuggest.candidates.length > 0 && (
+                      <div style={{
+                        position: "absolute", top: "100%", left: 0, zIndex: 50,
+                        background: "#fff", border: "1px solid #e2e8f0",
+                        borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                        overflow: "hidden", minWidth: 180, marginTop: 2,
+                      }}>
+                        {tagSuggest.candidates.map((tag) => (
+                          <div key={tag}
+                            onMouseDown={() => applyTag(row.id, "detail", row.detail, tag)}
+                            style={{ padding: "8px 14px", cursor: "pointer", fontSize: 13, color: "#6D28D9", display: "flex", alignItems: "center", gap: 6 }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = "#F5F3FF"}
+                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
+                          >
+                            <span style={{ color: "#8B5CF6", fontWeight: 600 }}>#{tag}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {row.managerComment && (
                   <div
@@ -3320,12 +3407,6 @@ function DateGroup({
   );
 }
 
-const extractTags = (text) => {
-  if (!text) return [];
-  const matches = text.match(/#([^\s#]+)/g) || [];
-  return matches.map((t) => t.slice(1));
-};
-
 function LogListPage({
   logs,
   currentUser,
@@ -3497,7 +3578,7 @@ function LogListPage({
         <div style={{ ...C, marginBottom: 16, padding: "12px 16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>🏷 タグ</span>
-            <span style={{ fontSize: 11, color: "#94a3b8" }}>タグをクリックで絞り込み・長押しでピン留め</span>
+            <span style={{ fontSize: 11, color: "#94a3b8" }}>タグをクリックで絞り込み・右クリックでピン留め</span>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {/* ピン留めタグを先に表示 */}
