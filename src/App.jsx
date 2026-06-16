@@ -1500,6 +1500,52 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   const [rows, setRows] = useState(
     () => draft?.rows ?? [newRow(), newRow(), newRow()],
   );
+  const [templates, setTemplates] = useState([]);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [templateSaved, setTemplateSaved] = useState(false);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      const { data } = await supabase
+        .from("log_templates")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
+      if (data) setTemplates(data);
+    };
+    fetchTemplates();
+  }, []);
+
+  const handleSaveTemplate = async () => {
+    if (!templateName.trim()) return;
+    const validRows = rows
+      .filter((r) => r.task)
+      .map((r) => ({ task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
+    if (validRows.length === 0) return;
+    const { data, error } = await supabase
+      .from("log_templates")
+      .insert({ user_id: currentUser.id, name: templateName.trim(), rows: validRows })
+      .select().single();
+    if (!error && data) {
+      setTemplates((p) => [data, ...p]);
+      setTemplateName("");
+      setShowSaveTemplate(false);
+      setTemplateSaved(true);
+      setTimeout(() => setTemplateSaved(false), 2000);
+    }
+  };
+
+  const handleLoadTemplate = (tmpl) => {
+    setRows(tmpl.rows.map((r) => ({ ...newRow(), ...r })));
+    setShowTemplateModal(false);
+  };
+
+  const handleDeleteTemplate = async (id) => {
+    await supabase.from("log_templates").delete().eq("id", id);
+    setTemplates((p) => p.filter((t) => t.id !== id));
+  };
 
   // ページ移動時にドラフトを保存（debounceで連続実行を防ぐ）
   useEffect(() => {
@@ -1786,6 +1832,12 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
           )}
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button onClick={() => setShowTemplateModal(true)} style={{ ...BB }}>
+            📋 テンプレート
+          </button>
+          <button onClick={() => setShowSaveTemplate(true)} style={{ ...BB }}>
+            💾 テンプレート保存
+          </button>
           <button
             onClick={handleSave}
             style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)" }}
@@ -1803,6 +1855,87 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
             )}
           </button>
         </div>
+        {templateSaved && (
+          <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "8px 14px", fontSize: 13, color: "#15803D", marginTop: 8 }}>
+            ✅ テンプレートを保存しました！
+          </div>
+        )}
+
+        {/* テンプレート呼び出しモーダル */}
+        {showTemplateModal && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
+            onClick={(e) => e.target === e.currentTarget && setShowTemplateModal(false)}>
+            <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 480, maxWidth: "95vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>📋 テンプレートを選択</h3>
+                <button onClick={() => setShowTemplateModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
+                  <Icon name="x" size={18} />
+                </button>
+              </div>
+              {templates.length === 0 ? (
+                <div style={{ textAlign: "center", color: "#94a3b8", padding: "32px 0", fontSize: 13 }}>
+                  保存済みのテンプレートがありません
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {templates.map((t) => (
+                    <div key={t.id} style={{ background: "#f8fafc", borderRadius: 10, padding: "12px 14px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b", flex: 1 }}>{t.name}</span>
+                        <button onClick={() => handleLoadTemplate(t)} style={{ ...BP, padding: "5px 14px", fontSize: 12 }}>
+                          適用
+                        </button>
+                        <button onClick={() => handleDeleteTemplate(t.id)} style={{ ...BB, padding: "5px 10px", fontSize: 12, color: "#EF4444", borderColor: "#FECACA" }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = "#FEF2F2"}
+                          onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}>
+                          <Icon name="trash" size={13} />
+                        </button>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        {t.rows.map((r, i) => (
+                          <div key={i} style={{ fontSize: 12, color: "#64748b", display: "flex", gap: 8 }}>
+                            <span style={{ color: r.cat ? CATEGORIES[r.cat]?.color : "#94a3b8", fontWeight: 600 }}>{r.cat || "-"}</span>
+                            <span>{r.task}</span>
+                            {r.start && r.end && <span style={{ color: "#94a3b8" }}>{r.start}〜{r.end}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* テンプレート保存モーダル */}
+        {showSaveTemplate && (
+          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
+            onClick={(e) => e.target === e.currentTarget && setShowSaveTemplate(false)}>
+            <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>💾 テンプレートとして保存</h3>
+                <button onClick={() => setShowSaveTemplate(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
+                  <Icon name="x" size={18} />
+                </button>
+              </div>
+              <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 16px" }}>現在の入力内容をテンプレートとして保存します。</p>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>テンプレート名</label>
+                <input value={templateName} onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="例：定期訪問ルート、社内作業デー"
+                  style={I} autoFocus
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveTemplate()} />
+              </div>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <button onClick={() => setShowSaveTemplate(false)} style={BB}>キャンセル</button>
+                <button onClick={handleSaveTemplate} disabled={!templateName.trim()} style={{ ...BP, opacity: templateName.trim() ? 1 : 0.4 }}>
+                  <Icon name="save" size={14} />保存
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <div
         style={{
@@ -2875,6 +3008,7 @@ function DateGroup({
   onSaveManagerComment,
   onSaveDayComment,
   onEditLog,
+  onDuplicate,
 }) {
   const [editDay, setEditDay] = useState(false);
   const [dayDraft, setDayDraft] = useState(recs[0]?.managerDayComment || "");
@@ -2885,20 +3019,19 @@ function DateGroup({
   const managerDayComment = recs[0]?.managerDayComment || "";
   return (
     <div style={{ marginBottom: 20 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          marginBottom: 8,
-        }}
-      >
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
-          {date}
-        </span>
-        <span style={{ fontSize: 12, color: "#94a3b8" }}>
-          {recs.length}件 / {totMins}分
-        </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>{date}</span>
+        <span style={{ fontSize: 12, color: "#94a3b8" }}>{recs.length}件 / {totMins}分</span>
+        {onDuplicate && recs.some(r => r.user === currentUser.name) && (
+          <button onClick={() => onDuplicate(recs)} style={{
+            display: "flex", alignItems: "center", gap: 4,
+            fontSize: 11, color: "#3B82F6", background: "#EFF6FF",
+            border: "1px solid #BFDBFE", borderRadius: 6, padding: "3px 10px",
+            cursor: "pointer", fontFamily: "inherit",
+          }}>
+            📋 この日を複製
+          </button>
+        )}
       </div>
       <div
         style={{
@@ -3105,6 +3238,7 @@ function LogListPage({
   onSaveDayComment,
   onEditLog,
   filterUser,
+  onDuplicate,
 }) {
   const targetLogs = filterUser
     ? logs.filter((l) => l.user === filterUser)
@@ -3268,6 +3402,7 @@ function LogListPage({
             onSaveManagerComment={onSaveManagerComment}
             onSaveDayComment={onSaveDayComment}
             onEditLog={onEditLog}
+            onDuplicate={onDuplicate}
           />
         ))
       )}
@@ -8512,6 +8647,17 @@ export default function App() {
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
             onEditLog={editLog}
+            onDuplicate={(recs) => {
+              const today = new Date().toISOString().slice(0, 10);
+              setReportDraft({
+                date: today,
+                dayComment: "",
+                rows: recs
+                  .filter((r) => r.user === currentUser.name && r.task !== "（コメントのみ）")
+                  .map((r) => ({ ...newRow(), task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat })),
+              });
+              setPage("report");
+            }}
           />
         )}
         {page === "board" && (
