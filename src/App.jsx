@@ -2686,6 +2686,7 @@ function LogCard({
   onSaveManagerComment,
   onEditLog,
   onDuplicateRow,
+  onTagClick,
 }) {
   const [editModal, setEditModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -2725,17 +2726,13 @@ function LogCard({
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div
-            style={{
-              fontSize: 14,
-              color: "#1e293b",
-              fontWeight: 600,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {rec.task}
+          <div style={{ fontSize: 14, color: "#1e293b", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {rec.task.split(/(#[^\s#]+)/g).map((part, i) =>
+              part.startsWith("#") ? (
+                <span key={i} onClick={(e) => { e.stopPropagation(); onTagClick?.(part.slice(1)); }}
+                  style={{ color: "#8B5CF6", cursor: "pointer", fontWeight: 600 }}>{part}</span>
+              ) : part
+            )}
           </div>
           {rec.detail && !expanded && (
             <div
@@ -3099,6 +3096,7 @@ function DateGroup({
   onSaveDayComment,
   onEditLog,
   onDuplicate,
+  onTagClick,
 }) {
   const [editDay, setEditDay] = useState(false);
   const [dayDraft, setDayDraft] = useState(recs[0]?.managerDayComment || "");
@@ -3143,6 +3141,7 @@ function DateGroup({
             onSaveManagerComment={onSaveManagerComment}
             onEditLog={onEditLog}
             onDuplicateRow={onDuplicate ? (r) => onDuplicate(recs, r) : null}
+            onTagClick={onTagClick}
           />
         ))}
       </div>
@@ -3321,6 +3320,12 @@ function DateGroup({
   );
 }
 
+const extractTags = (text) => {
+  if (!text) return [];
+  const matches = text.match(/#([^\s#]+)/g) || [];
+  return matches.map((t) => t.slice(1));
+};
+
 function LogListPage({
   logs,
   currentUser,
@@ -3331,12 +3336,43 @@ function LogListPage({
   filterUser,
   onDuplicate,
 }) {
+  const storageKey = `pinnedTags_${currentUser.id}`;
   const targetLogs = filterUser
     ? logs.filter((l) => l.user === filterUser)
     : logs.filter((l) => l.user === currentUser.name);
   const [fd, setFd] = useState("");
   const [fk, setFk] = useState("");
   const [fc, setFc] = useState("");
+  const [activeTag, setActiveTag] = useState("");
+  const [pinnedTags, setPinnedTags] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || "[]"); }
+    catch { return []; }
+  });
+
+  const allTags = useMemo(() => {
+    const tagSet = new Set();
+    targetLogs.forEach((l) => {
+      extractTags(l.task).forEach((t) => tagSet.add(t));
+      extractTags(l.detail).forEach((t) => tagSet.add(t));
+      extractTags(l.dayComment).forEach((t) => tagSet.add(t));
+    });
+    return Array.from(tagSet).sort();
+  }, [targetLogs]);
+
+  const togglePin = (tag) => {
+    setPinnedTags((p) => {
+      const next = p.includes(tag) ? p.filter((t) => t !== tag) : [...p, tag];
+      localStorage.setItem(storageKey, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const normalize = (str) =>
+    (str || "")
+      .normalize("NFKC")
+      .replace(/[\u3041-\u3096]/g, (s) => String.fromCharCode(s.charCodeAt(0) + 0x60))
+      .toLowerCase();
+
   const filtered = useMemo(
     () =>
       targetLogs
@@ -3344,25 +3380,24 @@ function LogListPage({
         .filter((l) => !fc || l.cat === fc)
         .filter((l) => {
           if (!fk) return true;
-          const normalize = (str) =>
-            (str || "")
-              .normalize("NFKC")
-              .replace(/[\u3041-\u3096]/g, (s) =>
-                String.fromCharCode(s.charCodeAt(0) + 0x60),
-              )
-              .toLowerCase();
           const keyword = normalize(fk);
-          return (
-            normalize(l.task).includes(keyword) ||
-            normalize(l.detail).includes(keyword)
-          );
+          return normalize(l.task).includes(keyword) || normalize(l.detail).includes(keyword);
+        })
+        .filter((l) => {
+          if (!activeTag) return true;
+          const tags = [
+            ...extractTags(l.task),
+            ...extractTags(l.detail),
+            ...extractTags(l.dayComment),
+          ];
+          return tags.includes(activeTag);
         })
         .sort(
           (a, b) =>
             b.date.localeCompare(a.date) ||
             (a.start || "").localeCompare(b.start || ""),
         ),
-    [targetLogs, fd, fc, fk],
+    [targetLogs, fd, fc, fk, activeTag],
   );
   const grouped = useMemo(() => {
     const g = {};
@@ -3446,22 +3481,10 @@ function LogListPage({
             </option>
           ))}
         </select>
-        {(fd || fc || fk) && (
+        {(fd || fc || fk || activeTag) && (
           <button
-            onClick={() => {
-              setFd("");
-              setFc("");
-              setFk("");
-            }}
-            style={{
-              padding: "8px 12px",
-              borderRadius: 8,
-              border: "1px solid #e2e8f0",
-              background: "#fff",
-              fontSize: 13,
-              cursor: "pointer",
-              color: "#64748b",
-            }}
+            onClick={() => { setFd(""); setFc(""); setFk(""); setActiveTag(""); }}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", fontSize: 13, cursor: "pointer", color: "#64748b" }}
           >
             リセット
           </button>
@@ -3470,6 +3493,59 @@ function LogListPage({
           <b style={{ color: "#1e293b" }}>{filtered.length}件</b>
         </div>
       </div>
+      {allTags.length > 0 && (
+        <div style={{ ...C, marginBottom: 16, padding: "12px 16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>🏷 タグ</span>
+            <span style={{ fontSize: 11, color: "#94a3b8" }}>タグをクリックで絞り込み・長押しでピン留め</span>
+          </div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {/* ピン留めタグを先に表示 */}
+            {pinnedTags.filter((t) => allTags.includes(t)).map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
+                style={{
+                  padding: "4px 10px", borderRadius: 20, border: "1px solid",
+                  fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 4,
+                  borderColor: activeTag === tag ? "#8B5CF6" : "#DDD6FE",
+                  background: activeTag === tag ? "#8B5CF6" : "#F5F3FF",
+                  color: activeTag === tag ? "#fff" : "#6D28D9",
+                  fontWeight: activeTag === tag ? 600 : 400,
+                }}
+              >
+                📌 #{tag}
+              </button>
+            ))}
+            {/* 通常タグ */}
+            {allTags.filter((t) => !pinnedTags.includes(t)).map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
+                onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
+                style={{
+                  padding: "4px 10px", borderRadius: 20, border: "1px solid",
+                  fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+                  borderColor: activeTag === tag ? "#3B82F6" : "#e2e8f0",
+                  background: activeTag === tag ? "#3B82F6" : "#f8fafc",
+                  color: activeTag === tag ? "#fff" : "#64748b",
+                  fontWeight: activeTag === tag ? 600 : 400,
+                }}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+          {activeTag && (
+            <div style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
+              <span style={{ background: "#F5F3FF", color: "#6D28D9", padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>#{activeTag}</span>
+              <span style={{ marginLeft: 6 }}>で絞り込み中 · {filtered.length}件</span>
+            </div>
+          )}
+        </div>
+      )}
       {Object.keys(grouped).length === 0 ? (
         <div
           style={{
@@ -3494,6 +3570,7 @@ function LogListPage({
             onSaveDayComment={onSaveDayComment}
             onEditLog={onEditLog}
             onDuplicate={onDuplicate}
+            onTagClick={(tag) => setActiveTag(tag)}
           />
         ))
       )}
