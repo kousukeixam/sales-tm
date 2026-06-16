@@ -1556,19 +1556,13 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   };
 
   const handleLoadTemplate = (tmpl) => {
-    if (tmpl.type === "row") {
-      setRows((p) => {
-        const nonEmpty = p.filter((r) => r.task);
-        const newRows = tmpl.rows.map((r) => ({ ...newRow(), ...r }));
-        return [...sortByTime([...nonEmpty, ...newRows]), newRow()];
-      });
-    } else {
-      setRows((p) => {
-        const nonEmpty = p.filter((r) => r.task);
-        const newRows = tmpl.rows.map((r) => ({ ...newRow(), ...r }));
-        return [...sortByTime([...nonEmpty, ...newRows]), newRow()];
-      });
-    }
+    setRows((p) => {
+      const nonEmpty = p.filter((r) => r.task);
+      const newRows = tmpl.rows.map((r) => ({ ...newRow(), ...r }));
+      const sorted = sortByTime([...nonEmpty, ...newRows]);
+      // 空白行を最低2行確保
+      return [...sorted, newRow(), newRow()];
+    });
     setShowTemplateModal(false);
   };
 
