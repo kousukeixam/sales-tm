@@ -1523,13 +1523,12 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
 
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) return;
-    let saveRows;
+    // templateRowTargetがあれば業務行1行、なければ日報全体
     const actualType = templateRowTarget ? "row" : "report";
-    if (actualType === "row" && templateRowTarget) {
-      // 業務行1行だけ保存
+    let saveRows;
+    if (actualType === "row") {
       saveRows = [{ task: templateRowTarget.task, detail: templateRowTarget.detail, start: templateRowTarget.start, end: templateRowTarget.end, cat: templateRowTarget.cat }];
     } else {
-      // 日報全体保存
       saveRows = rows.filter((r) => r.task).map((r) => ({ task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
     }
     if (saveRows.length === 0) return;
@@ -1958,17 +1957,22 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
                 </button>
               </div>
               <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "#f1f5f9", borderRadius: 10, padding: 4 }}>
-                {[["report", "📋 日報全体"], ["row", "📌 業務行1行"]].map(([type, label]) => (
-                  <button key={type} onClick={() => setTemplateType(type)} style={{
-                    flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                    fontSize: 13, fontWeight: templateType === type ? 600 : 400, fontFamily: "inherit",
-                    background: templateType === type ? "#fff" : "transparent",
-                    color: templateType === type ? "#1e293b" : "#64748b",
-                    boxShadow: templateType === type ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                  }}>{label}</button>
-                ))}
+                {[["report", "📋 日報全体"], ["row", "📌 業務行1行"]].map(([type, label]) => {
+                  const isActive = templateRowTarget ? type === "row" : type === "report";
+                  return (
+                    <button key={type} onClick={() => {
+                      if (type === "report") setTemplateRowTarget(null);
+                    }} style={{
+                      flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                      fontSize: 13, fontWeight: isActive ? 600 : 400, fontFamily: "inherit",
+                      background: isActive ? "#fff" : "transparent",
+                      color: isActive ? "#1e293b" : "#64748b",
+                      boxShadow: isActive ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                    }}>{label}</button>
+                  );
+                })}
               </div>
-              {templateType === "row" && (
+              {templateRowTarget && (
                 <div style={{ marginBottom: 12 }}>
                   <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>保存する業務行を選択</label>
                   <select onChange={(e) => {
