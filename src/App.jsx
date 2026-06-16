@@ -1546,18 +1546,27 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     }
   };
 
+  const sortByTime = (rows) => {
+    return [...rows].sort((a, b) => {
+      if (!a.start && !b.start) return 0;
+      if (!a.start) return 1;
+      if (!b.start) return -1;
+      return a.start.localeCompare(b.start);
+    });
+  };
+
   const handleLoadTemplate = (tmpl) => {
     if (tmpl.type === "row") {
-      // 業務行テンプレート → 既存行に追加
-      setRows((p) => [...p, ...tmpl.rows.map((r) => ({ ...newRow(), ...r }))]);
-    } else {
-      // 日報テンプレート → 既存行に追加（上書きしない）
       setRows((p) => {
-        const empty = p.filter((r) => !r.task);
         const nonEmpty = p.filter((r) => r.task);
         const newRows = tmpl.rows.map((r) => ({ ...newRow(), ...r }));
-        // 空行を置き換えつつ追加
-        return [...nonEmpty, ...newRows, ...(empty.length > newRows.length ? [] : [newRow()])];
+        return [...sortByTime([...nonEmpty, ...newRows]), newRow()];
+      });
+    } else {
+      setRows((p) => {
+        const nonEmpty = p.filter((r) => r.task);
+        const newRows = tmpl.rows.map((r) => ({ ...newRow(), ...r }));
+        return [...sortByTime([...nonEmpty, ...newRows]), newRow()];
       });
     }
     setShowTemplateModal(false);
