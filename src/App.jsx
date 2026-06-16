@@ -2390,7 +2390,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                     />
                     {tagSuggest.rowId === row.id && tagSuggest.field === "detail" && tagSuggest.candidates.length > 0 && (
                       <div style={{
-                        position: "absolute", top: "100%", left: 0, zIndex: 50,
+                        position: "absolute", bottom: "100%", left: 0, zIndex: 50,
                         background: "#fff", border: "1px solid #e2e8f0",
                         borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                         overflow: "hidden", minWidth: 180, marginTop: 2,
