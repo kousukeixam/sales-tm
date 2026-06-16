@@ -88,7 +88,9 @@ const newRow = () => ({
 
 const extractTags = (text) => {
   if (!text) return [];
-  const matches = text.match(/#([^\s#]+)/g) || [];
+  // 全角スペース・半角スペース・改行を区切り文字として認識
+  const normalized = (text || "").replace(/[\u3000\u00A0]/g, " ");
+  const matches = normalized.match(/#([^\s#]+)/g) || [];
   return matches.map((t) => t.slice(1));
 };
 
