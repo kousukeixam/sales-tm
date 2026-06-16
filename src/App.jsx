@@ -4744,7 +4744,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     </div>
   );
 }
-function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
+function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser, darkMode, setDarkMode, accentColor, setAccentColor }) {
   const [name, setName] = useState(currentUser.name);
   const [newPassword, setNewPassword] = useState("");
   const [managerId, setManagerId] = useState(currentUser.manager_id || "");
@@ -5053,6 +5053,64 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser }) {
             </select>
           </div>
         )}
+
+        <div style={{ ...C, marginBottom: 16 }}>
+        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+          表示設定
+        </h3>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
+            ダークモード
+          </label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {[["light", "☀️ ライト"], ["dark", "🌙 ダーク"]].map(([mode, label]) => (
+              <button key={mode} onClick={() => {
+                const isDark = mode === "dark";
+                setDarkMode(isDark);
+                localStorage.setItem("darkMode", String(isDark));
+              }} style={{
+                padding: "8px 20px", borderRadius: 8, border: "1px solid",
+                fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                borderColor: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#e2e8f0",
+                background: (darkMode ? "dark" : "light") === mode ? "var(--accent-light, #EFF6FF)" : "#fff",
+                color: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#64748b",
+              }}>{label}</button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
+            カラーテーマ
+          </label>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {[
+              ["blue", "#3B82F6", "ブルー"],
+              ["purple", "#8B5CF6", "パープル"],
+              ["green", "#10B981", "グリーン"],
+              ["red", "#EF4444", "レッド"],
+              ["orange", "#F59E0B", "オレンジ"],
+              ["pink", "#EC4899", "ピンク"],
+            ].map(([key, color, label]) => (
+              <button key={key} onClick={() => {
+                setAccentColor(key);
+                localStorage.setItem("accentColor", key);
+              }} style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                padding: "10px 14px", borderRadius: 10, border: "2px solid",
+                borderColor: accentColor === key ? color : "#e2e8f0",
+                background: accentColor === key ? color + "18" : "#fff",
+                cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+              }}>
+                <div style={{ width: 24, height: 24, borderRadius: "50%", background: color,
+                  boxShadow: accentColor === key ? `0 0 0 3px ${color}44` : "none" }} />
+                <span style={{ fontSize: 11, color: accentColor === key ? color : "#64748b", fontWeight: accentColor === key ? 700 : 400 }}>
+                  {label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
         <button onClick={handleSave} style={BP}>
           <Icon name="save" size={14} />
@@ -7463,7 +7521,9 @@ function FeedbackAdminPage() {
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true); // ← 追加
+  const [authLoading, setAuthLoading] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("accentColor") || "blue");
   const [inviteSession, setInviteSession] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [passwordSaved, setPasswordSaved] = useState(false);
@@ -7933,6 +7993,32 @@ export default function App() {
   }
   // ▲ 追加ここまで
 
+  const ACCENT_COLORS = {
+    blue:   { primary: "#3B82F6", gradient: "135deg,#3B82F6,#6366F1", light: "#EFF6FF", border: "#BFDBFE" },
+    purple: { primary: "#8B5CF6", gradient: "135deg,#8B5CF6,#A855F7", light: "#F5F3FF", border: "#DDD6FE" },
+    green:  { primary: "#10B981", gradient: "135deg,#10B981,#059669", light: "#ECFDF5", border: "#A7F3D0" },
+    red:    { primary: "#EF4444", gradient: "135deg,#EF4444,#DC2626", light: "#FEF2F2", border: "#FECACA" },
+    orange: { primary: "#F59E0B", gradient: "135deg,#F59E0B,#D97706", light: "#FFFBEB", border: "#FDE68A" },
+    pink:   { primary: "#EC4899", gradient: "135deg,#EC4899,#DB2777", light: "#FDF2F8", border: "#FBCFE8" },
+  };
+  const accent = ACCENT_COLORS[accentColor] || ACCENT_COLORS.blue;
+
+  const themeVars = {
+    "--accent": accent.primary,
+    "--accent-gradient": `linear-gradient(${accent.gradient})`,
+    "--accent-light": accent.light,
+    "--accent-border": accent.border,
+    "--bg": darkMode ? "#0f172a" : "#f1f5f9",
+    "--sidebar-bg": darkMode ? "#020617" : "#0f172a",
+    "--card-bg": darkMode ? "#1e293b" : "#ffffff",
+    "--card-border": darkMode ? "#334155" : "#e2e8f0",
+    "--text-primary": darkMode ? "#f1f5f9" : "#1e293b",
+    "--text-secondary": darkMode ? "#94a3b8" : "#64748b",
+    "--text-muted": darkMode ? "#475569" : "#94a3b8",
+    "--input-bg": darkMode ? "#0f172a" : "#fafafa",
+    "--input-border": darkMode ? "#334155" : "#e2e8f0",
+  };
+
   if (!currentUser) return <LoginPage onLogin={login} />;
   const isSA = currentUser.role === "superadmin";
   const isAdmin = currentUser.role === "admin" || isSA;
@@ -8002,9 +8088,10 @@ export default function App() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f1f5f9",
+        background: "var(--bg)",
         fontFamily: "'Noto Sans JP','Helvetica Neue',-apple-system,sans-serif",
         display: "flex",
+        ...themeVars,
       }}
     >
       {sidebarOpen && (
@@ -8462,6 +8549,10 @@ export default function App() {
             groups={groups}
             isSA={isSA}
             onUpdateUser={(updated) => setCurrentUser(updated)}
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            accentColor={accentColor}
+            setAccentColor={setAccentColor}
           />
         )}
         {page === "superadmin" && isSA && (
