@@ -1524,7 +1524,8 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) return;
     let saveRows;
-    if (templateType === "row" && templateRowTarget) {
+    const actualType = templateRowTarget ? "row" : "report";
+    if (actualType === "row" && templateRowTarget) {
       // 業務行1行だけ保存
       saveRows = [{ task: templateRowTarget.task, detail: templateRowTarget.detail, start: templateRowTarget.start, end: templateRowTarget.end, cat: templateRowTarget.cat }];
     } else {
@@ -1534,7 +1535,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange }) {
     if (saveRows.length === 0) return;
     const { data, error } = await supabase
       .from("log_templates")
-      .insert({ user_id: currentUser.id, name: templateName.trim(), rows: saveRows, type: templateType })
+      .insert({ user_id: currentUser.id, name: templateName.trim(), rows: saveRows, type: actualType })
       .select().single();
     if (!error && data) {
       setTemplates((p) => [data, ...p]);
