@@ -8978,7 +8978,87 @@ function FeedbackAdminPage() {
     </div>
   );
 }
-function DashboardAlerts({ boards, currentUser }) {
+function TaskCarousel({ items, today }) {
+  const PAGE_SIZE = 3;
+  const totalPages = Math.ceil(items.length / PAGE_SIZE);
+  const [page, setPage] = useState(0);
+  const [hovering, setHovering] = useState(false);
+
+  useEffect(() => {
+    if (totalPages <= 1 || hovering) return;
+    const timer = setInterval(() => {
+      setPage((p) => (p + 1) % totalPages);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [totalPages, hovering]);
+
+  const pageItems = items.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
+  return (
+    <div
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      style={{ position: "relative" }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {pageItems.map((c) => {
+          const isOver = c.due < today;
+          return (
+            <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#78350F" }}>
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
+                background: isOver ? "#FEE2E2" : "#FEF3C7",
+                color: isOver ? "#991B1B" : "#92400E",
+                flexShrink: 0,
+              }}>
+                {isOver ? "期限切れ" : c.due}
+              </span>
+              <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {c.title}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      {totalPages > 1 && hovering && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); setPage((p) => (p - 1 + totalPages) % totalPages); }}
+            style={{
+              position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)",
+              width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
+              background: "#fff", color: "#92400E", fontSize: 11, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            }}
+          >‹</button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setPage((p) => (p + 1) % totalPages); }}
+            style={{
+              position: "absolute", right: -8, top: "50%", transform: "translateY(-50%)",
+              width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
+              background: "#fff", color: "#92400E", fontSize: 11, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+            }}
+          >›</button>
+          <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <div
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setPage(i); }}
+                style={{
+                  width: 6, height: 6, borderRadius: "50%", cursor: "pointer",
+                  background: i === page ? "#F59E0B" : "#FDE68A",
+                }}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function DashboardAlerts({ boards, currentUser, onNavigate }) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -9003,60 +9083,51 @@ function DashboardAlerts({ boards, currentUser }) {
     return c.due <= addDays(3);
   }).sort((a, b) => a.due.localeCompare(b.due));
 
-  if (urgentCards.length === 0 && unreadCount === 0) return null;
+  const hasTasks = urgentCards.length > 0;
+  const hasAnnouncements = unreadCount > 0;
+
+  if (!hasTasks && !hasAnnouncements) return null;
+
+  const taskBlock = (
+    <div
+      onClick={() => onNavigate?.("board")}
+      style={{
+        background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12,
+        padding: "12px 16px", cursor: "pointer", flex: hasTasks && hasAnnouncements ? 1 : "0 1 360px",
+        minWidth: 260,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#92400E" }}>⏰ 期日が近いタスク</span>
+        <span style={{ fontSize: 11, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>
+          {urgentCards.length}件
+        </span>
+      </div>
+      <TaskCarousel items={urgentCards} today={today} />
+    </div>
+  );
+
+  const annBlock = (
+    <div
+      onClick={() => onNavigate?.("announcement")}
+      style={{
+        background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 12,
+        padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
+        cursor: "pointer", flex: hasTasks && hasAnnouncements ? 1 : "0 1 360px",
+        minWidth: 260,
+      }}
+    >
+      <span style={{ fontSize: 16 }}>📣</span>
+      <span style={{ fontSize: 13, color: "#1D4ED8", fontWeight: 600 }}>
+        未読のお知らせが {unreadCount}件 あります
+      </span>
+    </div>
+  );
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
-      {urgentCards.length > 0 && (
-        <div style={{
-          background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12,
-          padding: "12px 16px",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#92400E" }}>⏰ 期日が近いタスク</span>
-            <span style={{ fontSize: 11, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>
-              {urgentCards.length}件
-            </span>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {urgentCards.slice(0, 3).map((c) => {
-              const isOver = c.due < today;
-              return (
-                <div key={c.id} style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  fontSize: 12, color: "#78350F",
-                }}>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
-                    background: isOver ? "#FEE2E2" : "#FEF3C7",
-                    color: isOver ? "#991B1B" : "#92400E",
-                    flexShrink: 0,
-                  }}>
-                    {isOver ? "期限切れ" : c.due}
-                  </span>
-                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {c.title}
-                  </span>
-                </div>
-              );
-            })}
-            {urgentCards.length > 3 && (
-              <div style={{ fontSize: 11, color: "#92400E", opacity: 0.7 }}>他{urgentCards.length - 3}件</div>
-            )}
-          </div>
-        </div>
-      )}
-      {unreadCount > 0 && (
-        <div style={{
-          background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 12,
-          padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
-        }}>
-          <span style={{ fontSize: 16 }}>📣</span>
-          <span style={{ fontSize: 13, color: "#1D4ED8", fontWeight: 600 }}>
-            未読のお知らせが {unreadCount}件 あります
-          </span>
-        </div>
-      )}
+    <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+      {hasTasks && taskBlock}
+      {hasAnnouncements && annBlock}
     </div>
   );
 }
@@ -10021,7 +10092,7 @@ export default function App() {
                 filterTabs.find((t) => t.id === dashFilter)?.label || "";
               return (
                 <div>
-                  <DashboardAlerts boards={boards} currentUser={currentUser} />
+                  <DashboardAlerts boards={boards} currentUser={currentUser} onNavigate={setPage} />
                   <div
                     style={{
                       display: "flex",
