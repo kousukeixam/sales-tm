@@ -4563,6 +4563,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
         : "ok";
   const pc = { high: "#EF4444", mid: "#F59E0B", low: "#10B981" };
   const pl = { high: "高", mid: "中", low: "低" };
+  const isUrgent = dc === "over" || dc === "near";
   return (
     <div
       draggable={isOwner}
@@ -4573,9 +4574,9 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       }}
       onClick={() => onOpen(card)}
       style={{
-        background: "#fff",
+        background: dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#fff",
         borderRadius: 12,
-        border: "1px solid #e2e8f0",
+        border: `1px solid ${dc === "over" ? "#FECACA" : dc === "near" ? "#FDE68A" : "#e2e8f0"}`,
         padding: "12px 14px",
         cursor: isOwner ? "grab" : "pointer",
         transition: "all 0.15s",
@@ -4583,11 +4584,11 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
-        e.currentTarget.style.borderColor = "#cbd5e1";
+        if (!isUrgent) e.currentTarget.style.borderColor = "#cbd5e1";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.boxShadow = "none";
-        e.currentTarget.style.borderColor = "#e2e8f0";
+        if (!isUrgent) e.currentTarget.style.borderColor = "#e2e8f0";
       }}
     >
       <div
