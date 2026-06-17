@@ -4183,9 +4183,12 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
     ]);
     setNewCmt("");
   };
-  const save = () => {
-    if (!title.trim()) return;
-    onSave({ ...card, title: title.trim(), desc, prio, due, comments });
+  const [saving, setSaving] = useState(false);
+  const save = async () => {
+    if (!title.trim() || saving) return;
+    setSaving(true);
+    await onSave({ ...card, title: title.trim(), desc, prio, due, comments });
+    setSaving(false);
     onClose();
   };
   return (
@@ -4523,11 +4526,11 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               </button>
               <button
                 onClick={save}
-                disabled={!title.trim()}
-                style={{ ...BP, opacity: title.trim() ? 1 : 0.4 }}
+                disabled={!title.trim() || saving}
+                style={{ ...BP, opacity: title.trim() && !saving ? 1 : 0.4 }}
               >
                 <Icon name="save" size={14} />
-                保存
+                {saving ? "保存中..." : "保存"}
               </button>
             </div>
           </div>
