@@ -3454,7 +3454,7 @@ function LogListPage({
   const [fd, setFd] = useState("");
   const [fk, setFk] = useState("");
   const [fc, setFc] = useState("");
-  const [activeTag, setActiveTag] = useState("");
+  const [activeTags, setActiveTags] = useState([]);
   const [pinnedTags, setPinnedTags] = useState(() => {
     try { return JSON.parse(localStorage.getItem(storageKey) || "[]"); }
     catch { return []; }
@@ -3495,20 +3495,20 @@ function LogListPage({
           return normalize(l.task).includes(keyword) || normalize(l.detail).includes(keyword);
         })
         .filter((l) => {
-          if (!activeTag) return true;
+          if (activeTags.length === 0) return true;
           const tags = [
             ...extractTags(l.task),
             ...extractTags(l.detail),
             ...extractTags(l.dayComment),
           ];
-          return tags.includes(activeTag);
+          return activeTags.every((at) => tags.includes(at));
         })
         .sort(
           (a, b) =>
             b.date.localeCompare(a.date) ||
             (a.start || "").localeCompare(b.start || ""),
         ),
-    [targetLogs, fd, fc, fk, activeTag],
+    [targetLogs, fd, fc, fk, activeTags],
   );
   const grouped = useMemo(() => {
     const g = {};
@@ -3592,9 +3592,9 @@ function LogListPage({
             </option>
           ))}
         </select>
-        {(fd || fc || fk || activeTag) && (
+        {(fd || fc || fk || activeTags.length > 0) && (
           <button
-            onClick={() => { setFd(""); setFc(""); setFk(""); setActiveTag(""); }}
+            onClick={() => { setFd(""); setFc(""); setFk(""); setActiveTags([]); }}
             style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", fontSize: 13, cursor: "pointer", color: "#64748b" }}
           >
             リセット
@@ -3612,47 +3612,55 @@ function LogListPage({
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {/* ピン留めタグを先に表示 */}
-            {pinnedTags.filter((t) => allTags.includes(t)).map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
-                onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
-                style={{
-                  padding: "4px 10px", borderRadius: 20, border: "1px solid",
-                  fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-                  display: "flex", alignItems: "center", gap: 4,
-                  borderColor: activeTag === tag ? "#8B5CF6" : "#DDD6FE",
-                  background: activeTag === tag ? "#8B5CF6" : "#F5F3FF",
-                  color: activeTag === tag ? "#fff" : "#6D28D9",
-                  fontWeight: activeTag === tag ? 600 : 400,
-                }}
-              >
-                📌 #{tag}
-              </button>
-            ))}
+            {pinnedTags.filter((t) => allTags.includes(t)).map((tag) => {
+              const isActive = activeTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTags((p) => isActive ? p.filter((t) => t !== tag) : [...p, tag])}
+                  onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
+                  style={{
+                    padding: "4px 10px", borderRadius: 20, border: "1px solid",
+                    fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+                    display: "flex", alignItems: "center", gap: 4,
+                    borderColor: isActive ? "#8B5CF6" : "#DDD6FE",
+                    background: isActive ? "#8B5CF6" : "#F5F3FF",
+                    color: isActive ? "#fff" : "#6D28D9",
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  📌 #{tag}
+                </button>
+              );
+            })}
             {/* 通常タグ */}
-            {allTags.filter((t) => !pinnedTags.includes(t)).map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setActiveTag(activeTag === tag ? "" : tag)}
-                onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
-                style={{
-                  padding: "4px 10px", borderRadius: 20, border: "1px solid",
-                  fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-                  borderColor: activeTag === tag ? "#3B82F6" : "#e2e8f0",
-                  background: activeTag === tag ? "#3B82F6" : "#f8fafc",
-                  color: activeTag === tag ? "#fff" : "#64748b",
-                  fontWeight: activeTag === tag ? 600 : 400,
-                }}
-              >
-                #{tag}
-              </button>
-            ))}
+            {allTags.filter((t) => !pinnedTags.includes(t)).map((tag) => {
+              const isActive = activeTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => setActiveTags((p) => isActive ? p.filter((t) => t !== tag) : [...p, tag])}
+                  onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
+                  style={{
+                    padding: "4px 10px", borderRadius: 20, border: "1px solid",
+                    fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+                    borderColor: isActive ? "#3B82F6" : "#e2e8f0",
+                    background: isActive ? "#3B82F6" : "#f8fafc",
+                    color: isActive ? "#fff" : "#64748b",
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  #{tag}
+                </button>
+              );
+            })}
           </div>
-          {activeTag && (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
-              <span style={{ background: "#F5F3FF", color: "#6D28D9", padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>#{activeTag}</span>
-              <span style={{ marginLeft: 6 }}>で絞り込み中 · {filtered.length}件</span>
+          {activeTags.length > 0 && (
+            <div style={{ marginTop: 8, fontSize: 12, color: "#64748b", display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+              {activeTags.map((tag) => (
+                <span key={tag} style={{ background: "#F5F3FF", color: "#6D28D9", padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>#{tag}</span>
+              ))}
+              <span style={{ marginLeft: 4 }}>すべて含む（AND） · {filtered.length}件</span>
             </div>
           )}
         </div>
@@ -3681,7 +3689,7 @@ function LogListPage({
             onSaveDayComment={onSaveDayComment}
             onEditLog={onEditLog}
             onDuplicate={onDuplicate}
-            onTagClick={(tag) => setActiveTag(tag)}
+            onTagClick={(tag) => setActiveTags((p) => p.includes(tag) ? p : [...p, tag])}
           />
         ))
       )}
