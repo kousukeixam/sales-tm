@@ -3458,7 +3458,7 @@ function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onS
   };
 
   return (
-    <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", width: "100%", maxWidth: "100%", overflow: "hidden" }}>
       <div style={{
         transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
         width: selectedDate ? 280 : "100%",
@@ -3486,6 +3486,8 @@ function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onS
 
       <div style={{
         flex: 1,
+        minWidth: 0,
+        maxWidth: "100%",
         opacity: selectedDate ? 1 : 0,
         transform: selectedDate ? "translateX(0)" : "translateX(20px)",
         transition: "opacity 0.3s 0.1s, transform 0.3s 0.1s",
