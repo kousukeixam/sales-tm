@@ -9058,7 +9058,7 @@ function TaskCarousel({ items, today }) {
   );
 }
 
-function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) { {
+function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
