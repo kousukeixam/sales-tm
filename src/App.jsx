@@ -4696,6 +4696,8 @@ function KanbanColumn({
   onOpenCard,
   onDrop,
   onDeleteCol,
+  sortValue,
+  onSortChange,
 }) {
   const [over, setOver] = useState(false);
   const cc = { todo: "#64748b", prog: "#3B82F6", done: "#10B981" };
@@ -4756,6 +4758,20 @@ function KanbanColumn({
         >
           {col.name}
         </span>
+        <select
+          value={sortValue || ""}
+          onChange={(e) => onSortChange(col.id, e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            fontSize: 11, color: "#64748b", border: "1px solid #e2e8f0",
+            borderRadius: 6, padding: "2px 4px", background: "#fff",
+            outline: "none", cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          <option value="">並び替え</option>
+          <option value="prio">優先度順</option>
+          <option value="due">期日順</option>
+        </select>
         <span
           style={{
             fontSize: 12,
@@ -4871,6 +4887,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   const [addingCol, setAddingCol] = useState(false);
   const [newColName, setNewColName] = useState("");
   const [filterPrio, setFilterPrio] = useState("");
+  const [colSortBy, setColSortBy] = useState({}); // { colId: "prio" | "due" | "" }
   const isOwner = viewId === currentUser.id;
   const viewUser = allUsers.find((u) => u.id === viewId);
   const board = boards[viewId] || { cols: [], cards: [] };
@@ -4878,7 +4895,22 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     () => board.cards.filter((c) => !filterPrio || c.prio === filterPrio),
     [board.cards, filterPrio],
   );
-  const colCards = (cId) => visibleCards.filter((c) => c.col === cId);
+  const sortCards = (cards, sortBy) => {
+    if (sortBy === "prio") {
+      const order = { high: 0, mid: 1, low: 2 };
+      return [...cards].sort((a, b) => (order[a.prio] ?? 99) - (order[b.prio] ?? 99));
+    }
+    if (sortBy === "due") {
+      return [...cards].sort((a, b) => {
+        if (!a.due && !b.due) return 0;
+        if (!a.due) return 1;
+        if (!b.due) return -1;
+        return a.due.localeCompare(b.due);
+      });
+    }
+    return cards;
+  };
+  const colCards = (cId) => sortCards(visibleCards.filter((c) => c.col === cId), colSortBy[cId] || "");
   const totalByStatus = useMemo(() => {
     const all = Object.entries(boards)
       .filter(([uid]) =>
@@ -5224,6 +5256,8 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             col={col}
             cards={colCards(col.id)}
             isOwner={isOwner}
+            sortValue={colSortBy[col.id]}
+            onSortChange={(colId, val) => setColSortBy((p) => ({ ...p, [colId]: val }))}
             onAddCard={(cId) =>
               setModal({
                 card: {
