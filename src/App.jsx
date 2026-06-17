@@ -3435,6 +3435,143 @@ function DateGroup({
     </div>
   );
 }
+function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onSaveDayComment, onEditLog, onDuplicate, onTagClick }) {
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  // 月別グルーピング
+  const monthGroups = useMemo(() => {
+    const mg = {};
+    Object.entries(grouped).forEach(([date, recs]) => {
+      const month = date.slice(0, 7); // YYYY-MM
+      if (!mg[month]) mg[month] = [];
+      mg[month].push([date, recs]);
+    });
+    // 日付降順
+    Object.values(mg).forEach((arr) => arr.sort((a, b) => b[0].localeCompare(a[0])));
+    return Object.entries(mg).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [grouped]);
+
+  const selectedRecs = selectedDate ? grouped[selectedDate] : null;
+
+  const handleSelect = (date) => {
+    setSelectedDate((prev) => (prev === date ? null : date));
+  };
+
+  return (
+    <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+      <div style={{
+        transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
+        width: selectedDate ? 280 : "100%",
+        minWidth: selectedDate ? 280 : "auto",
+        flexShrink: 0,
+      }}>
+        {monthGroups.map(([month, dates]) => (
+          <div key={month} style={{ marginBottom: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: "#64748b", margin: "0 0 8px" }}>
+              {month.replace("-", "年")}月
+            </p>
+            {dates.map(([date, recs]) => (
+              <DayCard
+                key={date}
+                date={date}
+                recs={recs}
+                selected={selectedDate === date}
+                compact={!!selectedDate}
+                onClick={() => handleSelect(date)}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div style={{
+        flex: 1,
+        opacity: selectedDate ? 1 : 0,
+        transform: selectedDate ? "translateX(0)" : "translateX(20px)",
+        transition: "opacity 0.3s 0.1s, transform 0.3s 0.1s",
+        pointerEvents: selectedDate ? "auto" : "none",
+        display: selectedDate ? "block" : "none",
+      }}>
+        {selectedRecs && (
+          <DateGroup
+            date={selectedDate}
+            recs={selectedRecs}
+            currentUser={currentUser}
+            onDelete={onDelete}
+            onSaveManagerComment={onSaveManagerComment}
+            onSaveDayComment={onSaveDayComment}
+            onEditLog={onEditLog}
+            onDuplicate={onDuplicate}
+            onTagClick={onTagClick}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DayCard({ date, recs, selected, compact, onClick }) {
+  const totMins = recs.reduce((s, r) => s + r.minutes, 0);
+  const catMins = {};
+  Object.keys(CATEGORIES).forEach((k) => (catMins[k] = 0));
+  recs.forEach((r) => {
+    if (catMins[r.cat] !== undefined) catMins[r.cat] += r.minutes;
+  });
+  const dateObj = new Date(date);
+  const weekday = ["日", "月", "火", "水", "木", "金", "土"][dateObj.getDay()];
+  const displayDate = `${dateObj.getMonth() + 1}月${dateObj.getDate()}日（${weekday}）`;
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: "#fff",
+        border: `1px solid ${selected ? "#3B82F6" : "#e2e8f0"}`,
+        borderRadius: 14,
+        padding: compact ? "10px 12px" : "13px 16px",
+        marginBottom: 8,
+        cursor: "pointer",
+        transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
+        boxShadow: selected ? "0 2px 8px rgba(59,130,246,0.12)" : "none",
+      }}
+      onMouseEnter={(e) => { if (!selected) e.currentTarget.style.borderColor = "#cbd5e1"; }}
+      onMouseLeave={(e) => { if (!selected) e.currentTarget.style.borderColor = "#e2e8f0"; }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: compact ? 0 : 7 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
+          <span style={{ fontSize: compact ? 13 : 14, fontWeight: 600, color: "#1e293b", whiteSpace: "nowrap" }}>
+            {displayDate}
+          </span>
+          {!compact && (
+            <span style={{ fontSize: 11, color: "#94a3b8", whiteSpace: "nowrap" }}>
+              {recs.length}件 / {Math.floor(totMins / 60)}h{totMins % 60 > 0 ? `${totMins % 60}m` : ""}
+            </span>
+          )}
+        </div>
+        <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0 }}>▶</span>
+      </div>
+      {!compact && (
+        <>
+          <div style={{ display: "flex", height: 5, borderRadius: 3, overflow: "hidden", gap: 1, marginTop: 6 }}>
+            {Object.entries(CATEGORIES).map(([k, v]) => {
+              const w = totMins > 0 ? (catMins[k] / totMins) * 100 : 0;
+              return w > 0 ? (
+                <div key={k} style={{ width: `${w}%`, background: v.color, borderRadius: 3 }} />
+              ) : null;
+            })}
+          </div>
+          <div style={{ display: "flex", gap: 8, marginTop: 5, flexWrap: "wrap" }}>
+            {Object.entries(CATEGORIES).filter(([k]) => catMins[k] > 0).map(([k, v]) => (
+              <span key={k} style={{ fontSize: 10, color: v.color }}>
+                {k}: {Math.floor(catMins[k] / 60)}h{catMins[k] % 60 > 0 ? `${catMins[k] % 60}m` : ""}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function LogListPage({
   logs,
@@ -3517,6 +3654,13 @@ function LogListPage({
     });
     return g;
   }, [filtered]);
+
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem("logViewMode") || "list");
+  const changeViewMode = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem("logViewMode", mode);
+  };
+
   return (
     <div>
       {filterUser && (
@@ -3599,8 +3743,19 @@ function LogListPage({
             リセット
           </button>
         )}
-        <div style={{ marginLeft: "auto", fontSize: 13 }}>
+        <div style={{ marginLeft: "auto", fontSize: 13, display: "flex", alignItems: "center", gap: 12 }}>
           <b style={{ color: "#1e293b" }}>{filtered.length}件</b>
+          <div style={{ display: "flex", gap: 2, background: "#f1f5f9", borderRadius: 8, padding: 3 }}>
+            {[["list", "📋 リスト"], ["card", "🗂 カード"]].map(([id, label]) => (
+              <button key={id} onClick={() => changeViewMode(id)} style={{
+                padding: "5px 12px", borderRadius: 6, border: "none", cursor: "pointer",
+                fontSize: 12, fontWeight: viewMode === id ? 600 : 400, fontFamily: "inherit",
+                background: viewMode === id ? "#fff" : "transparent",
+                color: viewMode === id ? "#1e293b" : "#64748b",
+                boxShadow: viewMode === id ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+              }}>{label}</button>
+            ))}
+          </div>
         </div>
       </div>
       {allTags.length > 0 && (
@@ -3665,17 +3820,20 @@ function LogListPage({
         </div>
       )}
       {Object.keys(grouped).length === 0 ? (
-        <div
-          style={{
-            ...C,
-            textAlign: "center",
-            color: "#94a3b8",
-            fontSize: 14,
-            padding: 48,
-          }}
-        >
+        <div style={{ ...C, textAlign: "center", color: "#94a3b8", fontSize: 14, padding: 48 }}>
           記録がありません
         </div>
+      ) : viewMode === "card" ? (
+        <CardLogView
+          grouped={grouped}
+          currentUser={currentUser}
+          onDelete={onDelete}
+          onSaveManagerComment={onSaveManagerComment}
+          onSaveDayComment={onSaveDayComment}
+          onEditLog={onEditLog}
+          onDuplicate={onDuplicate}
+          onTagClick={(tag) => setActiveTags((p) => p.includes(tag) ? p : [...p, tag])}
+        />
       ) : (
         Object.entries(grouped).map(([date, recs]) => (
           <DateGroup
