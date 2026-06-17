@@ -1517,15 +1517,22 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   const [templateRowTarget, setTemplateRowTarget] = useState(null); // 業務行テンプレート保存時の対象行
   const [templateSaved, setTemplateSaved] = useState(false);
   const [templateTab, setTemplateTab] = useState("report");
-  const [tagSuggest, setTagSuggest] = useState({ rowId: null, field: null, candidates: [], word: "" });
+  const [tagSuggest, setTagSuggest] = useState({
+    rowId: null,
+    field: null,
+    candidates: [],
+    word: "",
+  });
 
   const allPastTags = useMemo(() => {
     const tagSet = new Set();
-    (logs || []).filter((l) => l.userId === currentUser.id).forEach((l) => {
-      extractTags(l.task).forEach((t) => tagSet.add(t));
-      extractTags(l.detail).forEach((t) => tagSet.add(t));
-      extractTags(l.dayComment).forEach((t) => tagSet.add(t));
-    });
+    (logs || [])
+      .filter((l) => l.userId === currentUser.id)
+      .forEach((l) => {
+        extractTags(l.task).forEach((t) => tagSet.add(t));
+        extractTags(l.detail).forEach((t) => tagSet.add(t));
+        extractTags(l.dayComment).forEach((t) => tagSet.add(t));
+      });
     return Array.from(tagSet);
   }, [logs]);
 
@@ -1536,8 +1543,8 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     const match = lastLine.match(/#(\S*)$/);
     if (match) {
       const word = match[1];
-      const candidates = allPastTags.filter((t) =>
-        t.toLowerCase().startsWith(word.toLowerCase()) && t !== word
+      const candidates = allPastTags.filter(
+        (t) => t.toLowerCase().startsWith(word.toLowerCase()) && t !== word,
       );
       setTagSuggest({ rowId, field, candidates, word });
     } else {
@@ -1547,7 +1554,10 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
 
   const applyTag = (rowId, field, currentVal, tag) => {
     const lines = currentVal.split("\n");
-    lines[lines.length - 1] = lines[lines.length - 1].replace(/#(\S*)$/, `#${tag} `);
+    lines[lines.length - 1] = lines[lines.length - 1].replace(
+      /#(\S*)$/,
+      `#${tag} `,
+    );
     const newVal = lines.join("\n");
     upd(rowId, field, newVal);
     setTagSuggest({ rowId: null, field: null, candidates: [], word: "" });
@@ -1571,15 +1581,37 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     const actualType = templateRowTarget ? "row" : "report";
     let saveRows;
     if (actualType === "row") {
-      saveRows = [{ task: templateRowTarget.task, detail: templateRowTarget.detail, start: templateRowTarget.start, end: templateRowTarget.end, cat: templateRowTarget.cat }];
+      saveRows = [
+        {
+          task: templateRowTarget.task,
+          detail: templateRowTarget.detail,
+          start: templateRowTarget.start,
+          end: templateRowTarget.end,
+          cat: templateRowTarget.cat,
+        },
+      ];
     } else {
-      saveRows = rows.filter((r) => r.task).map((r) => ({ task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
+      saveRows = rows
+        .filter((r) => r.task)
+        .map((r) => ({
+          task: r.task,
+          detail: r.detail,
+          start: r.start,
+          end: r.end,
+          cat: r.cat,
+        }));
     }
     if (saveRows.length === 0) return;
     const { data, error } = await supabase
       .from("log_templates")
-      .insert({ user_id: currentUser.id, name: templateName.trim(), rows: saveRows, type: actualType })
-      .select().single();
+      .insert({
+        user_id: currentUser.id,
+        name: templateName.trim(),
+        rows: saveRows,
+        type: actualType,
+      })
+      .select()
+      .single();
     if (!error && data) {
       setTemplates((p) => [data, ...p]);
       setTemplateName("");
@@ -1645,9 +1677,14 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   // 転記（業務行があれば行＋コメント、なければコメントのみ）
   const handleSave = async () => {
     // セッションを実際にサーバーへ問い合わせて有効性を確認
-    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: sessionError,
+    } = await supabase.auth.getUser();
     if (sessionError || !user) {
-      alert("セッションが切れています。ページを再読み込みしてログインし直してください。");
+      alert(
+        "セッションが切れています。ページを再読み込みしてログインし直してください。",
+      );
       window.location.reload();
       return;
     }
@@ -1923,62 +1960,229 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
           </button>
         </div>
         {templateSaved && (
-          <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "8px 14px", fontSize: 13, color: "#15803D", marginTop: 8 }}>
+          <div
+            style={{
+              background: "#DCFCE7",
+              border: "1px solid #BBF7D0",
+              borderRadius: 8,
+              padding: "8px 14px",
+              fontSize: 13,
+              color: "#15803D",
+              marginTop: 8,
+            }}
+          >
             ✅ テンプレートを保存しました！
           </div>
         )}
 
         {/* テンプレート呼び出しモーダル */}
         {showTemplateModal && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
-            onClick={(e) => e.target === e.currentTarget && setShowTemplateModal(false)}>
-            <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 500, maxWidth: "95vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>📋 テンプレートを選択</h3>
-                <button onClick={() => setShowTemplateModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.45)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 200,
+            }}
+            onClick={(e) =>
+              e.target === e.currentTarget && setShowTemplateModal(false)
+            }
+          >
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 18,
+                padding: 28,
+                width: 500,
+                maxWidth: "95vw",
+                maxHeight: "80vh",
+                overflow: "auto",
+                boxShadow: "0 24px 64px rgba(0,0,0,0.22)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: "#1e293b",
+                  }}
+                >
+                  📋 テンプレートを選択
+                </h3>
+                <button
+                  onClick={() => setShowTemplateModal(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#94a3b8",
+                  }}
+                >
                   <Icon name="x" size={18} />
                 </button>
               </div>
               {/* タブ切り替え */}
-              <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "#f1f5f9", borderRadius: 10, padding: 4 }}>
-                {[["report", "📋 日報テンプレート"], ["row", "📌 業務行テンプレート"]].map(([tab, label]) => (
-                  <button key={tab} onClick={() => setTemplateTab(tab)} style={{
-                    flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                    fontSize: 13, fontWeight: templateTab === tab ? 600 : 400, fontFamily: "inherit",
-                    background: templateTab === tab ? "#fff" : "transparent",
-                    color: templateTab === tab ? "#1e293b" : "#64748b",
-                    boxShadow: templateTab === tab ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                  }}>{label}</button>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 4,
+                  marginBottom: 16,
+                  background: "#f1f5f9",
+                  borderRadius: 10,
+                  padding: 4,
+                }}
+              >
+                {[
+                  ["report", "📋 日報テンプレート"],
+                  ["row", "📌 業務行テンプレート"],
+                ].map(([tab, label]) => (
+                  <button
+                    key={tab}
+                    onClick={() => setTemplateTab(tab)}
+                    style={{
+                      flex: 1,
+                      padding: "7px 0",
+                      borderRadius: 8,
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: templateTab === tab ? 600 : 400,
+                      fontFamily: "inherit",
+                      background: templateTab === tab ? "#fff" : "transparent",
+                      color: templateTab === tab ? "#1e293b" : "#64748b",
+                      boxShadow:
+                        templateTab === tab
+                          ? "0 1px 3px rgba(0,0,0,0.1)"
+                          : "none",
+                    }}
+                  >
+                    {label}
+                  </button>
                 ))}
               </div>
               {(() => {
-                const filtered = templates.filter((t) => (t.type || "report") === templateTab);
-                if (filtered.length === 0) return (
-                  <div style={{ textAlign: "center", color: "#94a3b8", padding: "32px 0", fontSize: 13 }}>
-                    保存済みのテンプレートがありません
-                  </div>
+                const filtered = templates.filter(
+                  (t) => (t.type || "report") === templateTab,
                 );
+                if (filtered.length === 0)
+                  return (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        color: "#94a3b8",
+                        padding: "32px 0",
+                        fontSize: 13,
+                      }}
+                    >
+                      保存済みのテンプレートがありません
+                    </div>
+                  );
                 return (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
+                    }}
+                  >
                     {filtered.map((t) => (
-                      <div key={t.id} style={{ background: "#f8fafc", borderRadius: 10, padding: "12px 14px", border: "1px solid #e2e8f0" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b", flex: 1 }}>{t.name}</span>
-                          <button onClick={() => handleLoadTemplate(t)} style={{ ...BP, padding: "5px 14px", fontSize: 12 }}>
+                      <div
+                        key={t.id}
+                        style={{
+                          background: "#f8fafc",
+                          borderRadius: 10,
+                          padding: "12px 14px",
+                          border: "1px solid #e2e8f0",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            marginBottom: 8,
+                          }}
+                        >
+                          <span
+                            style={{
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: "#1e293b",
+                              flex: 1,
+                            }}
+                          >
+                            {t.name}
+                          </span>
+                          <button
+                            onClick={() => handleLoadTemplate(t)}
+                            style={{ ...BP, padding: "5px 14px", fontSize: 12 }}
+                          >
                             追加
                           </button>
-                          <button onClick={() => handleDeleteTemplate(t.id)} style={{ ...BB, padding: "5px 10px", fontSize: 12, color: "#EF4444", borderColor: "#FECACA" }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "#FEF2F2"}
-                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}>
+                          <button
+                            onClick={() => handleDeleteTemplate(t.id)}
+                            style={{
+                              ...BB,
+                              padding: "5px 10px",
+                              fontSize: 12,
+                              color: "#EF4444",
+                              borderColor: "#FECACA",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.background = "#FEF2F2")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.background = "#fff")
+                            }
+                          >
                             <Icon name="trash" size={13} />
                           </button>
                         </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 4,
+                          }}
+                        >
                           {t.rows.map((r, i) => (
-                            <div key={i} style={{ fontSize: 12, color: "#64748b", display: "flex", gap: 8 }}>
-                              <span style={{ color: r.cat ? CATEGORIES[r.cat]?.color : "#94a3b8", fontWeight: 600 }}>{r.cat || "-"}</span>
+                            <div
+                              key={i}
+                              style={{
+                                fontSize: 12,
+                                color: "#64748b",
+                                display: "flex",
+                                gap: 8,
+                              }}
+                            >
+                              <span
+                                style={{
+                                  color: r.cat
+                                    ? CATEGORIES[r.cat]?.color
+                                    : "#94a3b8",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {r.cat || "-"}
+                              </span>
                               <span>{r.task}</span>
-                              {r.start && r.end && <span style={{ color: "#94a3b8" }}>{r.start}〜{r.end}</span>}
+                              {r.start && r.end && (
+                                <span style={{ color: "#94a3b8" }}>
+                                  {r.start}〜{r.end}
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -1993,64 +2197,175 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
 
         {/* テンプレート保存モーダル */}
         {showSaveTemplate && (
-          <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}
-            onClick={(e) => e.target === e.currentTarget && setShowSaveTemplate(false)}>
-            <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>💾 テンプレートとして保存</h3>
-                <button onClick={() => setShowSaveTemplate(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.45)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 200,
+            }}
+            onClick={(e) =>
+              e.target === e.currentTarget && setShowSaveTemplate(false)
+            }
+          >
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 18,
+                padding: 28,
+                width: 420,
+                maxWidth: "95vw",
+                boxShadow: "0 24px 64px rgba(0,0,0,0.22)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 20,
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: "#1e293b",
+                  }}
+                >
+                  💾 テンプレートとして保存
+                </h3>
+                <button
+                  onClick={() => setShowSaveTemplate(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#94a3b8",
+                  }}
+                >
                   <Icon name="x" size={18} />
                 </button>
               </div>
-              <div style={{ display: "flex", gap: 4, marginBottom: 16, background: "#f1f5f9", borderRadius: 10, padding: 4 }}>
-                {[["report", "📋 日報全体"], ["row", "📌 業務行1行"]].map(([type, label]) => {
-                  const isActive = templateRowTarget ? type === "row" : type === "report";
+              <div
+                style={{
+                  display: "flex",
+                  gap: 4,
+                  marginBottom: 16,
+                  background: "#f1f5f9",
+                  borderRadius: 10,
+                  padding: 4,
+                }}
+              >
+                {[
+                  ["report", "📋 日報全体"],
+                  ["row", "📌 業務行1行"],
+                ].map(([type, label]) => {
+                  const isActive = templateRowTarget
+                    ? type === "row"
+                    : type === "report";
                   return (
-                    <button key={type} onClick={() => {
-                      if (type === "report") {
-                        setTemplateRowTarget(null);
-                      } else {
-                        // 業務行タブを押したとき、入力済みの最初の行をデフォルトでセット
-                        const firstRow = rows.find((r) => r.task);
-                        setTemplateRowTarget(firstRow || null);
-                      }
-                    }} style={{
-                      flex: 1, padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer",
-                      fontSize: 13, fontWeight: isActive ? 600 : 400, fontFamily: "inherit",
-                      background: isActive ? "#fff" : "transparent",
-                      color: isActive ? "#1e293b" : "#64748b",
-                      boxShadow: isActive ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-                    }}>{label}</button>
+                    <button
+                      key={type}
+                      onClick={() => {
+                        if (type === "report") {
+                          setTemplateRowTarget(null);
+                        } else {
+                          // 業務行タブを押したとき、入力済みの最初の行をデフォルトでセット
+                          const firstRow = rows.find((r) => r.task);
+                          setTemplateRowTarget(firstRow || null);
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: "7px 0",
+                        borderRadius: 8,
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: 13,
+                        fontWeight: isActive ? 600 : 400,
+                        fontFamily: "inherit",
+                        background: isActive ? "#fff" : "transparent",
+                        color: isActive ? "#1e293b" : "#64748b",
+                        boxShadow: isActive
+                          ? "0 1px 3px rgba(0,0,0,0.1)"
+                          : "none",
+                      }}
+                    >
+                      {label}
+                    </button>
                   );
                 })}
               </div>
               {templateRowTarget && (
                 <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>保存する業務行を選択</label>
+                  <label
+                    style={{
+                      fontSize: 12,
+                      color: "#64748b",
+                      display: "block",
+                      marginBottom: 5,
+                    }}
+                  >
+                    保存する業務行を選択
+                  </label>
                   <select
                     value={templateRowTarget?.id || ""}
                     onChange={(e) => {
                       const row = rows.find((r) => r.id === e.target.value);
                       setTemplateRowTarget(row || null);
-                    }} style={I}>
+                    }}
+                    style={I}
+                  >
                     <option value="">選択してください</option>
-                    {rows.filter((r) => r.task).map((r) => (
-                      <option key={r.id} value={r.id}>{r.cat ? `[${r.cat}] ` : ""}{r.task}</option>
-                    ))}
+                    {rows
+                      .filter((r) => r.task)
+                      .map((r) => (
+                        <option key={r.id} value={r.id}>
+                          {r.cat ? `[${r.cat}] ` : ""}
+                          {r.task}
+                        </option>
+                      ))}
                   </select>
                 </div>
               )}
               <div style={{ marginBottom: 16 }}>
-                <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>テンプレート名</label>
-                <input value={templateName} onChange={(e) => setTemplateName(e.target.value)}
+                <label
+                  style={{
+                    fontSize: 12,
+                    color: "#64748b",
+                    display: "block",
+                    marginBottom: 5,
+                  }}
+                >
+                  テンプレート名
+                </label>
+                <input
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
                   placeholder="例：定期訪問ルート、週次社内作業"
-                  style={I} autoFocus
-                  onKeyDown={(e) => e.key === "Enter" && handleSaveTemplate()} />
+                  style={I}
+                  autoFocus
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveTemplate()}
+                />
               </div>
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-                <button onClick={() => setShowSaveTemplate(false)} style={BB}>キャンセル</button>
-                <button onClick={handleSaveTemplate} disabled={!templateName.trim()} style={{ ...BP, opacity: templateName.trim() ? 1 : 0.4 }}>
-                  <Icon name="save" size={14} />保存
+              <div
+                style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}
+              >
+                <button onClick={() => setShowSaveTemplate(false)} style={BB}>
+                  キャンセル
+                </button>
+                <button
+                  onClick={handleSaveTemplate}
+                  disabled={!templateName.trim()}
+                  style={{ ...BP, opacity: templateName.trim() ? 1 : 0.4 }}
+                >
+                  <Icon name="save" size={14} />
+                  保存
                 </button>
               </div>
             </div>
@@ -2246,25 +2561,82 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                     </div>
                   )}
                 </div>
-                <div style={{ marginLeft: "auto", display: "flex", gap: 6, flexShrink: 0 }}>
+                <div
+                  style={{
+                    marginLeft: "auto",
+                    display: "flex",
+                    gap: 6,
+                    flexShrink: 0,
+                  }}
+                >
                   {row.task && (
                     <>
-                      <button onClick={() => {
-                        setRows((p) => [...p, { ...newRow(), task: row.task, detail: row.detail, start: row.start, end: row.end, cat: row.cat }]);
-                      }} style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", cursor: "pointer", color: "#3B82F6", padding: "4px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: "inherit" }}>
+                      <button
+                        onClick={() => {
+                          setRows((p) => [
+                            ...p,
+                            {
+                              ...newRow(),
+                              task: row.task,
+                              detail: row.detail,
+                              start: row.start,
+                              end: row.end,
+                              cat: row.cat,
+                            },
+                          ]);
+                        }}
+                        style={{
+                          background: "#EFF6FF",
+                          border: "1px solid #BFDBFE",
+                          cursor: "pointer",
+                          color: "#3B82F6",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          fontFamily: "inherit",
+                        }}
+                      >
                         複製
                       </button>
-                      <button onClick={() => {
-                        setTemplateType("row");
-                        setTemplateRowTarget(row);
-                        setShowSaveTemplate(true);
-                      }} style={{ background: "#F5F3FF", border: "1px solid #DDD6FE", cursor: "pointer", color: "#8B5CF6", padding: "4px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: "inherit" }}>
+                      <button
+                        onClick={() => {
+                          setTemplateType("row");
+                          setTemplateRowTarget(row);
+                          setShowSaveTemplate(true);
+                        }}
+                        style={{
+                          background: "#F5F3FF",
+                          border: "1px solid #DDD6FE",
+                          cursor: "pointer",
+                          color: "#8B5CF6",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          fontFamily: "inherit",
+                        }}
+                      >
                         保存
                       </button>
                     </>
                   )}
                   {rows.length > 1 && (
-                    <button onClick={() => delRow(row.id)} style={{ background: "#FEF2F2", border: "1px solid #FECACA", cursor: "pointer", color: "#EF4444", padding: "4px 8px", borderRadius: 6, display: "flex", flexShrink: 0, fontSize: 12, fontWeight: 700 }}>
+                    <button
+                      onClick={() => delRow(row.id)}
+                      style={{
+                        background: "#FEF2F2",
+                        border: "1px solid #FECACA",
+                        cursor: "pointer",
+                        color: "#EF4444",
+                        padding: "4px 8px",
+                        borderRadius: 6,
+                        display: "flex",
+                        flexShrink: 0,
+                        fontSize: 12,
+                        fontWeight: 700,
+                      }}
+                    >
                       ✕
                     </button>
                   )}
@@ -2293,7 +2665,9 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                   <div style={{ position: "relative" }}>
                     <input
                       value={row.task}
-                      onChange={(e) => handleTagInput(row.id, "task", e.target.value)}
+                      onChange={(e) =>
+                        handleTagInput(row.id, "task", e.target.value)
+                      }
                       placeholder="業務タイトル（#タグで分類できます）"
                       style={{
                         width: "100%",
@@ -2309,39 +2683,92 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                       onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#e2e8f0";
-                        setTimeout(() => setTagSuggest({ rowId: null, field: null, candidates: [], word: "" }), 150);
+                        setTimeout(
+                          () =>
+                            setTagSuggest({
+                              rowId: null,
+                              field: null,
+                              candidates: [],
+                              word: "",
+                            }),
+                          150,
+                        );
                       }}
                     />
-                    {tagSuggest.rowId === row.id && tagSuggest.field === "task" && tagSuggest.candidates.length > 0 && (
-                      <div style={{
-                        position: "absolute", top: "100%", left: 0, zIndex: 50,
-                        background: "#fff", border: "1px solid #e2e8f0",
-                        borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                        overflow: "hidden", minWidth: 180, marginTop: 2,
-                      }}>
-                        {tagSuggest.candidates.map((tag) => (
-                          <div key={tag}
-                            onMouseDown={() => applyTag(row.id, "task", row.task, tag)}
-                            style={{
-                              padding: "8px 14px", cursor: "pointer", fontSize: 13,
-                              color: "#6D28D9", display: "flex", alignItems: "center", gap: 6,
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "#F5F3FF"}
-                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
-                          >
-                            <span style={{ color: "#8B5CF6", fontWeight: 600 }}>#{tag}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {tagSuggest.rowId === row.id &&
+                      tagSuggest.field === "task" &&
+                      tagSuggest.candidates.length > 0 && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "100%",
+                            left: 0,
+                            zIndex: 50,
+                            background: "#fff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: 10,
+                            boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                            overflow: "hidden",
+                            minWidth: 180,
+                            marginTop: 2,
+                          }}
+                        >
+                          {tagSuggest.candidates.map((tag) => (
+                            <div
+                              key={tag}
+                              onMouseDown={() =>
+                                applyTag(row.id, "task", row.task, tag)
+                              }
+                              style={{
+                                padding: "8px 14px",
+                                cursor: "pointer",
+                                fontSize: 13,
+                                color: "#6D28D9",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.background = "#F5F3FF")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.background = "#fff")
+                              }
+                            >
+                              <span
+                                style={{ color: "#8B5CF6", fontWeight: 600 }}
+                              >
+                                #{tag}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     {extractTags(row.task).length > 0 && (
-                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 4,
+                          flexWrap: "wrap",
+                          marginTop: 6,
+                        }}
+                      >
                         {extractTags(row.task).map((tag) => (
-                          <span key={tag} style={{
-                            display: "inline-block", padding: "2px 8px", borderRadius: 10,
-                            background: "#F5F3FF", color: "#6D28D9", fontSize: 11, fontWeight: 600,
-                            border: "1px solid #DDD6FE",
-                          }}>#{tag}</span>
+                          <span
+                            key={tag}
+                            style={{
+                              display: "inline-block",
+                              padding: "2px 8px",
+                              borderRadius: 10,
+                              background: "#F5F3FF",
+                              color: "#6D28D9",
+                              fontSize: 11,
+                              fontWeight: 600,
+                              border: "1px solid #DDD6FE",
+                            }}
+                          >
+                            #{tag}
+                          </span>
                         ))}
                       </div>
                     )}
@@ -2365,7 +2792,9 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                   <div style={{ position: "relative" }}>
                     <textarea
                       value={row.detail}
-                      onChange={(e) => handleTagInput(row.id, "detail", e.target.value)}
+                      onChange={(e) =>
+                        handleTagInput(row.id, "detail", e.target.value)
+                      }
                       placeholder="場所・相手・内容・目的など詳細を入力...(#タグで分類できます)"
                       style={{
                         width: "100%",
@@ -2385,36 +2814,92 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                       onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#e2e8f0";
-                        setTimeout(() => setTagSuggest({ rowId: null, field: null, candidates: [], word: "" }), 150);
+                        setTimeout(
+                          () =>
+                            setTagSuggest({
+                              rowId: null,
+                              field: null,
+                              candidates: [],
+                              word: "",
+                            }),
+                          150,
+                        );
                       }}
                     />
-                    {tagSuggest.rowId === row.id && tagSuggest.field === "detail" && tagSuggest.candidates.length > 0 && (
-                      <div style={{
-                        position: "absolute", bottom: "100%", left: 0, zIndex: 50,
-                        background: "#fff", border: "1px solid #e2e8f0",
-                        borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                        overflow: "hidden", minWidth: 180, marginTop: 2,
-                      }}>
-                        {tagSuggest.candidates.map((tag) => (
-                          <div key={tag}
-                            onMouseDown={() => applyTag(row.id, "detail", row.detail, tag)}
-                            style={{ padding: "8px 14px", cursor: "pointer", fontSize: 13, color: "#6D28D9", display: "flex", alignItems: "center", gap: 6 }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = "#F5F3FF"}
-                            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
-                          >
-                            <span style={{ color: "#8B5CF6", fontWeight: 600 }}>#{tag}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {tagSuggest.rowId === row.id &&
+                      tagSuggest.field === "detail" &&
+                      tagSuggest.candidates.length > 0 && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "100%",
+                            left: 0,
+                            zIndex: 50,
+                            background: "#fff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: 10,
+                            boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                            overflow: "hidden",
+                            minWidth: 180,
+                            marginTop: 2,
+                          }}
+                        >
+                          {tagSuggest.candidates.map((tag) => (
+                            <div
+                              key={tag}
+                              onMouseDown={() =>
+                                applyTag(row.id, "detail", row.detail, tag)
+                              }
+                              style={{
+                                padding: "8px 14px",
+                                cursor: "pointer",
+                                fontSize: 13,
+                                color: "#6D28D9",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                              onMouseEnter={(e) =>
+                                (e.currentTarget.style.background = "#F5F3FF")
+                              }
+                              onMouseLeave={(e) =>
+                                (e.currentTarget.style.background = "#fff")
+                              }
+                            >
+                              <span
+                                style={{ color: "#8B5CF6", fontWeight: 600 }}
+                              >
+                                #{tag}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     {extractTags(row.detail).length > 0 && (
-                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 4,
+                          flexWrap: "wrap",
+                          marginTop: 6,
+                        }}
+                      >
                         {extractTags(row.detail).map((tag) => (
-                          <span key={tag} style={{
-                            display: "inline-block", padding: "2px 8px", borderRadius: 10,
-                            background: "#F5F3FF", color: "#6D28D9", fontSize: 11, fontWeight: 600,
-                            border: "1px solid #DDD6FE",
-                          }}>#{tag}</span>
+                          <span
+                            key={tag}
+                            style={{
+                              display: "inline-block",
+                              padding: "2px 8px",
+                              borderRadius: 10,
+                              background: "#F5F3FF",
+                              color: "#6D28D9",
+                              fontSize: 11,
+                              fontWeight: 600,
+                              border: "1px solid #DDD6FE",
+                            }}
+                          >
+                            #{tag}
+                          </span>
                         ))}
                       </div>
                     )}
@@ -2842,12 +3327,35 @@ function LogCard({
           }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, color: "#1e293b", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <div
+            style={{
+              fontSize: 14,
+              color: "#1e293b",
+              fontWeight: 600,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {rec.task.split(/(#[^\s#]+)/g).map((part, i) =>
               part.startsWith("#") ? (
-                <span key={i} onClick={(e) => { e.stopPropagation(); onTagClick?.(part.slice(1)); }}
-                  style={{ color: "#8B5CF6", cursor: "pointer", fontWeight: 600 }}>{part}</span>
-              ) : part
+                <span
+                  key={i}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTagClick?.(part.slice(1));
+                  }}
+                  style={{
+                    color: "#8B5CF6",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  {part}
+                </span>
+              ) : (
+                part
+              ),
             )}
           </div>
           {rec.detail && !expanded && (
@@ -3073,14 +3581,27 @@ function LogCard({
             )}
           </div>
           {canEdit && (
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            <div
+              style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}
+            >
               {rec.task !== "（コメントのみ）" && onDuplicateRow && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onDuplicateRow(rec);
                   }}
-                  style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#3B82F6", background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 7, padding: "5px 10px", cursor: "pointer" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                    fontSize: 12,
+                    color: "#3B82F6",
+                    background: "#EFF6FF",
+                    border: "1px solid #BFDBFE",
+                    borderRadius: 7,
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                  }}
                 >
                   📋 この行を複製
                 </button>
@@ -3223,16 +3744,37 @@ function DateGroup({
   const managerDayComment = recs[0]?.managerDayComment || "";
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>{date}</span>
-        <span style={{ fontSize: 12, color: "#94a3b8" }}>{recs.length}件 / {totMins}分</span>
-        {onDuplicate && recs.some(r => r.user === currentUser.name) && (
-          <button onClick={() => onDuplicate(recs)} style={{
-            display: "flex", alignItems: "center", gap: 4,
-            fontSize: 11, color: "#3B82F6", background: "#EFF6FF",
-            border: "1px solid #BFDBFE", borderRadius: 6, padding: "3px 10px",
-            cursor: "pointer", fontFamily: "inherit",
-          }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 8,
+        }}
+      >
+        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
+          {date}
+        </span>
+        <span style={{ fontSize: 12, color: "#94a3b8" }}>
+          {recs.length}件 / {totMins}分
+        </span>
+        {onDuplicate && recs.some((r) => r.user === currentUser.name) && (
+          <button
+            onClick={() => onDuplicate(recs)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 11,
+              color: "#3B82F6",
+              background: "#EFF6FF",
+              border: "1px solid #BFDBFE",
+              borderRadius: 6,
+              padding: "3px 10px",
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
             📋 この日を複製
           </button>
         )}
@@ -3435,7 +3977,16 @@ function DateGroup({
     </div>
   );
 }
-function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onSaveDayComment, onEditLog, onDuplicate, onTagClick }) {
+function CardLogView({
+  grouped,
+  currentUser,
+  onDelete,
+  onSaveManagerComment,
+  onSaveDayComment,
+  onEditLog,
+  onDuplicate,
+  onTagClick,
+}) {
   const [selectedDate, setSelectedDate] = useState(null);
 
   // 月別グルーピング
@@ -3447,7 +3998,9 @@ function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onS
       mg[month].push([date, recs]);
     });
     // 日付降順
-    Object.values(mg).forEach((arr) => arr.sort((a, b) => b[0].localeCompare(a[0])));
+    Object.values(mg).forEach((arr) =>
+      arr.sort((a, b) => b[0].localeCompare(a[0])),
+    );
     return Object.entries(mg).sort((a, b) => b[0].localeCompare(a[0]));
   }, [grouped]);
 
@@ -3458,16 +4011,34 @@ function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onS
   };
 
   return (
-    <div style={{ display: "flex", gap: 16, alignItems: "flex-start", width: "100%", maxWidth: "100%", overflow: "hidden" }}>
-      <div style={{
-        transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
-        width: selectedDate ? 280 : "100%",
-        minWidth: selectedDate ? 280 : "auto",
-        flexShrink: 0,
-      }}>
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "flex-start",
+        width: "100%",
+        maxWidth: "100%",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          transition: "width 0.35s cubic-bezier(0.4,0,0.2,1)",
+          width: selectedDate ? 280 : "100%",
+          minWidth: selectedDate ? 280 : "auto",
+          flexShrink: 0,
+        }}
+      >
         {monthGroups.map(([month, dates]) => (
           <div key={month} style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: "#64748b", margin: "0 0 8px" }}>
+            <p
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#64748b",
+                margin: "0 0 8px",
+              }}
+            >
               {month.replace("-", "年")}月
             </p>
             {dates.map(([date, recs]) => (
@@ -3484,16 +4055,18 @@ function CardLogView({ grouped, currentUser, onDelete, onSaveManagerComment, onS
         ))}
       </div>
 
-      <div style={{
-        flex: 1,
-        minWidth: 0,
-        maxWidth: "100%",
-        opacity: selectedDate ? 1 : 0,
-        transform: selectedDate ? "translateX(0)" : "translateX(20px)",
-        transition: "opacity 0.3s 0.1s, transform 0.3s 0.1s",
-        pointerEvents: selectedDate ? "auto" : "none",
-        display: selectedDate ? "block" : "none",
-      }}>
+      <div
+        style={{
+          flex: 1,
+          minWidth: 0,
+          maxWidth: "100%",
+          opacity: selectedDate ? 1 : 0,
+          transform: selectedDate ? "translateX(0)" : "translateX(20px)",
+          transition: "opacity 0.3s 0.1s, transform 0.3s 0.1s",
+          pointerEvents: selectedDate ? "auto" : "none",
+          display: selectedDate ? "block" : "none",
+        }}
+      >
         {selectedRecs && (
           <DateGroup
             date={selectedDate}
@@ -3536,17 +4109,40 @@ function DayCard({ date, recs, selected, compact, onClick }) {
         transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
         boxShadow: selected ? "0 2px 8px rgba(59,130,246,0.12)" : "none",
       }}
-      onMouseEnter={(e) => { if (!selected) e.currentTarget.style.borderColor = "#cbd5e1"; }}
-      onMouseLeave={(e) => { if (!selected) e.currentTarget.style.borderColor = "#e2e8f0"; }}
+      onMouseEnter={(e) => {
+        if (!selected) e.currentTarget.style.borderColor = "#cbd5e1";
+      }}
+      onMouseLeave={(e) => {
+        if (!selected) e.currentTarget.style.borderColor = "#e2e8f0";
+      }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: compact ? 0 : 7 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
-          <span style={{ fontSize: compact ? 13 : 14, fontWeight: 600, color: "#1e293b", whiteSpace: "nowrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: compact ? 0 : 7,
+        }}
+      >
+        <div
+          style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}
+        >
+          <span
+            style={{
+              fontSize: compact ? 13 : 14,
+              fontWeight: 600,
+              color: "#1e293b",
+              whiteSpace: "nowrap",
+            }}
+          >
             {displayDate}
           </span>
           {!compact && (
-            <span style={{ fontSize: 11, color: "#94a3b8", whiteSpace: "nowrap" }}>
-              {recs.length}件 / {Math.floor(totMins / 60)}h{totMins % 60 > 0 ? `${totMins % 60}m` : ""}
+            <span
+              style={{ fontSize: 11, color: "#94a3b8", whiteSpace: "nowrap" }}
+            >
+              {recs.length}件 / {Math.floor(totMins / 60)}h
+              {totMins % 60 > 0 ? `${totMins % 60}m` : ""}
             </span>
           )}
         </div>
@@ -3554,20 +4150,41 @@ function DayCard({ date, recs, selected, compact, onClick }) {
       </div>
       {!compact && (
         <>
-          <div style={{ display: "flex", height: 5, borderRadius: 3, overflow: "hidden", gap: 1, marginTop: 6 }}>
+          <div
+            style={{
+              display: "flex",
+              height: 5,
+              borderRadius: 3,
+              overflow: "hidden",
+              gap: 1,
+              marginTop: 6,
+            }}
+          >
             {Object.entries(CATEGORIES).map(([k, v]) => {
               const w = totMins > 0 ? (catMins[k] / totMins) * 100 : 0;
               return w > 0 ? (
-                <div key={k} style={{ width: `${w}%`, background: v.color, borderRadius: 3 }} />
+                <div
+                  key={k}
+                  style={{
+                    width: `${w}%`,
+                    background: v.color,
+                    borderRadius: 3,
+                  }}
+                />
               ) : null;
             })}
           </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 5, flexWrap: "wrap" }}>
-            {Object.entries(CATEGORIES).filter(([k]) => catMins[k] > 0).map(([k, v]) => (
-              <span key={k} style={{ fontSize: 10, color: v.color }}>
-                {k}: {Math.floor(catMins[k] / 60)}h{catMins[k] % 60 > 0 ? `${catMins[k] % 60}m` : ""}
-              </span>
-            ))}
+          <div
+            style={{ display: "flex", gap: 8, marginTop: 5, flexWrap: "wrap" }}
+          >
+            {Object.entries(CATEGORIES)
+              .filter(([k]) => catMins[k] > 0)
+              .map(([k, v]) => (
+                <span key={k} style={{ fontSize: 10, color: v.color }}>
+                  {k}: {Math.floor(catMins[k] / 60)}h
+                  {catMins[k] % 60 > 0 ? `${catMins[k] % 60}m` : ""}
+                </span>
+              ))}
           </div>
         </>
       )}
@@ -3594,8 +4211,11 @@ function LogListPage({
   const [fc, setFc] = useState("");
   const [activeTags, setActiveTags] = useState([]);
   const [pinnedTags, setPinnedTags] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(storageKey) || "[]"); }
-    catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem(storageKey) || "[]");
+    } catch {
+      return [];
+    }
   });
 
   const allTags = useMemo(() => {
@@ -3619,7 +4239,9 @@ function LogListPage({
   const normalize = (str) =>
     (str || "")
       .normalize("NFKC")
-      .replace(/[\u3041-\u3096]/g, (s) => String.fromCharCode(s.charCodeAt(0) + 0x60))
+      .replace(/[\u3041-\u3096]/g, (s) =>
+        String.fromCharCode(s.charCodeAt(0) + 0x60),
+      )
       .toLowerCase();
 
   const filtered = useMemo(
@@ -3630,7 +4252,10 @@ function LogListPage({
         .filter((l) => {
           if (!fk) return true;
           const keyword = normalize(fk);
-          return normalize(l.task).includes(keyword) || normalize(l.detail).includes(keyword);
+          return (
+            normalize(l.task).includes(keyword) ||
+            normalize(l.detail).includes(keyword)
+          );
         })
         .filter((l) => {
           if (activeTags.length === 0) return true;
@@ -3657,7 +4282,9 @@ function LogListPage({
     return g;
   }, [filtered]);
 
-  const [viewMode, setViewMode] = useState(() => localStorage.getItem("logViewMode") || "list");
+  const [viewMode, setViewMode] = useState(
+    () => localStorage.getItem("logViewMode") || "list",
+  );
   const changeViewMode = (mode) => {
     setViewMode(mode);
     localStorage.setItem("logViewMode", mode);
@@ -3739,90 +4366,204 @@ function LogListPage({
         </select>
         {(fd || fc || fk || activeTags.length > 0) && (
           <button
-            onClick={() => { setFd(""); setFc(""); setFk(""); setActiveTags([]); }}
-            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", fontSize: 13, cursor: "pointer", color: "#64748b" }}
+            onClick={() => {
+              setFd("");
+              setFc("");
+              setFk("");
+              setActiveTags([]);
+            }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid #e2e8f0",
+              background: "#fff",
+              fontSize: 13,
+              cursor: "pointer",
+              color: "#64748b",
+            }}
           >
             リセット
           </button>
         )}
-        <div style={{ marginLeft: "auto", fontSize: 13, display: "flex", alignItems: "center", gap: 12 }}>
+        <div
+          style={{
+            marginLeft: "auto",
+            fontSize: 13,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
           <b style={{ color: "#1e293b" }}>{filtered.length}件</b>
-          <div style={{ display: "flex", gap: 2, background: "#f1f5f9", borderRadius: 8, padding: 3 }}>
-            {[["list", "📋 リスト"], ["card", "🗂 カード"]].map(([id, label]) => (
-              <button key={id} onClick={() => changeViewMode(id)} style={{
-                padding: "5px 12px", borderRadius: 6, border: "none", cursor: "pointer",
-                fontSize: 12, fontWeight: viewMode === id ? 600 : 400, fontFamily: "inherit",
-                background: viewMode === id ? "#fff" : "transparent",
-                color: viewMode === id ? "#1e293b" : "#64748b",
-                boxShadow: viewMode === id ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
-              }}>{label}</button>
+          <div
+            style={{
+              display: "flex",
+              gap: 2,
+              background: "#f1f5f9",
+              borderRadius: 8,
+              padding: 3,
+            }}
+          >
+            {[
+              ["list", "📋 リスト"],
+              ["card", "🗂 カード"],
+            ].map(([id, label]) => (
+              <button
+                key={id}
+                onClick={() => changeViewMode(id)}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: 6,
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  fontWeight: viewMode === id ? 600 : 400,
+                  fontFamily: "inherit",
+                  background: viewMode === id ? "#fff" : "transparent",
+                  color: viewMode === id ? "#1e293b" : "#64748b",
+                  boxShadow:
+                    viewMode === id ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+                }}
+              >
+                {label}
+              </button>
             ))}
           </div>
         </div>
       </div>
       {allTags.length > 0 && (
         <div style={{ ...C, marginBottom: 16, padding: "12px 16px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>🏷 タグ</span>
-            <span style={{ fontSize: 11, color: "#94a3b8" }}>タグをクリックで絞り込み・右クリックでピン留め</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 8,
+            }}
+          >
+            <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>
+              🏷 タグ
+            </span>
+            <span style={{ fontSize: 11, color: "#94a3b8" }}>
+              タグをクリックで絞り込み・右クリックでピン留め
+            </span>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {/* ピン留めタグを先に表示 */}
-            {pinnedTags.filter((t) => allTags.includes(t)).map((tag) => {
-              const isActive = activeTags.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  onClick={() => setActiveTags((p) => isActive ? p.filter((t) => t !== tag) : [...p, tag])}
-                  onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
-                  style={{
-                    padding: "4px 10px", borderRadius: 20, border: "1px solid",
-                    fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-                    display: "flex", alignItems: "center", gap: 4,
-                    borderColor: isActive ? "#8B5CF6" : "#DDD6FE",
-                    background: isActive ? "#8B5CF6" : "#F5F3FF",
-                    color: isActive ? "#fff" : "#6D28D9",
-                    fontWeight: isActive ? 600 : 400,
-                  }}
-                >
-                  📌 #{tag}
-                </button>
-              );
-            })}
+            {pinnedTags
+              .filter((t) => allTags.includes(t))
+              .map((tag) => {
+                const isActive = activeTags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    onClick={() =>
+                      setActiveTags((p) =>
+                        isActive ? p.filter((t) => t !== tag) : [...p, tag],
+                      )
+                    }
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      togglePin(tag);
+                    }}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: 20,
+                      border: "1px solid",
+                      fontSize: 12,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                      borderColor: isActive ? "#8B5CF6" : "#DDD6FE",
+                      background: isActive ? "#8B5CF6" : "#F5F3FF",
+                      color: isActive ? "#fff" : "#6D28D9",
+                      fontWeight: isActive ? 600 : 400,
+                    }}
+                  >
+                    📌 #{tag}
+                  </button>
+                );
+              })}
             {/* 通常タグ */}
-            {allTags.filter((t) => !pinnedTags.includes(t)).map((tag) => {
-              const isActive = activeTags.includes(tag);
-              return (
-                <button
+            {allTags
+              .filter((t) => !pinnedTags.includes(t))
+              .map((tag) => {
+                const isActive = activeTags.includes(tag);
+                return (
+                  <button
+                    key={tag}
+                    onClick={() =>
+                      setActiveTags((p) =>
+                        isActive ? p.filter((t) => t !== tag) : [...p, tag],
+                      )
+                    }
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      togglePin(tag);
+                    }}
+                    style={{
+                      padding: "4px 10px",
+                      borderRadius: 20,
+                      border: "1px solid",
+                      fontSize: 12,
+                      cursor: "pointer",
+                      fontFamily: "inherit",
+                      borderColor: isActive ? "#3B82F6" : "#e2e8f0",
+                      background: isActive ? "#3B82F6" : "#f8fafc",
+                      color: isActive ? "#fff" : "#64748b",
+                      fontWeight: isActive ? 600 : 400,
+                    }}
+                  >
+                    #{tag}
+                  </button>
+                );
+              })}
+          </div>
+          {activeTags.length > 0 && (
+            <div
+              style={{
+                marginTop: 8,
+                fontSize: 12,
+                color: "#64748b",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                flexWrap: "wrap",
+              }}
+            >
+              {activeTags.map((tag) => (
+                <span
                   key={tag}
-                  onClick={() => setActiveTags((p) => isActive ? p.filter((t) => t !== tag) : [...p, tag])}
-                  onContextMenu={(e) => { e.preventDefault(); togglePin(tag); }}
                   style={{
-                    padding: "4px 10px", borderRadius: 20, border: "1px solid",
-                    fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-                    borderColor: isActive ? "#3B82F6" : "#e2e8f0",
-                    background: isActive ? "#3B82F6" : "#f8fafc",
-                    color: isActive ? "#fff" : "#64748b",
-                    fontWeight: isActive ? 600 : 400,
+                    background: "#F5F3FF",
+                    color: "#6D28D9",
+                    padding: "2px 8px",
+                    borderRadius: 10,
+                    fontWeight: 600,
                   }}
                 >
                   #{tag}
-                </button>
-              );
-            })}
-          </div>
-          {activeTags.length > 0 && (
-            <div style={{ marginTop: 8, fontSize: 12, color: "#64748b", display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-              {activeTags.map((tag) => (
-                <span key={tag} style={{ background: "#F5F3FF", color: "#6D28D9", padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>#{tag}</span>
+                </span>
               ))}
-              <span style={{ marginLeft: 4 }}>すべて含む（AND） · {filtered.length}件</span>
+              <span style={{ marginLeft: 4 }}>
+                すべて含む（AND） · {filtered.length}件
+              </span>
             </div>
           )}
         </div>
       )}
       {Object.keys(grouped).length === 0 ? (
-        <div style={{ ...C, textAlign: "center", color: "#94a3b8", fontSize: 14, padding: 48 }}>
+        <div
+          style={{
+            ...C,
+            textAlign: "center",
+            color: "#94a3b8",
+            fontSize: 14,
+            padding: 48,
+          }}
+        >
           記録がありません
         </div>
       ) : viewMode === "card" ? (
@@ -3834,7 +4575,9 @@ function LogListPage({
           onSaveDayComment={onSaveDayComment}
           onEditLog={onEditLog}
           onDuplicate={onDuplicate}
-          onTagClick={(tag) => setActiveTags((p) => p.includes(tag) ? p : [...p, tag])}
+          onTagClick={(tag) =>
+            setActiveTags((p) => (p.includes(tag) ? p : [...p, tag]))
+          }
         />
       ) : (
         Object.entries(grouped).map(([date, recs]) => (
@@ -3848,7 +4591,9 @@ function LogListPage({
             onSaveDayComment={onSaveDayComment}
             onEditLog={onEditLog}
             onDuplicate={onDuplicate}
-            onTagClick={(tag) => setActiveTags((p) => p.includes(tag) ? p : [...p, tag])}
+            onTagClick={(tag) =>
+              setActiveTags((p) => (p.includes(tag) ? p : [...p, tag]))
+            }
           />
         ))
       )}
@@ -4574,7 +5319,8 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       }}
       onClick={() => onOpen(card)}
       style={{
-        background: dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#fff",
+        background:
+          dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#fff",
         borderRadius: 12,
         border: `1px solid ${dc === "over" ? "#FECACA" : dc === "near" ? "#FDE68A" : "#e2e8f0"}`,
         padding: "12px 14px",
@@ -4767,9 +5513,15 @@ function KanbanColumn({
           onChange={(e) => onSortChange(col.id, e.target.value)}
           onClick={(e) => e.stopPropagation()}
           style={{
-            fontSize: 11, color: "#64748b", border: "1px solid #e2e8f0",
-            borderRadius: 6, padding: "2px 4px", background: "#fff",
-            outline: "none", cursor: "pointer", fontFamily: "inherit",
+            fontSize: 11,
+            color: "#64748b",
+            border: "1px solid #e2e8f0",
+            borderRadius: 6,
+            padding: "2px 4px",
+            background: "#fff",
+            outline: "none",
+            cursor: "pointer",
+            fontFamily: "inherit",
           }}
         >
           <option value="">並び替え</option>
@@ -4902,7 +5654,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   const sortCards = (cards, sortBy) => {
     if (sortBy === "prio") {
       const order = { high: 0, mid: 1, low: 2 };
-      return [...cards].sort((a, b) => (order[a.prio] ?? 99) - (order[b.prio] ?? 99));
+      return [...cards].sort(
+        (a, b) => (order[a.prio] ?? 99) - (order[b.prio] ?? 99),
+      );
     }
     if (sortBy === "due") {
       return [...cards].sort((a, b) => {
@@ -4914,7 +5668,11 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     }
     return cards;
   };
-  const colCards = (cId) => sortCards(visibleCards.filter((c) => c.col === cId), colSortBy[cId] || "");
+  const colCards = (cId) =>
+    sortCards(
+      visibleCards.filter((c) => c.col === cId),
+      colSortBy[cId] || "",
+    );
   const totalByStatus = useMemo(() => {
     const all = Object.entries(boards)
       .filter(([uid]) =>
@@ -4993,7 +5751,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           ...p,
           [viewId]: {
             ...p[viewId],
-            cards: (p[viewId]?.cards || []).map((c) => (c.id === updated.id ? updated : c)),
+            cards: (p[viewId]?.cards || []).map((c) =>
+              c.id === updated.id ? updated : c,
+            ),
           },
         }));
       }
@@ -5261,7 +6021,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             cards={colCards(col.id)}
             isOwner={isOwner}
             sortValue={colSortBy[col.id]}
-            onSortChange={(colId, val) => setColSortBy((p) => ({ ...p, [colId]: val }))}
+            onSortChange={(colId, val) =>
+              setColSortBy((p) => ({ ...p, [colId]: val }))
+            }
             onAddCard={(cId) =>
               setModal({
                 card: {
@@ -5363,7 +6125,17 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     </div>
   );
 }
-function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser, darkMode, setDarkMode, accentColor, setAccentColor }) {
+function MyPage({
+  currentUser,
+  allUsers,
+  groups,
+  isSA,
+  onUpdateUser,
+  darkMode,
+  setDarkMode,
+  accentColor,
+  setAccentColor,
+}) {
   const [name, setName] = useState(currentUser.name);
   const [newPassword, setNewPassword] = useState("");
   const [managerId, setManagerId] = useState(currentUser.manager_id || "");
@@ -5674,62 +6446,131 @@ function MyPage({ currentUser, allUsers, groups, isSA, onUpdateUser, darkMode, s
         )}
 
         <div style={{ ...C, marginBottom: 16 }}>
-        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-          表示設定
-        </h3>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
-            ダークモード
-          </label>
-          <div style={{ display: "flex", gap: 8 }}>
-            {[["light", "☀️ ライト"], ["dark", "🌙 ダーク"]].map(([mode, label]) => (
-              <button key={mode} onClick={() => {
-                const isDark = mode === "dark";
-                setDarkMode(isDark);
-                localStorage.setItem("darkMode", String(isDark));
-              }} style={{
-                padding: "8px 20px", borderRadius: 8, border: "1px solid",
-                fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                borderColor: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#e2e8f0",
-                background: (darkMode ? "dark" : "light") === mode ? "var(--accent-light, #EFF6FF)" : "#fff",
-                color: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#64748b",
-              }}>{label}</button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
-            カラーテーマ
-          </label>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {[
-              ["blue", "#3B82F6", "ブルー"],
-              ["purple", "#8B5CF6", "パープル"],
-              ["green", "#10B981", "グリーン"],
-              ["red", "#EF4444", "レッド"],
-              ["orange", "#F59E0B", "オレンジ"],
-              ["pink", "#EC4899", "ピンク"],
-            ].map(([key, color, label]) => (
-              <button key={key} onClick={() => {
-                setAccentColor(key);
-                localStorage.setItem("accentColor", key);
-              }} style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                padding: "10px 14px", borderRadius: 10, border: "2px solid",
-                borderColor: accentColor === key ? color : "#e2e8f0",
-                background: accentColor === key ? color + "18" : "#fff",
-                cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
-              }}>
-                <div style={{ width: 24, height: 24, borderRadius: "50%", background: color,
-                  boxShadow: accentColor === key ? `0 0 0 3px ${color}44` : "none" }} />
-                <span style={{ fontSize: 11, color: accentColor === key ? color : "#64748b", fontWeight: accentColor === key ? 700 : 400 }}>
+          <h3
+            style={{
+              margin: "0 0 16px",
+              fontSize: 15,
+              fontWeight: 700,
+              color: "var(--text-primary, #1e293b)",
+            }}
+          >
+            表示設定
+          </h3>
+          <div style={{ marginBottom: 16 }}>
+            <label
+              style={{
+                fontSize: 12,
+                color: "var(--text-secondary, #64748b)",
+                display: "block",
+                marginBottom: 8,
+              }}
+            >
+              ダークモード
+            </label>
+            <div style={{ display: "flex", gap: 8 }}>
+              {[
+                ["light", "☀️ ライト"],
+                ["dark", "🌙 ダーク"],
+              ].map(([mode, label]) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    const isDark = mode === "dark";
+                    setDarkMode(isDark);
+                    localStorage.setItem("darkMode", String(isDark));
+                  }}
+                  style={{
+                    padding: "8px 20px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    borderColor:
+                      (darkMode ? "dark" : "light") === mode
+                        ? "var(--accent, #3B82F6)"
+                        : "#e2e8f0",
+                    background:
+                      (darkMode ? "dark" : "light") === mode
+                        ? "var(--accent-light, #EFF6FF)"
+                        : "#fff",
+                    color:
+                      (darkMode ? "dark" : "light") === mode
+                        ? "var(--accent, #3B82F6)"
+                        : "#64748b",
+                  }}
+                >
                   {label}
-                </span>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label
+              style={{
+                fontSize: 12,
+                color: "var(--text-secondary, #64748b)",
+                display: "block",
+                marginBottom: 8,
+              }}
+            >
+              カラーテーマ
+            </label>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {[
+                ["blue", "#3B82F6", "ブルー"],
+                ["purple", "#8B5CF6", "パープル"],
+                ["green", "#10B981", "グリーン"],
+                ["red", "#EF4444", "レッド"],
+                ["orange", "#F59E0B", "オレンジ"],
+                ["pink", "#EC4899", "ピンク"],
+              ].map(([key, color, label]) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setAccentColor(key);
+                    localStorage.setItem("accentColor", key);
+                  }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    border: "2px solid",
+                    borderColor: accentColor === key ? color : "#e2e8f0",
+                    background: accentColor === key ? color + "18" : "#fff",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    transition: "all 0.15s",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: "50%",
+                      background: color,
+                      boxShadow:
+                        accentColor === key ? `0 0 0 3px ${color}44` : "none",
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: accentColor === key ? color : "#64748b",
+                      fontWeight: accentColor === key ? 700 : 400,
+                    }}
+                  >
+                    {label}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
         <button onClick={handleSave} style={BP}>
           <Icon name="save" size={14} />
@@ -8137,12 +8978,98 @@ function FeedbackAdminPage() {
     </div>
   );
 }
+function DashboardAlerts({ boards, currentUser }) {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      const { data: ann } = await supabase.from("announcements").select("id");
+      const { data: reads } = await supabase
+        .from("announcement_reads")
+        .select("announcement_id")
+        .eq("user_id", currentUser.id);
+      if (ann) {
+        const readIds = new Set((reads || []).map((r) => r.announcement_id));
+        setUnreadCount(ann.filter((a) => !readIds.has(a.id)).length);
+      }
+    };
+    fetchUnread();
+  }, [currentUser.id]);
+
+  const today = new Date().toISOString().split("T")[0];
+  const myBoard = boards[currentUser.id] || { cards: [] };
+  const urgentCards = myBoard.cards.filter((c) => {
+    if (c.col === "done" || !c.due) return false;
+    return c.due <= addDays(3);
+  }).sort((a, b) => a.due.localeCompare(b.due));
+
+  if (urgentCards.length === 0 && unreadCount === 0) return null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+      {urgentCards.length > 0 && (
+        <div style={{
+          background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12,
+          padding: "12px 16px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#92400E" }}>⏰ 期日が近いタスク</span>
+            <span style={{ fontSize: 11, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>
+              {urgentCards.length}件
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {urgentCards.slice(0, 3).map((c) => {
+              const isOver = c.due < today;
+              return (
+                <div key={c.id} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  fontSize: 12, color: "#78350F",
+                }}>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
+                    background: isOver ? "#FEE2E2" : "#FEF3C7",
+                    color: isOver ? "#991B1B" : "#92400E",
+                    flexShrink: 0,
+                  }}>
+                    {isOver ? "期限切れ" : c.due}
+                  </span>
+                  <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {c.title}
+                  </span>
+                </div>
+              );
+            })}
+            {urgentCards.length > 3 && (
+              <div style={{ fontSize: 11, color: "#92400E", opacity: 0.7 }}>他{urgentCards.length - 3}件</div>
+            )}
+          </div>
+        </div>
+      )}
+      {unreadCount > 0 && (
+        <div style={{
+          background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 12,
+          padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
+        }}>
+          <span style={{ fontSize: 16 }}>📣</span>
+          <span style={{ fontSize: 13, color: "#1D4ED8", fontWeight: 600 }}>
+            未読のお知らせが {unreadCount}件 あります
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
-  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("accentColor") || "blue");
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("darkMode") === "true",
+  );
+  const [accentColor, setAccentColor] = useState(
+    () => localStorage.getItem("accentColor") || "blue",
+  );
   const [inviteSession, setInviteSession] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [passwordSaved, setPasswordSaved] = useState(false);
@@ -8152,7 +9079,9 @@ export default function App() {
     // 初回マウント時に即座にセッション確認
     const initSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (session?.user) {
           const { data: profile, error: profileError } = await supabase
             .from("profiles")
@@ -8616,12 +9545,42 @@ export default function App() {
   // ▲ 追加ここまで
 
   const ACCENT_COLORS = {
-    blue:   { primary: "#3B82F6", gradient: "135deg,#3B82F6,#6366F1", light: "#EFF6FF", border: "#BFDBFE" },
-    purple: { primary: "#8B5CF6", gradient: "135deg,#8B5CF6,#A855F7", light: "#F5F3FF", border: "#DDD6FE" },
-    green:  { primary: "#10B981", gradient: "135deg,#10B981,#059669", light: "#ECFDF5", border: "#A7F3D0" },
-    red:    { primary: "#EF4444", gradient: "135deg,#EF4444,#DC2626", light: "#FEF2F2", border: "#FECACA" },
-    orange: { primary: "#F59E0B", gradient: "135deg,#F59E0B,#D97706", light: "#FFFBEB", border: "#FDE68A" },
-    pink:   { primary: "#EC4899", gradient: "135deg,#EC4899,#DB2777", light: "#FDF2F8", border: "#FBCFE8" },
+    blue: {
+      primary: "#3B82F6",
+      gradient: "135deg,#3B82F6,#6366F1",
+      light: "#EFF6FF",
+      border: "#BFDBFE",
+    },
+    purple: {
+      primary: "#8B5CF6",
+      gradient: "135deg,#8B5CF6,#A855F7",
+      light: "#F5F3FF",
+      border: "#DDD6FE",
+    },
+    green: {
+      primary: "#10B981",
+      gradient: "135deg,#10B981,#059669",
+      light: "#ECFDF5",
+      border: "#A7F3D0",
+    },
+    red: {
+      primary: "#EF4444",
+      gradient: "135deg,#EF4444,#DC2626",
+      light: "#FEF2F2",
+      border: "#FECACA",
+    },
+    orange: {
+      primary: "#F59E0B",
+      gradient: "135deg,#F59E0B,#D97706",
+      light: "#FFFBEB",
+      border: "#FDE68A",
+    },
+    pink: {
+      primary: "#EC4899",
+      gradient: "135deg,#EC4899,#DB2777",
+      light: "#FDF2F8",
+      border: "#FBCFE8",
+    },
   };
   const accent = ACCENT_COLORS[accentColor] || ACCENT_COLORS.blue;
 
@@ -9062,6 +10021,7 @@ export default function App() {
                 filterTabs.find((t) => t.id === dashFilter)?.label || "";
               return (
                 <div>
+                  <DashboardAlerts boards={boards} currentUser={currentUser} />
                   <div
                     style={{
                       display: "flex",
@@ -9138,11 +10098,36 @@ export default function App() {
             onDuplicate={(recs, singleRow) => {
               const today = new Date().toISOString().slice(0, 10);
               const addRows = singleRow
-                ? [{ ...newRow(), task: singleRow.task, detail: singleRow.detail, start: singleRow.start, end: singleRow.end, cat: singleRow.cat }]
-                : recs.filter((r) => r.user === currentUser.name && r.task !== "（コメントのみ）")
-                    .map((r) => ({ ...newRow(), task: r.task, detail: r.detail, start: r.start, end: r.end, cat: r.cat }));
+                ? [
+                    {
+                      ...newRow(),
+                      task: singleRow.task,
+                      detail: singleRow.detail,
+                      start: singleRow.start,
+                      end: singleRow.end,
+                      cat: singleRow.cat,
+                    },
+                  ]
+                : recs
+                    .filter(
+                      (r) =>
+                        r.user === currentUser.name &&
+                        r.task !== "（コメントのみ）",
+                    )
+                    .map((r) => ({
+                      ...newRow(),
+                      task: r.task,
+                      detail: r.detail,
+                      start: r.start,
+                      end: r.end,
+                      cat: r.cat,
+                    }));
               setReportDraft((prev) => {
-                const existingRows = prev?.rows ?? [newRow(), newRow(), newRow()];
+                const existingRows = prev?.rows ?? [
+                  newRow(),
+                  newRow(),
+                  newRow(),
+                ];
                 const nonEmpty = existingRows.filter((r) => r.task);
                 return {
                   date: today,
