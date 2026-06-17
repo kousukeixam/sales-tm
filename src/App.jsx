@@ -5881,7 +5881,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
         }}
       >
         <span style={{ fontSize: 12, color: "#64748b", fontWeight: 500 }}>
-          ボードを選択：
+          ToDoリストを選択：
         </span>
         <button
           onClick={() => setViewId(currentUser.id)}
@@ -5912,7 +5912,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           >
             {currentUser.name[0]}
           </div>
-          マイボード
+          マイToDo
         </button>
         {groupMembers.map((m) => (
           <button
@@ -5968,7 +5968,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 color: "#1e293b",
               }}
             >
-              {isOwner ? "マイボード" : `${viewUser?.name} のボード`}
+              {isOwner ? "マイToDo" : `${viewUser?.name} のToDoリスト`}
             </h2>
             {!isOwner && (
               <span
@@ -9621,7 +9621,7 @@ export default function App() {
     ...(isAdmin && !isSA
       ? [{ id: "team", label: "部下の記録", icon: "users" }]
       : []),
-    { id: "board", label: "ボード", icon: "board" },
+    { id: "board", label: "ToDoリスト", icon: "board" },
     { id: "announcement", label: "📣 お知らせ", icon: "msg" },
     { id: "ranking", label: "🏆 ランキング", icon: "chart" },
     { id: "mypage", label: "マイページ", icon: "person" },
@@ -9639,7 +9639,7 @@ export default function App() {
     report: "日報入力",
     log: "自分の記録",
     mypage: "マイページ",
-    board: "ボード",
+    board: "ToDoリスト",
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
     superadmin: "システム管理",
@@ -9655,7 +9655,7 @@ export default function App() {
     report: "業務内容を入力します（行追加・詳細入力・高さ調整対応）",
     log: "自分の記録を確認できます（行をクリックで詳細・上司コメント表示）",
     mypage: "プロフィール・設定を管理できます",
-    board: "マイボードと部署メンバーのボードを確認できます",
+    board: "マイToDoリストと部署メンバーのToDoリストを確認できます",
     team: "部下を選んで記録・ダッシュボードを確認できます",
     member_detail:
       "ダッシュボードと記録一覧・コメント入力を切り替えて確認できます",
