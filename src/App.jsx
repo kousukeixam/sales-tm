@@ -1644,16 +1644,15 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
 
   // 転記（業務行があれば行＋コメント、なければコメントのみ）
   const handleSave = async () => {
-    // セッションを再確認・リフレッシュ
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      alert("セッションが切れています。ページを再読み込みしてください。");
+    // セッションを実際にサーバーへ問い合わせて有効性を確認
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
+    if (sessionError || !user) {
+      alert("セッションが切れています。ページを再読み込みしてログインし直してください。");
       window.location.reload();
       return;
     }
+    // トークンが切れていればリフレッシュを試みる
+    await supabase.auth.refreshSession();
 
     const valid = rows.filter(
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
@@ -7954,24 +7953,27 @@ export default function App() {
   useEffect(() => {
     // 初回マウント時に即座にセッション確認
     const initSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        if (profile) {
-          setCurrentUser({
-            ...profile,
-            email: session.user.email,
-            groupId: profile.group_id,
-          });
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          if (profile && !profileError) {
+            setCurrentUser({
+              ...profile,
+              email: session.user.email,
+              groupId: profile.group_id,
+            });
+          }
         }
+      } catch (e) {
+        console.error("セッション復元エラー:", e);
+      } finally {
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     };
     initSession();
 
@@ -8001,11 +8003,11 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // タイムアウト保険：3秒
+  // タイムアウト保険：6秒（低速ネットワーク・古いPCでも安全に動作するよう延長）
   useEffect(() => {
     const timer = setTimeout(() => {
       setAuthLoading(false);
-    }, 3000);
+    }, 6000);
     return () => clearTimeout(timer);
   }, []);
   // ▲ セッション自動復元ここまで
