@@ -9058,7 +9058,7 @@ function TaskCarousel({ items, today }) {
   );
 }
 
-function DashboardAlerts({ boards, currentUser, onNavigate }) {
+function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) { {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -9125,7 +9125,7 @@ function DashboardAlerts({ boards, currentUser, onNavigate }) {
   );
 
   return (
-    <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+    <div style={{ display: "flex", gap: 12, marginBottom: noBottomMargin ? 0 : 20, flexWrap: "wrap" }}>
       {hasTasks && taskBlock}
       {hasAnnouncements && annBlock}
     </div>
@@ -10031,20 +10031,28 @@ export default function App() {
           </div>
         )}
         {window.innerWidth >= 768 && (
-          <div style={{ marginBottom: 20 }}>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: 22,
-                fontWeight: 700,
-                color: "#1e293b",
-              }}
-            >
-              {titles[page] || ""}
-            </h1>
-            <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
-              {subs[page] || ""}
+          <div style={{ marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ flexShrink: 0 }}>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: "#1e293b",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {titles[page] || ""}
+              </h1>
+              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4, whiteSpace: "nowrap" }}>
+                {subs[page] || ""}
+              </div>
             </div>
+            {page === "dashboard" && (
+              <div style={{ flex: 1, minWidth: 260 }}>
+                <DashboardAlerts boards={boards} currentUser={currentUser} onNavigate={setPage} noBottomMargin />
+              </div>
+            )}
           </div>
         )}
         {page === "dashboard" &&
@@ -10092,7 +10100,7 @@ export default function App() {
                 filterTabs.find((t) => t.id === dashFilter)?.label || "";
               return (
                 <div>
-                  <DashboardAlerts boards={boards} currentUser={currentUser} onNavigate={setPage} />
+
                   <div
                     style={{
                       display: "flex",
