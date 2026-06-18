@@ -1804,6 +1804,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     }
     setRows([newRow(), newRow(), newRow()]);
     setDayComment("");
+    onDraftChange?.(null);
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
@@ -5646,7 +5647,17 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   const [addingCol, setAddingCol] = useState(false);
   const [newColName, setNewColName] = useState("");
   const [filterPrio, setFilterPrio] = useState("");
-  const [colSortBy, setColSortBy] = useState({}); // { colId: "prio" | "due" | "" }
+  const [colSortBy, setColSortBy] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("todoColSortBy") || "{}"); }
+    catch { return {}; }
+  });
+  const updateColSortBy = (updater) => {
+    setColSortBy((p) => {
+      const next = typeof updater === "function" ? updater(p) : updater;
+      localStorage.setItem("todoColSortBy", JSON.stringify(next));
+      return next;
+    });
+  };
   const isOwner = viewId === currentUser.id;
   const viewUser = allUsers.find((u) => u.id === viewId);
   const board = boards[viewId] || { cols: [], cards: [] };
@@ -6024,9 +6035,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             cards={colCards(col.id)}
             isOwner={isOwner}
             sortValue={colSortBy[col.id]}
-            onSortChange={(colId, val) =>
-              setColSortBy((p) => ({ ...p, [colId]: val }))
-            }
+            onSortChange={(colId, val) => updateColSortBy((p) => ({ ...p, [colId]: val }))}
             onAddCard={(cId) =>
               setModal({
                 card: {
@@ -9221,7 +9230,24 @@ export default function App() {
   }, []);
   const [page, setPage] = useState("dashboard");
   const [logs, setLogs] = useState([]);
-  const [reportDraft, setReportDraft] = useState(null); // ← ここに追加
+  const [reportDraft, _setReportDraft] = useState(() => {
+    try {
+      const saved = localStorage.getItem("reportDraft");
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+  const setReportDraft = (updater) => {
+    _setReportDraft((p) => {
+      const next = typeof updater === "function" ? updater(p) : updater;
+      try {
+        if (next) localStorage.setItem("reportDraft", JSON.stringify(next));
+        else localStorage.removeItem("reportDraft");
+      } catch (e) {
+        console.error("ドラフト保存エラー:", e);
+      }
+      return next;
+    });
+  };
   useEffect(() => {
     const fetchLogs = async () => {
       const { data, error } = await supabase
