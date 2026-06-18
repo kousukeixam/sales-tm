@@ -8993,23 +8993,46 @@ function FeedbackAdminPage() {
 function TaskCarousel({ items, today }) {
   const PAGE_SIZE = 3;
   const totalPages = Math.ceil(items.length / PAGE_SIZE);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(0); // 0 ~ totalPages（最後は複製した先頭ページ）
   const [hovering, setHovering] = useState(false);
+  const [transitionOn, setTransitionOn] = useState(true);
 
+  // 自動スライド：常に+1（左方向）のみ。最後の複製ページに着いたら一瞬で先頭へワープ
   useEffect(() => {
     if (totalPages <= 1 || hovering) return;
     const timer = setInterval(() => {
-      setPage((p) => (p + 1) % totalPages);
+      setTransitionOn(true);
+      setPage((p) => p + 1);
     }, 4000);
     return () => clearInterval(timer);
   }, [totalPages, hovering]);
 
-  // 全ページ分のアイテムをPAGE_SIZEごとにまとめる（最後のページは不足分を空欄で埋めて高さを揃える）
-  const pages = Array.from({ length: totalPages }, (_, i) => {
+  useEffect(() => {
+    if (page === totalPages) {
+      const t = setTimeout(() => {
+        setTransitionOn(false);
+        setPage(0);
+      }, 500); // トランジション時間と合わせる
+      return () => clearTimeout(t);
+    }
+  }, [page, totalPages]);
+
+  // 手動操作（矢印・ドット）は左右どちらにも自由に動ける通常のページ番号を使う
+  const goTo = (target) => {
+    setTransitionOn(true);
+    setPage(((target % totalPages) + totalPages) % totalPages);
+  };
+
+  // 全ページ分のアイテムをPAGE_SIZEごとにまとめ、末尾に先頭ページの複製を追加（無限ループ用）
+  const basePages = Array.from({ length: totalPages }, (_, i) => {
     const slice = items.slice(i * PAGE_SIZE, i * PAGE_SIZE + PAGE_SIZE);
     while (slice.length < PAGE_SIZE) slice.push(null);
     return slice;
   });
+  const pages = totalPages > 1 ? [...basePages, basePages[0]] : basePages;
+  const trackPages = pages.length;
+  const displayPage = totalPages > 1 ? page : 0;
+  const activeDot = ((displayPage % totalPages) + totalPages) % totalPages;
 
   return (
     <div
@@ -9020,12 +9043,12 @@ function TaskCarousel({ items, today }) {
       <div style={{ overflow: "hidden", width: "100%" }}>
         <div style={{
           display: "flex",
-          width: `${totalPages * 100}%`,
-          transform: `translateX(-${page * (100 / totalPages)}%)`,
-          transition: "transform 0.5s cubic-bezier(0.4,0,0.2,1)",
+          width: `${trackPages * 100}%`,
+          transform: `translateX(-${displayPage * (100 / trackPages)}%)`,
+          transition: transitionOn ? "transform 0.5s cubic-bezier(0.4,0,0.2,1)" : "none",
         }}>
           {pages.map((pageItems, pi) => (
-            <div key={pi} style={{ width: `${100 / totalPages}%`, flexShrink: 0, display: "flex", flexDirection: "column", gap: 6, paddingRight: 8, boxSizing: "border-box" }}>
+            <div key={pi} style={{ width: `${100 / trackPages}%`, flexShrink: 0, display: "flex", flexDirection: "column", gap: 6, paddingRight: 8, boxSizing: "border-box" }}>
               {pageItems.map((c, ci) => {
                 if (!c) return <div key={ci} style={{ height: 17 }} />;
                 const isOver = c.due < today;
