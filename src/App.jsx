@@ -10060,31 +10060,27 @@ export default function App() {
           </div>
         )}
         {window.innerWidth >= 768 && (
-          <div style={{ marginBottom: 20, display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ flexShrink: 0 }}>
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: 22,
-                  fontWeight: 700,
-                  color: "#1e293b",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {titles[page] || ""}
-              </h1>
-              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4, whiteSpace: "nowrap" }}>
-                {subs[page] || ""}
-              </div>
+          <div style={{ marginBottom: 20 }}>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 22,
+                fontWeight: 700,
+                color: "#1e293b",
+              }}
+            >
+              {titles[page] || ""}
+            </h1>
+            <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
+              {subs[page] || ""}
             </div>
             {page === "dashboard" && (
-              <div style={{ flex: 1, minWidth: 260 }}>
+              <div style={{ marginTop: 16 }}>
                 <DashboardAlerts boards={boards} currentUser={currentUser} onNavigate={setPage} noBottomMargin />
               </div>
             )}
           </div>
-        )}
-        {page === "dashboard" &&
+        )}        {page === "dashboard" &&
           (() => {
             const DashboardWithFilter = () => {
               const [dashFilter, setDashFilter] = useState("self");
