@@ -9075,7 +9075,7 @@ function TaskCarousel({ items, today }) {
       {totalPages > 1 && hovering && (
         <>
           <button
-            onClick={(e) => { e.stopPropagation(); setPage((p) => (p - 1 + totalPages) % totalPages); }}
+            onClick={(e) => { e.stopPropagation(); goTo(activeDot - 1); }}
             style={{
               position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)",
               width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
@@ -9084,7 +9084,7 @@ function TaskCarousel({ items, today }) {
             }}
           >‹</button>
           <button
-            onClick={(e) => { e.stopPropagation(); setPage((p) => (p + 1) % totalPages); }}
+            onClick={(e) => { e.stopPropagation(); goTo(activeDot + 1); }}
             style={{
               position: "absolute", right: -8, top: "50%", transform: "translateY(-50%)",
               width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
@@ -9096,10 +9096,10 @@ function TaskCarousel({ items, today }) {
             {Array.from({ length: totalPages }).map((_, i) => (
               <div
                 key={i}
-                onClick={(e) => { e.stopPropagation(); setPage(i); }}
+                onClick={(e) => { e.stopPropagation(); goTo(i); }}
                 style={{
                   width: 6, height: 6, borderRadius: "50%", cursor: "pointer",
-                  background: i === page ? "#F59E0B" : "#FDE68A",
+                  background: i === activeDot ? "#F59E0B" : "#FDE68A",
                 }}
               />
             ))}
