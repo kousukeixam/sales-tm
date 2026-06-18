@@ -9004,7 +9004,12 @@ function TaskCarousel({ items, today }) {
     return () => clearInterval(timer);
   }, [totalPages, hovering]);
 
-  const pageItems = items.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  // 全ページ分のアイテムをPAGE_SIZEごとにまとめる（最後のページは不足分を空欄で埋めて高さを揃える）
+  const pages = Array.from({ length: totalPages }, (_, i) => {
+    const slice = items.slice(i * PAGE_SIZE, i * PAGE_SIZE + PAGE_SIZE);
+    while (slice.length < PAGE_SIZE) slice.push(null);
+    return slice;
+  });
 
   return (
     <div
@@ -9012,25 +9017,37 @@ function TaskCarousel({ items, today }) {
       onMouseLeave={() => setHovering(false)}
       style={{ position: "relative" }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {pageItems.map((c) => {
-          const isOver = c.due < today;
-          return (
-            <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#78350F" }}>
-              <span style={{
-                fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
-                background: isOver ? "#FEE2E2" : "#FEF3C7",
-                color: isOver ? "#991B1B" : "#92400E",
-                flexShrink: 0,
-              }}>
-                {isOver ? "期限切れ" : c.due}
-              </span>
-              <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {c.title}
-              </span>
+      <div style={{ overflow: "hidden", width: "100%" }}>
+        <div style={{
+          display: "flex",
+          width: `${totalPages * 100}%`,
+          transform: `translateX(-${page * (100 / totalPages)}%)`,
+          transition: "transform 0.5s cubic-bezier(0.4,0,0.2,1)",
+        }}>
+          {pages.map((pageItems, pi) => (
+            <div key={pi} style={{ width: `${100 / totalPages}%`, flexShrink: 0, display: "flex", flexDirection: "column", gap: 6, paddingRight: 8, boxSizing: "border-box" }}>
+              {pageItems.map((c, ci) => {
+                if (!c) return <div key={ci} style={{ height: 17 }} />;
+                const isOver = c.due < today;
+                return (
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#78350F", height: 17 }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
+                      background: isOver ? "#FEE2E2" : "#FEF3C7",
+                      color: isOver ? "#991B1B" : "#92400E",
+                      flexShrink: 0,
+                    }}>
+                      {isOver ? "期限切れ" : c.due}
+                    </span>
+                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {c.title}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
       {totalPages > 1 && hovering && (
         <>
