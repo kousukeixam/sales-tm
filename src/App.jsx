@@ -1676,20 +1676,17 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
 
   // 転記（業務行があれば行＋コメント、なければコメントのみ）
   const handleSave = async () => {
-    // セッションを実際にサーバーへ問い合わせて有効性を確認
-    const {
-      data: { user },
-      error: sessionError,
-    } = await supabase.auth.getUser();
-    if (sessionError || !user) {
-      alert(
-        "セッションが切れています。ページを再読み込みしてログインし直してください。",
-      );
-      window.location.reload();
-      return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        alert("セッションが切れています。ページを再読み込みしてログインし直してください。");
+        window.location.reload();
+        return;
+      }
+    } catch (e) {
+      console.error("セッション確認エラー:", e);
+      // セッション確認に失敗しても処理は継続する（誤って止まらないように）
     }
-    // トークンが切れていればリフレッシュを試みる
-    await supabase.auth.refreshSession();
 
     const valid = rows.filter(
       (r) => r.task && r.start && r.end && r.cat && getMins(r.start, r.end) > 0,
@@ -4932,9 +4929,15 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
   const save = async () => {
     if (!title.trim() || saving) return;
     setSaving(true);
-    await onSave({ ...card, title: title.trim(), desc, prio, due, comments });
-    setSaving(false);
-    onClose();
+    try {
+      await onSave({ ...card, title: title.trim(), desc, prio, due, comments });
+      onClose();
+    } catch (e) {
+      console.error("カード保存エラー:", e);
+      alert("保存に失敗しました。もう一度お試しください。");
+    } finally {
+      setSaving(false);
+    }
   };
   return (
     <div
