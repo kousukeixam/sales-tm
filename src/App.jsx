@@ -1694,15 +1694,18 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     if (!valid.length && !dayComment.trim()) return;
 
     if (valid.length > 0) {
-      // 同日の「（コメントのみ）」レコードのコメントを取得してから削除
-      const { data: commentOnlyRec } = await supabase
+      // 同日の既存コメント（通常レコード・コメントのみレコード両方）を取得し、新規コメントを追記する
+      const { data: existingRecs } = await supabase
         .from("logs")
         .select("day_comment")
         .eq("user_id", currentUser.id)
-        .eq("date", date)
-        .eq("task", "（コメントのみ）")
-        .maybeSingle();
-      const finalComment = dayComment || commentOnlyRec?.day_comment || "";
+        .eq("date", date);
+      const existingComment = (existingRecs || [])
+        .map((r) => r.day_comment)
+        .find((c) => c && c.trim()) || "";
+      const finalComment = existingComment
+        ? (dayComment.trim() ? `${existingComment}\n\n${dayComment.trim()}` : existingComment)
+        : dayComment;
       await supabase
         .from("logs")
         .delete()
@@ -1818,16 +1821,21 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     // 同じ日付・同ユーザーの既存レコードを確認
     const { data: existing } = await supabase
       .from("logs")
-      .select("id")
+      .select("id, day_comment")
       .eq("user_id", currentUser.id)
-      .eq("date", date)
-      .limit(1);
+      .eq("date", date);
 
     if (existing && existing.length > 0) {
-      // 既存レコードがあればday_commentだけ更新
+      const existingComment = existing
+        .map((r) => r.day_comment)
+        .find((c) => c && c.trim()) || "";
+      const finalComment = existingComment
+        ? `${existingComment}\n\n${dayComment.trim()}`
+        : dayComment.trim();
+      // 既存レコードがあれば全レコードのday_commentを統一して更新
       const { error } = await supabase
         .from("logs")
-        .update({ day_comment: dayComment })
+        .update({ day_comment: finalComment })
         .eq("user_id", currentUser.id)
         .eq("date", date);
       if (error) {
@@ -1843,7 +1851,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
         task: "（コメントのみ）",
         minutes: 0,
         cat: "other",
-        day_comment: dayComment,
+        day_comment: dayComment.trim(),
       });
       if (error) {
         alert("保存に失敗しました: " + error.message);
@@ -3729,6 +3737,7 @@ function DateGroup({
   onDelete,
   onSaveManagerComment,
   onSaveDayComment,
+  onUpdateMemberComment,
   onEditLog,
   onDuplicate,
   onTagClick,
@@ -3740,6 +3749,9 @@ function DateGroup({
   const totMins = recs.reduce((s, r) => s + r.minutes, 0);
   const memberDayComment = recs[0]?.dayComment || "";
   const managerDayComment = recs[0]?.managerDayComment || "";
+  const userName = recs[0]?.user;
+  const [editMemberComment, setEditMemberComment] = useState(false);
+  const [memberCommentDraft, setMemberCommentDraft] = useState(memberDayComment);
   return (
     <div style={{ marginBottom: 20 }}>
       <div
@@ -3827,15 +3839,90 @@ function DateGroup({
         <div style={{ marginBottom: 10 }}>
           <div
             style={{
-              fontSize: 11,
-              color: "#94a3b8",
-              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
               marginBottom: 4,
             }}
           >
-            メンバーの振り返り
+            <div
+              style={{
+                fontSize: 11,
+                color: "#94a3b8",
+                fontWeight: 600,
+              }}
+            >
+              メンバーの振り返り
+            </div>
+            {onUpdateMemberComment && memberDayComment && !editMemberComment && (
+              <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+                <button
+                  onClick={() => {
+                    setMemberCommentDraft(memberDayComment);
+                    setEditMemberComment(true);
+                  }}
+                  style={{
+                    fontSize: 11, color: "#3B82F6", background: "none",
+                    border: "none", cursor: "pointer", fontFamily: "inherit",
+                    padding: "2px 4px",
+                  }}
+                >
+                  編集
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm("振り返りコメントを削除しますか？")) {
+                      onUpdateMemberComment(date, userName, "");
+                    }
+                  }}
+                  style={{
+                    fontSize: 11, color: "#EF4444", background: "none",
+                    border: "none", cursor: "pointer", fontFamily: "inherit",
+                    padding: "2px 4px",
+                  }}
+                >
+                  削除
+                </button>
+              </div>
+            )}
           </div>
-          {memberDayComment ? (
+          {editMemberComment ? (
+            <div>
+              <textarea
+                value={memberCommentDraft}
+                onChange={(e) => setMemberCommentDraft(e.target.value)}
+                style={{
+                  width: "100%", minHeight: 80, fontSize: 13, padding: "10px 12px",
+                  borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "inherit",
+                  resize: "vertical", boxSizing: "border-box",
+                }}
+              />
+              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                <button
+                  onClick={() => {
+                    onUpdateMemberComment(date, userName, memberCommentDraft);
+                    setEditMemberComment(false);
+                  }}
+                  style={{
+                    fontSize: 12, padding: "5px 14px", borderRadius: 6,
+                    border: "none", background: "#3B82F6", color: "#fff",
+                    cursor: "pointer", fontFamily: "inherit",
+                  }}
+                >
+                  保存
+                </button>
+                <button
+                  onClick={() => setEditMemberComment(false)}
+                  style={{
+                    fontSize: 12, padding: "5px 14px", borderRadius: 6,
+                    border: "1px solid #e2e8f0", background: "#fff", color: "#64748b",
+                    cursor: "pointer", fontFamily: "inherit",
+                  }}
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          ) : memberDayComment ? (
             <div
               style={{
                 fontSize: 13,
@@ -3981,6 +4068,7 @@ function CardLogView({
   onDelete,
   onSaveManagerComment,
   onSaveDayComment,
+  onUpdateMemberComment,
   onEditLog,
   onDuplicate,
   onTagClick,
@@ -4098,6 +4186,7 @@ function CardLogView({
             onDelete={onDelete}
             onSaveManagerComment={onSaveManagerComment}
             onSaveDayComment={onSaveDayComment}
+            onUpdateMemberComment={onUpdateMemberComment}
             onEditLog={onEditLog}
             onDuplicate={onDuplicate}
             onTagClick={onTagClick}
@@ -4221,6 +4310,7 @@ function LogListPage({
   onDelete,
   onSaveManagerComment,
   onSaveDayComment,
+  onUpdateMemberComment,
   onEditLog,
   filterUser,
   onDuplicate,
@@ -4618,6 +4708,7 @@ function LogListPage({
           onDelete={onDelete}
           onSaveManagerComment={onSaveManagerComment}
           onSaveDayComment={onSaveDayComment}
+          onUpdateMemberComment={onUpdateMemberComment}
           onEditLog={onEditLog}
           onDuplicate={onDuplicate}
           onTagClick={(tag) =>
@@ -4659,6 +4750,7 @@ function LogListPage({
                   onDelete={onDelete}
                   onSaveManagerComment={onSaveManagerComment}
                   onSaveDayComment={onSaveDayComment}
+                  onUpdateMemberComment={onUpdateMemberComment}
                   onEditLog={onEditLog}
                   onDuplicate={onDuplicate}
                   onTagClick={(tag) => setActiveTags((p) => p.includes(tag) ? p : [...p, tag])}
@@ -9544,6 +9636,26 @@ export default function App() {
       );
     }
   };
+  // メンバー本人の振り返りコメント（day_comment）を編集・削除する
+  const updateMemberDayComment = async (date, userName, comment) => {
+    const { error } = await supabase
+      .from("logs")
+      .update({ day_comment: comment })
+      .eq("date", date)
+      .eq("user_name", userName);
+    if (!error) {
+      setLogs((p) =>
+        p.map((l) =>
+          l.date === date && l.user === userName
+            ? { ...l, dayComment: comment }
+            : l,
+        ),
+      );
+    } else {
+      alert("更新に失敗しました: " + error.message);
+    }
+  };
+
   const saveDayComment = async (date, user, comment) => {
     const { error } = await supabase
       .from("logs")
@@ -10311,6 +10423,7 @@ export default function App() {
             onDelete={deleteLog}
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
+            onUpdateMemberComment={updateMemberDayComment}
             onEditLog={editLog}
             onDuplicate={(recs, singleRow) => {
               const today = new Date().toISOString().slice(0, 10);
