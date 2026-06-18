@@ -4288,6 +4288,28 @@ function LogListPage({
     localStorage.setItem("logViewMode", mode);
   };
 
+  // 当月以外を月単位で折りたたむための処理（リスト表示用）
+  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const monthGroupedForList = useMemo(() => {
+    const mg = {};
+    Object.entries(grouped).forEach(([date, recs]) => {
+      const month = date.slice(0, 7);
+      if (!mg[month]) mg[month] = [];
+      mg[month].push([date, recs]);
+    });
+    Object.values(mg).forEach((arr) => arr.sort((a, b) => b[0].localeCompare(a[0])));
+    return Object.entries(mg).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [grouped]);
+  const [expandedMonths, setExpandedMonths] = useState(() => new Set([currentMonth]));
+  const toggleMonth = (month) => {
+    setExpandedMonths((p) => {
+      const next = new Set(p);
+      if (next.has(month)) next.delete(month);
+      else next.add(month);
+      return next;
+    });
+  };
+
   return (
     <div>
       {filterUser && (
@@ -4578,22 +4600,48 @@ function LogListPage({
           }
         />
       ) : (
-        Object.entries(grouped).map(([date, recs]) => (
-          <DateGroup
-            key={date}
-            date={date}
-            recs={recs}
-            currentUser={currentUser}
-            onDelete={onDelete}
-            onSaveManagerComment={onSaveManagerComment}
-            onSaveDayComment={onSaveDayComment}
-            onEditLog={onEditLog}
-            onDuplicate={onDuplicate}
-            onTagClick={(tag) =>
-              setActiveTags((p) => (p.includes(tag) ? p : [...p, tag]))
-            }
-          />
-        ))
+        monthGroupedForList.map(([month, dateEntries]) => {
+          const isExpanded = expandedMonths.has(month);
+          const [y, m] = month.split("-");
+          const totalCount = dateEntries.reduce((s, [, recs]) => s + recs.length, 0);
+          return (
+            <div key={month} style={{ marginBottom: 16 }}>
+              <button
+                onClick={() => toggleMonth(month)}
+                style={{
+                  width: "100%", display: "flex", alignItems: "center", gap: 8,
+                  padding: "10px 14px", background: "#f8fafc", border: "1px solid #e2e8f0",
+                  borderRadius: 10, cursor: "pointer", fontFamily: "inherit",
+                  marginBottom: isExpanded ? 10 : 0,
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+                  {y}年{m}月
+                </span>
+                {!isExpanded && (
+                  <span style={{ fontSize: 12, color: "#94a3b8" }}>{totalCount}件</span>
+                )}
+                <span style={{ marginLeft: "auto", fontSize: 11, color: "#94a3b8", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                  ▼
+                </span>
+              </button>
+              {isExpanded && dateEntries.map(([date, recs]) => (
+                <DateGroup
+                  key={date}
+                  date={date}
+                  recs={recs}
+                  currentUser={currentUser}
+                  onDelete={onDelete}
+                  onSaveManagerComment={onSaveManagerComment}
+                  onSaveDayComment={onSaveDayComment}
+                  onEditLog={onEditLog}
+                  onDuplicate={onDuplicate}
+                  onTagClick={(tag) => setActiveTags((p) => p.includes(tag) ? p : [...p, tag])}
+                />
+              ))}
+            </div>
+          );
+        })
       )}
     </div>
   );
