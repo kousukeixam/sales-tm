@@ -1751,17 +1751,22 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
         })),
       );
     } else {
-      // 業務行なし → コメントのみ転記
+      // 業務行なし → コメントのみ転記（既存コメントがあれば追記する）
       const { data: existing } = await supabase
         .from("logs")
-        .select("id")
+        .select("id, day_comment")
         .eq("user_id", currentUser.id)
-        .eq("date", date)
-        .limit(1);
+        .eq("date", date);
       if (existing && existing.length > 0) {
+        const existingComment = existing
+          .map((r) => r.day_comment)
+          .find((c) => c && c.trim()) || "";
+        const finalComment = existingComment
+          ? `${existingComment}\n\n${dayComment.trim()}`
+          : dayComment.trim();
         const { error } = await supabase
           .from("logs")
-          .update({ day_comment: dayComment })
+          .update({ day_comment: finalComment })
           .eq("user_id", currentUser.id)
           .eq("date", date);
         if (error) {
