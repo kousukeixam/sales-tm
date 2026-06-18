@@ -519,20 +519,46 @@ function LoginPage({ onLogin }) {
   const go = async () => {
     setLoading(true);
     setErr("");
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password: pass,
-    });
-    if (error) {
-      setErr("メールアドレスまたはパスワードが正しくありません");
-      setLoading(false);
-    } else {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", data.user.id)
-        .single();
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password: pass,
+      });
+      if (error) {
+        setErr("メールアドレスまたはパスワードが正しくありません");
+        return;
+      }
+
+      // ログイン直後はセッション同期にタイムラグが生じることがあるため、
+      // 失敗時は少し待って最大3回までリトライする
+      let profile = null;
+      let lastError = null;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const { data: p, error: profileError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", data.user.id)
+          .single();
+        if (p && !profileError) {
+          profile = p;
+          break;
+        }
+        lastError = profileError;
+        console.error(`プロフィール取得失敗(${attempt}回目):`, profileError);
+        if (attempt < 3) await new Promise((r) => setTimeout(r, 500 * attempt));
+      }
+
+      if (!profile) {
+        console.error("プロフィール取得に最終的に失敗しました:", lastError);
+        setErr("ログインに成功しましたが、プロフィール情報の取得に失敗しました。ページを再読み込みしてください。");
+        return;
+      }
       onLogin({ ...profile, email: data.user.email });
+    } catch (e) {
+      console.error("ログイン処理で例外発生:", e);
+      setErr("ログインに失敗しました。通信状況を確認し、もう一度お試しください。");
+    } finally {
+      setLoading(false);
     }
   };
   const si = {
