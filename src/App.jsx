@@ -1819,19 +1819,23 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   const handleSaveCommentOnly = async () => {
     if (!dayComment.trim()) return;
     // 同じ日付・同ユーザーの既存レコードを確認
-    const { data: existing } = await supabase
+    const { data: existing, error: fetchError } = await supabase
       .from("logs")
       .select("id, day_comment")
       .eq("user_id", currentUser.id)
       .eq("date", date);
 
+    console.log("[振り返り保存] 既存レコード取得結果:", existing, "エラー:", fetchError);
+
     if (existing && existing.length > 0) {
       const existingComment = existing
         .map((r) => r.day_comment)
         .find((c) => c && c.trim()) || "";
+      console.log("[振り返り保存] 既存コメント:", existingComment, "新規入力:", dayComment);
       const finalComment = existingComment
         ? `${existingComment}\n\n${dayComment.trim()}`
         : dayComment.trim();
+      console.log("[振り返り保存] 最終的に保存する内容:", finalComment);
       // 既存レコードがあれば全レコードのday_commentを統一して更新
       const { error } = await supabase
         .from("logs")
