@@ -4008,6 +4008,17 @@ function CardLogView({
     setSelectedDate((prev) => (prev === date ? null : date));
   };
 
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const [expandedMonths, setExpandedMonths] = useState(() => new Set([currentMonth]));
+  const toggleMonth = (month) => {
+    setExpandedMonths((p) => {
+      const next = new Set(p);
+      if (next.has(month)) next.delete(month);
+      else next.add(month);
+      return next;
+    });
+  };
+
   return (
     <div
       style={{
@@ -4027,30 +4038,44 @@ function CardLogView({
           flexShrink: 0,
         }}
       >
-        {monthGroups.map(([month, dates]) => (
-          <div key={month} style={{ marginBottom: 16 }}>
-            <p
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#64748b",
-                margin: "0 0 8px",
-              }}
-            >
-              {month.replace("-", "年")}月
-            </p>
-            {dates.map(([date, recs]) => (
-              <DayCard
-                key={date}
-                date={date}
-                recs={recs}
-                selected={selectedDate === date}
-                compact={!!selectedDate}
-                onClick={() => handleSelect(date)}
-              />
-            ))}
-          </div>
-        ))}
+        {monthGroups.map(([month, dates]) => {
+          const isExpanded = expandedMonths.has(month);
+          const [y, m] = month.split("-");
+          const totalCount = dates.reduce((s, [, recs]) => s + recs.length, 0);
+          return (
+            <div key={month} style={{ marginBottom: 16 }}>
+              <button
+                onClick={() => toggleMonth(month)}
+                style={{
+                  width: "100%", display: "flex", alignItems: "center", gap: 8,
+                  padding: "8px 12px", background: "#f8fafc", border: "1px solid #e2e8f0",
+                  borderRadius: 10, cursor: "pointer", fontFamily: "inherit",
+                  marginBottom: isExpanded ? 8 : 0,
+                }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#1e293b" }}>
+                  {y}年{m}月
+                </span>
+                {!isExpanded && (
+                  <span style={{ fontSize: 11, color: "#94a3b8" }}>{totalCount}件</span>
+                )}
+                <span style={{ marginLeft: "auto", fontSize: 10, color: "#94a3b8", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                  ▼
+                </span>
+              </button>
+              {isExpanded && dates.map(([date, recs]) => (
+                <DayCard
+                  key={date}
+                  date={date}
+                  recs={recs}
+                  selected={selectedDate === date}
+                  compact={!!selectedDate}
+                  onClick={() => handleSelect(date)}
+                />
+              ))}
+            </div>
+          );
+        })}
       </div>
 
       <div
