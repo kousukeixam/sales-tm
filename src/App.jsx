@@ -449,14 +449,14 @@ const Icon = ({ name, size = 16 }) => (
     strokeLinejoin="round"
   >
     {(PATHS[name] || "")
-      .split(" M ")
+      // 連続するパス（"M..." の前にスペースなしで続く場合も含む）を正しく分割
+      .split(/(?=M)/)
+      .map((s) => s.trim())
       .filter(Boolean)
       .map((s, i) => (
         <path
           key={i}
-          d={
-            i === 0 && !s.startsWith("M") ? s : `M ${s}`.replace(/^M M /, "M ")
-          }
+          d={s}
         />
       ))}
   </svg>
