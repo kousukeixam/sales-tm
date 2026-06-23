@@ -9483,23 +9483,42 @@ export default function App() {
         commentMap.set(`${c.user_id}_${c.date}`, c.comment);
       });
       if (!error && data) {
-        setLogs(
-          data.map((l) => ({
-            id: l.id,
-            date: l.date,
-            task: l.task,
-            detail: l.detail,
-            start: l.start_time,
-            end: l.end_time,
-            minutes: l.minutes,
-            cat: l.cat,
-            user: l.user_name,
-            userId: l.user_id,
-            managerComment: l.manager_comment || "",
-            managerDayComment: l.manager_day_comment || "",
-            dayComment: commentMap.get(`${l.user_id}_${l.date}`) || "",
-          })),
-        );
+        const logsWithComments = data.map((l) => ({
+          id: l.id,
+          date: l.date,
+          task: l.task,
+          detail: l.detail,
+          start: l.start_time,
+          end: l.end_time,
+          minutes: l.minutes,
+          cat: l.cat,
+          user: l.user_name,
+          userId: l.user_id,
+          managerComment: l.manager_comment || "",
+          managerDayComment: l.manager_day_comment || "",
+          dayComment: commentMap.get(`${l.user_id}_${l.date}`) || "",
+        }));
+        // 業務行が1件もない日でも振り返りコメントが残っていれば一覧に表示できるよう、
+        // 該当する日付の組み合わせがlogsに存在しない場合は「コメントのみ」の仮想エントリを追加する
+        const existingKeys = new Set(logsWithComments.map((l) => `${l.userId}_${l.date}`));
+        const virtualEntries = (dayComments || [])
+          .filter((c) => !existingKeys.has(`${c.user_id}_${c.date}`))
+          .map((c) => ({
+            id: `virtual_${c.user_id}_${c.date}`,
+            date: c.date,
+            task: "（コメントのみ）",
+            detail: "",
+            start: "",
+            end: "",
+            minutes: 0,
+            cat: "other",
+            user: c.user_name,
+            userId: c.user_id,
+            managerComment: "",
+            managerDayComment: "",
+            dayComment: c.comment || "",
+          }));
+        setLogs([...logsWithComments, ...virtualEntries]);
       }
     };
     if (currentUser) fetchLogs();
