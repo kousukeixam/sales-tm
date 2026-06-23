@@ -3765,6 +3765,7 @@ function DateGroup({
   const memberDayComment = recs[0]?.dayComment || "";
   const managerDayComment = recs[0]?.managerDayComment || "";
   const userName = recs[0]?.user;
+  const userIdForComment = recs[0]?.userId;
   const [editMemberComment, setEditMemberComment] = useState(false);
   const [memberCommentDraft, setMemberCommentDraft] = useState(memberDayComment);
   return (
@@ -3886,7 +3887,7 @@ function DateGroup({
                 <button
                   onClick={() => {
                     if (window.confirm("振り返りコメントを削除しますか？")) {
-                      onUpdateMemberComment(date, userName, "");
+                      onUpdateMemberComment(date, userName, "", userIdForComment);
                     }
                   }}
                   style={{
@@ -3914,7 +3915,7 @@ function DateGroup({
               <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
                 <button
                   onClick={() => {
-                    onUpdateMemberComment(date, userName, memberCommentDraft);
+                    onUpdateMemberComment(date, userName, memberCommentDraft, userIdForComment);
                     setEditMemberComment(false);
                   }}
                   style={{
