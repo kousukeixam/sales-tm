@@ -1016,29 +1016,101 @@ function MonthBar({ monthlyData }) {
 }
 // Open-Meteoのweather_codeを絵文字・日本語ラベルに変換
 const WMO_CODE_MAP = {
-  0: { icon: "☀️", label: "晴れ" },
-  1: { icon: "🌤", label: "晴れ" },
-  2: { icon: "⛅", label: "晴れ時々曇り" },
-  3: { icon: "☁️", label: "曇り" },
-  45: { icon: "🌫", label: "霧" },
-  48: { icon: "🌫", label: "霧" },
-  51: { icon: "🌦", label: "小雨" },
-  53: { icon: "🌦", label: "小雨" },
-  55: { icon: "🌧", label: "雨" },
-  61: { icon: "🌦", label: "雨" },
-  63: { icon: "🌧", label: "雨" },
-  65: { icon: "🌧", label: "強い雨" },
-  71: { icon: "🌨", label: "雪" },
-  73: { icon: "🌨", label: "雪" },
-  75: { icon: "❄️", label: "強い雪" },
-  80: { icon: "🌦", label: "にわか雨" },
-  81: { icon: "🌧", label: "にわか雨" },
-  82: { icon: "⛈", label: "激しいにわか雨" },
-  95: { icon: "⛈", label: "雷雨" },
-  96: { icon: "⛈", label: "雷雨" },
-  99: { icon: "⛈", label: "激しい雷雨" },
+  0: { type: "sun", label: "晴れ" },
+  1: { type: "sun", label: "晴れ" },
+  2: { type: "cloudSun", label: "晴れ時々曇り" },
+  3: { type: "cloud", label: "曇り" },
+  45: { type: "fog", label: "霧" },
+  48: { type: "fog", label: "霧" },
+  51: { type: "rain", label: "小雨" },
+  53: { type: "rain", label: "小雨" },
+  55: { type: "rain", label: "雨" },
+  61: { type: "rain", label: "雨" },
+  63: { type: "rain", label: "雨" },
+  65: { type: "rain", label: "強い雨" },
+  71: { type: "snow", label: "雪" },
+  73: { type: "snow", label: "雪" },
+  75: { type: "snow", label: "強い雪" },
+  80: { type: "rain", label: "にわか雨" },
+  81: { type: "rain", label: "にわか雨" },
+  82: { type: "storm", label: "激しいにわか雨" },
+  95: { type: "storm", label: "雷雨" },
+  96: { type: "storm", label: "雷雨" },
+  99: { type: "storm", label: "激しい雷雨" },
 };
-const wmoInfo = (code) => WMO_CODE_MAP[code] || { icon: "🌡", label: "—" };
+const wmoInfo = (code) => WMO_CODE_MAP[code] || { type: "cloud", label: "—" };
+
+// シンプルな線画アイコン（天気種別ごと）
+function WeatherIcon({ type, size = 22, color = "#3B82F6", night = false }) {
+  const stroke = color;
+  const common = {
+    width: size, height: size, viewBox: "0 0 24 24", fill: "none",
+    stroke, strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round",
+  };
+  if (night) {
+    return (
+      <svg {...common}>
+        <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z" />
+      </svg>
+    );
+  }
+  switch (type) {
+    case "sun":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="4.5" />
+          <path d="M12 2v3 M12 19v3 M4.2 4.2l2.1 2.1 M17.7 17.7l2.1 2.1 M2 12h3 M19 12h3 M4.2 19.8l2.1-2.1 M17.7 6.3l2.1-2.1" />
+        </svg>
+      );
+    case "cloudSun":
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="8" r="3" />
+          <path d="M8 2.5v1.5 M8 11v1.5 M3.5 8H2 M14 8h-1.5 M4.6 4.6l1 1 M11.4 4.6l-1 1" />
+          <path d="M9 20h7.5a3.5 3.5 0 0 0 0-7 5 5 0 0 0-9.5-1.5A4 4 0 0 0 6 19" />
+        </svg>
+      );
+    case "cloud":
+      return (
+        <svg {...common}>
+          <path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.8A4.5 4.5 0 0 0 7 18z" />
+        </svg>
+      );
+    case "fog":
+      return (
+        <svg {...common}>
+          <path d="M6 9h12 M4 13h16 M6 17h12" />
+        </svg>
+      );
+    case "rain":
+      return (
+        <svg {...common}>
+          <path d="M7 16h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.8A4.5 4.5 0 0 0 7 16z" />
+          <path d="M9 19l-1 2.5 M13 19l-1 2.5 M17 19l-1 2.5" />
+        </svg>
+      );
+    case "snow":
+      return (
+        <svg {...common}>
+          <path d="M7 14h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.8A4.5 4.5 0 0 0 7 14z" />
+          <path d="M9 18v4 M9 19l1.5 1 M9 19l-1.5 1 M15 18v4 M15 19l1.5 1 M15 19l-1.5 1" />
+        </svg>
+      );
+    case "storm":
+      return (
+        <svg {...common}>
+          <path d="M7 13h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.8A4.5 4.5 0 0 0 7 13z" />
+          <path d="M13 14l-3 4h3l-2 4" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...common}>
+          <path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5-1.8A4.5 4.5 0 0 0 7 18z" />
+        </svg>
+      );
+  }
+}
 
 function WeatherWidget() {
   const [data, setData] = useState(null);
@@ -1071,21 +1143,21 @@ function WeatherWidget() {
 
   if (error) {
     return (
-      <div style={{ ...C, flex: 1, minWidth: 200 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
-          🌤 今日の天気
+      <div style={{ ...C, flex: 1, minWidth: 220 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
+          今日の天気
         </div>
-        <div style={{ fontSize: 12, color: "#94a3b8" }}>{error}</div>
+        <div style={{ fontSize: 13, color: "#94a3b8" }}>{error}</div>
       </div>
     );
   }
   if (!data) {
     return (
-      <div style={{ ...C, flex: 1, minWidth: 200 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
-          🌤 今日の天気
+      <div style={{ ...C, flex: 1, minWidth: 220 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
+          今日の天気
         </div>
-        <div style={{ fontSize: 12, color: "#94a3b8" }}>取得中...</div>
+        <div style={{ fontSize: 13, color: "#94a3b8" }}>取得中...</div>
       </div>
     );
   }
@@ -1103,17 +1175,17 @@ function WeatherWidget() {
     .map((h) => h % 24);
 
   return (
-    <div style={{ ...C, flex: 1, minWidth: 200 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+    <div style={{ ...C, flex: 1, minWidth: 220 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
         <div style={{ display: "flex", gap: 4 }}>
           <button
             onClick={() => setTab("today")}
             style={{
-              fontSize: 11, padding: "4px 10px", borderRadius: 6, border: "1px solid",
+              fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
               borderColor: tab === "today" ? "#93c5fd" : "#e2e8f0",
               background: tab === "today" ? "#eff6ff" : "transparent",
               color: tab === "today" ? "#1d4ed8" : "#64748b",
-              cursor: "pointer", fontFamily: "inherit",
+              cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
             今日
@@ -1121,11 +1193,11 @@ function WeatherWidget() {
           <button
             onClick={() => setTab("week")}
             style={{
-              fontSize: 11, padding: "4px 10px", borderRadius: 6, border: "1px solid",
+              fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
               borderColor: tab === "week" ? "#93c5fd" : "#e2e8f0",
               background: tab === "week" ? "#eff6ff" : "transparent",
               color: tab === "week" ? "#1d4ed8" : "#64748b",
-              cursor: "pointer", fontFamily: "inherit",
+              cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
             週間
@@ -1135,7 +1207,7 @@ function WeatherWidget() {
           href="https://www.msn.com/ja-jp/weather/forecast"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ fontSize: 11, color: "#94a3b8", textDecoration: "none" }}
+          style={{ fontSize: 13, color: "#64748b", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
         >
           詳細 ↗
         </a>
@@ -1143,59 +1215,68 @@ function WeatherWidget() {
 
       {tab === "today" ? (
         <div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 32 }}>{current.icon}</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <WeatherIcon type={current.type} size={40} color="#3B82F6" />
               <div>
-                <div style={{ fontSize: 26, fontWeight: 700, color: "#1e293b" }}>
-                  {Math.round(data.current.temperature_2m)}°C
+                <div style={{ fontSize: 32, fontWeight: 700, color: "#1e293b", lineHeight: 1 }}>
+                  {Math.round(data.current.temperature_2m)}°
                 </div>
-                <div style={{ fontSize: 11, color: "#64748b" }}>{current.label}</div>
+                <div style={{ fontSize: 14, color: "#64748b", marginTop: 2 }}>{current.label}</div>
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 11, color: "#64748b" }}>最高 {todayMax}° / 最低 {todayMin}°</div>
-              <div style={{ fontSize: 11, color: "#94a3b8" }}>降水確率 {todayPop}%</div>
+              <div style={{ fontSize: 14, color: "#64748b" }}>
+                最高 <b style={{ color: "#1e293b" }}>{todayMax}°</b> / 最低 <b style={{ color: "#1e293b" }}>{todayMin}°</b>
+              </div>
+              <div style={{ fontSize: 13, color: "#3B82F6", marginTop: 4 }}>降水確率 {todayPop}%</div>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${hourlyIdx.length}, 1fr)`, gap: 2 }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${hourlyIdx.length}, 1fr)`, gap: 4, paddingTop: 14, borderTop: "1px solid #f1f5f9" }}>
             {hourlyIdx.map((h) => {
               const todayStr = new Date().toISOString().slice(0, 10);
               const hourIdx = data.hourly.time.findIndex((t) => t === `${todayStr}T${String(h).padStart(2, "0")}:00`);
               const temp = hourIdx >= 0 ? Math.round(data.hourly.temperature_2m[hourIdx]) : null;
               const pop = hourIdx >= 0 ? data.hourly.precipitation_probability[hourIdx] : null;
               const code = hourIdx >= 0 ? data.hourly.weather_code[hourIdx] : null;
+              const isNight = h >= 18 || h < 6;
+              const info = code !== null ? wmoInfo(code) : null;
               return (
                 <div key={h} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 10, color: "#94a3b8" }}>{h}時</div>
-                  <div style={{ fontSize: 14, margin: "2px 0" }}>{code !== null ? wmoInfo(code).icon : "—"}</div>
-                  <div style={{ fontSize: 10, color: "#1e293b" }}>{temp !== null ? `${temp}°` : ""}</div>
-                  <div style={{ fontSize: 9, color: "#60a5fa" }}>{pop !== null ? `${pop}%` : ""}</div>
+                  <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>{h}時</div>
+                  {info ? (
+                    <WeatherIcon type={info.type} size={22} color={info.type === "rain" || info.type === "storm" ? "#3B82F6" : "#64748b"} night={isNight} />
+                  ) : (
+                    <span style={{ fontSize: 12, color: "#cbd5e1" }}>—</span>
+                  )}
+                  <div style={{ fontSize: 13, color: "#1e293b", marginTop: 6 }}>{temp !== null ? `${temp}°` : ""}</div>
+                  <div style={{ fontSize: 11, color: "#3B82F6", marginTop: 2 }}>{pop !== null ? `${pop}%` : ""}</div>
                 </div>
               );
             })}
           </div>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div>
           {data.daily.time.map((dateStr, i) => {
             const d = new Date(dateStr);
             const label = i === 0 ? "今日" : `${d.getMonth() + 1}/${d.getDate()}(${["日", "月", "火", "水", "木", "金", "土"][d.getDay()]})`;
             const info = wmoInfo(data.daily.weather_code[i]);
             return (
               <div key={dateStr} style={{
-                display: "flex", alignItems: "center", gap: 8, fontSize: 12,
-                padding: "5px 0", borderBottom: i < data.daily.time.length - 1 ? "1px solid #f1f5f9" : "none",
+                display: "flex", alignItems: "center", gap: 14, fontSize: 14,
+                padding: "10px 0", borderBottom: i < data.daily.time.length - 1 ? "1px solid #f1f5f9" : "none",
               }}>
-                <span style={{ width: 56, color: "#64748b" }}>{label}</span>
-                <span style={{ fontSize: 16, width: 22 }}>{info.icon}</span>
-                <span style={{ width: 50, fontSize: 11, color: "#94a3b8" }}>
-                  降水 {data.daily.precipitation_probability_max[i]}%
+                <span style={{ width: 64, color: "#64748b" }}>{label}</span>
+                <span style={{ width: 26, display: "flex" }}>
+                  <WeatherIcon type={info.type} size={22} color="#3B82F6" />
                 </span>
-                <span style={{ marginLeft: "auto" }}>
-                  <span style={{ color: "#1e293b" }}>{Math.round(data.daily.temperature_2m_max[i])}°</span>
-                  {" / "}
-                  <span style={{ color: "#94a3b8" }}>{Math.round(data.daily.temperature_2m_min[i])}°</span>
+                <span style={{ width: 70, fontSize: 13, color: "#3B82F6" }}>
+                  {data.daily.precipitation_probability_max[i]}%
+                </span>
+                <span style={{ marginLeft: "auto", fontSize: 15 }}>
+                  <b style={{ color: "#1e293b" }}>{Math.round(data.daily.temperature_2m_max[i])}°</b>
+                  <span style={{ color: "#94a3b8" }}> / {Math.round(data.daily.temperature_2m_min[i])}°</span>
                 </span>
               </div>
             );
