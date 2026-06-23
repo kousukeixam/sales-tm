@@ -9661,7 +9661,41 @@ export default function App() {
   const deleteLog = async (id) => {
     const { error } = await supabase.from("logs").delete().eq("id", id);
     if (!error) {
-      setLogs((p) => p.filter((l) => l.id !== id));
+      setLogs((p) => {
+        const target = p.find((l) => l.id === id);
+        const remaining = p.filter((l) => l.id !== id);
+        if (!target) return remaining;
+        // 同じ日・同じユーザーの業務行が他に残っているか確認
+        const sameDayLogs = remaining.filter(
+          (l) => l.date === target.date && l.userId === target.userId,
+        );
+        const hasRealTask = sameDayLogs.some((l) => l.task !== "（コメントのみ）");
+        if (!hasRealTask && target.dayComment && target.dayComment.trim()) {
+          // 業務行が0件になったが振り返りコメントが残っている場合、
+          // 表示が消えないよう「コメントのみ」の仮想エントリを即座に補完する
+          const alreadyHasVirtual = sameDayLogs.some((l) => l.task === "（コメントのみ）");
+          if (alreadyHasVirtual) return remaining;
+          return [
+            ...remaining,
+            {
+              id: `virtual_${target.userId}_${target.date}`,
+              date: target.date,
+              task: "（コメントのみ）",
+              detail: "",
+              start: "",
+              end: "",
+              minutes: 0,
+              cat: "other",
+              user: target.user,
+              userId: target.userId,
+              managerComment: "",
+              managerDayComment: target.managerDayComment || "",
+              dayComment: target.dayComment,
+            },
+          ];
+        }
+        return remaining;
+      });
     }
   };
   const editLog = (updated) => {
