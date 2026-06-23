@@ -1719,26 +1719,31 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     );
     if (!valid.length && !dayComment.trim()) return;
 
-    if (valid.length > 0) {
-      // 同日の既存コメント（通常レコード・コメントのみレコード両方）を取得し、新規コメントを追記する
-      const { data: existingRecs } = await supabase
-        .from("logs")
-        .select("day_comment")
-        .eq("user_id", currentUser.id)
-        .eq("date", date);
-      const existingComment = (existingRecs || [])
-        .map((r) => r.day_comment)
-        .find((c) => c && c.trim()) || "";
-      const finalComment = existingComment
-        ? (dayComment.trim() ? `${existingComment}\n\n${dayComment.trim()}` : existingComment)
-        : dayComment;
-      await supabase
-        .from("logs")
-        .delete()
+    // 振り返りコメントは day_comments テーブルで独立管理（既存があれば追記）
+    if (dayComment.trim()) {
+      const { data: existingC } = await supabase
+        .from("day_comments")
+        .select("comment")
         .eq("user_id", currentUser.id)
         .eq("date", date)
-        .eq("task", "（コメントのみ）");
+        .maybeSingle();
+      const existingComment = existingC?.comment || "";
+      const finalComment = existingComment
+        ? `${existingComment}\n\n${dayComment.trim()}`
+        : dayComment.trim();
+      const { error: commentError } = await supabase
+        .from("day_comments")
+        .upsert(
+          { user_id: currentUser.id, user_name: currentUser.name, date, comment: finalComment },
+          { onConflict: "user_id,date" },
+        );
+      if (commentError) {
+        alert("振り返りコメントの保存に失敗しました: " + commentError.message);
+        return;
+      }
+    }
 
+    if (valid.length > 0) {
       const newLogs = valid.map((r) => ({
         user_id: currentUser.id,
         user_name: currentUser.name,
@@ -1749,7 +1754,6 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
         end_time: r.end,
         minutes: getMins(r.start, r.end),
         cat: r.cat,
-        day_comment: finalComment,
       }));
       const { data: inserted, error } = await supabase
         .from("logs")
@@ -1773,34 +1777,11 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
           userId: l.user_id,
           managerComment: "",
           managerDayComment: "",
-          dayComment: l.day_comment || "",
+          dayComment: dayComment.trim() || "",
         })),
       );
     } else {
-      // 業務行なし → コメントのみ転記（既存コメントがあれば追記する）
-      const { data: existing } = await supabase
-        .from("logs")
-        .select("id, day_comment")
-        .eq("user_id", currentUser.id)
-        .eq("date", date);
-      if (existing && existing.length > 0) {
-        const existingComment = existing
-          .map((r) => r.day_comment)
-          .find((c) => c && c.trim()) || "";
-        const finalComment = existingComment
-          ? `${existingComment}\n\n${dayComment.trim()}`
-          : dayComment.trim();
-        const { error } = await supabase
-          .from("logs")
-          .update({ day_comment: finalComment })
-          .eq("user_id", currentUser.id)
-          .eq("date", date);
-        if (error) {
-          alert("保存に失敗しました: " + error.message);
-          return;
-        }
-        onSave([]);
-      } else {
+      {
         const { data: inserted, error } = await supabase
           .from("logs")
           .insert({
@@ -1810,7 +1791,6 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
             task: "（コメントのみ）",
             minutes: 0,
             cat: "other",
-            day_comment: dayComment,
           })
           .select();
         if (error) {
@@ -9494,6 +9474,14 @@ export default function App() {
         .from("logs")
         .select("*")
         .order("date", { ascending: false });
+      const { data: dayComments } = await supabase
+        .from("day_comments")
+        .select("*");
+      // user_id + date をキーにして振り返りコメントを高速に引けるマップを作る
+      const commentMap = new Map();
+      (dayComments || []).forEach((c) => {
+        commentMap.set(`${c.user_id}_${c.date}`, c.comment);
+      });
       if (!error && data) {
         setLogs(
           data.map((l) => ({
@@ -9509,7 +9497,7 @@ export default function App() {
             userId: l.user_id,
             managerComment: l.manager_comment || "",
             managerDayComment: l.manager_day_comment || "",
-            dayComment: l.day_comment || "",
+            dayComment: commentMap.get(`${l.user_id}_${l.date}`) || "",
           })),
         );
       }
