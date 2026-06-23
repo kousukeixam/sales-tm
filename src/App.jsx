@@ -1014,9 +1014,37 @@ function MonthBar({ monthlyData }) {
     </div>
   );
 }
+// Open-Meteoのweather_codeを絵文字・日本語ラベルに変換
+const WMO_CODE_MAP = {
+  0: { icon: "☀️", label: "晴れ" },
+  1: { icon: "🌤", label: "晴れ" },
+  2: { icon: "⛅", label: "晴れ時々曇り" },
+  3: { icon: "☁️", label: "曇り" },
+  45: { icon: "🌫", label: "霧" },
+  48: { icon: "🌫", label: "霧" },
+  51: { icon: "🌦", label: "小雨" },
+  53: { icon: "🌦", label: "小雨" },
+  55: { icon: "🌧", label: "雨" },
+  61: { icon: "🌦", label: "雨" },
+  63: { icon: "🌧", label: "雨" },
+  65: { icon: "🌧", label: "強い雨" },
+  71: { icon: "🌨", label: "雪" },
+  73: { icon: "🌨", label: "雪" },
+  75: { icon: "❄️", label: "強い雪" },
+  80: { icon: "🌦", label: "にわか雨" },
+  81: { icon: "🌧", label: "にわか雨" },
+  82: { icon: "⛈", label: "激しいにわか雨" },
+  95: { icon: "⛈", label: "雷雨" },
+  96: { icon: "⛈", label: "雷雨" },
+  99: { icon: "⛈", label: "激しい雷雨" },
+};
+const wmoInfo = (code) => WMO_CODE_MAP[code] || { icon: "🌡", label: "—" };
+
 function WeatherWidget() {
-  const [weather, setWeather] = useState(null);
+  const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [tab, setTab] = useState("today");
+
   useEffect(() => {
     if (!navigator.geolocation) {
       setError("位置情報非対応");
@@ -1025,15 +1053,14 @@ function WeatherWidget() {
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
-          const res = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric&lang=ja`,
-          );
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=7`;
+          const res = await fetch(url);
           const d = await res.json();
-          if (String(d.cod) !== "200") {
-            setError("天気APIキーを有効化中...");
+          if (!d.current) {
+            setError("取得失敗");
             return;
           }
-          setWeather(d);
+          setData(d);
         } catch (e) {
           setError("取得失敗");
         }
@@ -1041,73 +1068,138 @@ function WeatherWidget() {
       () => setError("位置情報の取得を許可してください"),
     );
   }, []);
-  const icons = {
-    "01d": "☀️",
-    "01n": "🌙",
-    "02d": "🌤",
-    "02n": "🌤",
-    "03d": "☁️",
-    "03n": "☁️",
-    "04d": "☁️",
-    "04n": "☁️",
-    "09d": "🌧",
-    "09n": "🌧",
-    "10d": "🌦",
-    "10n": "🌦",
-    "11d": "⛈",
-    "11n": "⛈",
-    "13d": "❄️",
-    "13n": "❄️",
-    "50d": "🌫",
-    "50n": "🌫",
-  };
+
+  if (error) {
+    return (
+      <div style={{ ...C, flex: 1, minWidth: 200 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
+          🌤 今日の天気
+        </div>
+        <div style={{ fontSize: 12, color: "#94a3b8" }}>{error}</div>
+      </div>
+    );
+  }
+  if (!data) {
+    return (
+      <div style={{ ...C, flex: 1, minWidth: 200 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
+          🌤 今日の天気
+        </div>
+        <div style={{ fontSize: 12, color: "#94a3b8" }}>取得中...</div>
+      </div>
+    );
+  }
+
+  const todayMax = Math.round(data.daily.temperature_2m_max[0]);
+  const todayMin = Math.round(data.daily.temperature_2m_min[0]);
+  const todayPop = data.daily.precipitation_probability_max[0];
+  const current = wmoInfo(data.current.weather_code);
+
+  const nowHour = new Date().getHours();
+  const hourlyIdx = [0, 3, 6, 9, 12, 15, 18, 21]
+    .map((h) => (h >= nowHour ? h : h + 24))
+    .sort((a, b) => a - b)
+    .slice(0, 7)
+    .map((h) => h % 24);
+
   return (
     <div style={{ ...C, flex: 1, minWidth: 200 }}>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          color: "#64748b",
-          marginBottom: 10,
-        }}
-      >
-        🌤 今日の天気
-      </div>
-      {error ? (
-        <div style={{ fontSize: 12, color: "#94a3b8" }}>{error}</div>
-      ) : !weather ? (
-        <div style={{ fontSize: 12, color: "#94a3b8" }}>取得中...</div>
-      ) : (
-        <div>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>
-            {weather.name}
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 36 }}>
-              {icons[weather.weather[0].icon] || "🌡"}
-            </span>
-            <div>
-              <div style={{ fontSize: 28, fontWeight: 700, color: "#1e293b" }}>
-                {Math.round(weather.main.temp)}°C
-              </div>
-              <div style={{ fontSize: 12, color: "#64748b" }}>
-                {weather.weather[0].description}
-              </div>
-            </div>
-          </div>
-          <div
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+        <div style={{ display: "flex", gap: 4 }}>
+          <button
+            onClick={() => setTab("today")}
             style={{
-              display: "flex",
-              gap: 12,
-              marginTop: 10,
-              fontSize: 12,
-              color: "#64748b",
+              fontSize: 11, padding: "4px 10px", borderRadius: 6, border: "1px solid",
+              borderColor: tab === "today" ? "#93c5fd" : "#e2e8f0",
+              background: tab === "today" ? "#eff6ff" : "transparent",
+              color: tab === "today" ? "#1d4ed8" : "#64748b",
+              cursor: "pointer", fontFamily: "inherit",
             }}
           >
-            <span>💧 湿度 {weather.main.humidity}%</span>
-            <span>🌡 体感 {Math.round(weather.main.feels_like)}°C</span>
-            <span>💨 {Math.round(weather.wind.speed * 3.6)}km/h</span>
+            今日
+          </button>
+          <button
+            onClick={() => setTab("week")}
+            style={{
+              fontSize: 11, padding: "4px 10px", borderRadius: 6, border: "1px solid",
+              borderColor: tab === "week" ? "#93c5fd" : "#e2e8f0",
+              background: tab === "week" ? "#eff6ff" : "transparent",
+              color: tab === "week" ? "#1d4ed8" : "#64748b",
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            週間
+          </button>
+        </div>
+        <a
+          href="https://www.msn.com/ja-jp/weather/forecast"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: 11, color: "#94a3b8", textDecoration: "none" }}
+        >
+          詳細 ↗
+        </a>
+      </div>
+
+      {tab === "today" ? (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 32 }}>{current.icon}</span>
+              <div>
+                <div style={{ fontSize: 26, fontWeight: 700, color: "#1e293b" }}>
+                  {Math.round(data.current.temperature_2m)}°C
+                </div>
+                <div style={{ fontSize: 11, color: "#64748b" }}>{current.label}</div>
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 11, color: "#64748b" }}>最高 {todayMax}° / 最低 {todayMin}°</div>
+              <div style={{ fontSize: 11, color: "#94a3b8" }}>降水確率 {todayPop}%</div>
+            </div>
           </div>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${hourlyIdx.length}, 1fr)`, gap: 2 }}>
+            {hourlyIdx.map((h) => {
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const hourIdx = data.hourly.time.findIndex((t) => t === `${todayStr}T${String(h).padStart(2, "0")}:00`);
+              const temp = hourIdx >= 0 ? Math.round(data.hourly.temperature_2m[hourIdx]) : null;
+              const pop = hourIdx >= 0 ? data.hourly.precipitation_probability[hourIdx] : null;
+              const code = hourIdx >= 0 ? data.hourly.weather_code[hourIdx] : null;
+              return (
+                <div key={h} style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 10, color: "#94a3b8" }}>{h}時</div>
+                  <div style={{ fontSize: 14, margin: "2px 0" }}>{code !== null ? wmoInfo(code).icon : "—"}</div>
+                  <div style={{ fontSize: 10, color: "#1e293b" }}>{temp !== null ? `${temp}°` : ""}</div>
+                  <div style={{ fontSize: 9, color: "#60a5fa" }}>{pop !== null ? `${pop}%` : ""}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {data.daily.time.map((dateStr, i) => {
+            const d = new Date(dateStr);
+            const label = i === 0 ? "今日" : `${d.getMonth() + 1}/${d.getDate()}(${["日", "月", "火", "水", "木", "金", "土"][d.getDay()]})`;
+            const info = wmoInfo(data.daily.weather_code[i]);
+            return (
+              <div key={dateStr} style={{
+                display: "flex", alignItems: "center", gap: 8, fontSize: 12,
+                padding: "5px 0", borderBottom: i < data.daily.time.length - 1 ? "1px solid #f1f5f9" : "none",
+              }}>
+                <span style={{ width: 56, color: "#64748b" }}>{label}</span>
+                <span style={{ fontSize: 16, width: 22 }}>{info.icon}</span>
+                <span style={{ width: 50, fontSize: 11, color: "#94a3b8" }}>
+                  降水 {data.daily.precipitation_probability_max[i]}%
+                </span>
+                <span style={{ marginLeft: "auto" }}>
+                  <span style={{ color: "#1e293b" }}>{Math.round(data.daily.temperature_2m_max[i])}°</span>
+                  {" / "}
+                  <span style={{ color: "#94a3b8" }}>{Math.round(data.daily.temperature_2m_min[i])}°</span>
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -1177,92 +1269,6 @@ function QuoteWidget() {
       </div>
       <div style={{ fontSize: 12, color: "#94a3b8", textAlign: "right" }}>
         — {quote.author}
-      </div>
-    </div>
-  );
-}
-
-const TODAY_FACTS = [
-  { month: 1, day: 1, text: "元日。1872年、日本で太陽暦が採用された日。" },
-  {
-    month: 1,
-    day: 15,
-    text: "1999年、Wikipediaの前身プロジェクトが開始された日。",
-  },
-  {
-    month: 2,
-    day: 14,
-    text: "バレンタインデー。269年、聖バレンタインが処刑された日とされる。",
-  },
-  {
-    month: 3,
-    day: 3,
-    text: "ひな祭り。女の子の健やかな成長を祈る日本の伝統行事。",
-  },
-  {
-    month: 4,
-    day: 1,
-    text: "エイプリルフール。嘘をついてもいい日として世界中で親しまれている。",
-  },
-  {
-    month: 5,
-    day: 5,
-    text: "こどもの日。1948年に国民の祝日として制定された。",
-  },
-  {
-    month: 6,
-    day: 1,
-    text: "気象記念日。1875年、東京気象台（現・気象庁）が設立された日。",
-  },
-  {
-    month: 7,
-    day: 7,
-    text: "七夕。織姫と彦星が年に一度会えるという日本の伝統行事。",
-  },
-  {
-    month: 8,
-    day: 6,
-    text: "広島平和記念日。1945年、広島に原子爆弾が投下された日。",
-  },
-  {
-    month: 9,
-    day: 9,
-    text: "重陽の節句。菊の節句とも呼ばれる中国由来の伝統行事。",
-  },
-  {
-    month: 10,
-    day: 1,
-    text: "コーヒーの日。国際コーヒー機関が制定した世界共通のコーヒーの記念日。",
-  },
-  { month: 11, day: 3, text: "文化の日。1946年、日本国憲法が公布された日。" },
-  {
-    month: 12,
-    day: 25,
-    text: "クリスマス。キリストの降誕を祝うキリスト教の祝祭日。",
-  },
-];
-
-function TodayFactWidget() {
-  const today = new Date();
-  const fact = TODAY_FACTS.find(
-    (f) => f.month === today.getMonth() + 1 && f.day === today.getDate(),
-  ) || {
-    text: `今日は${today.getMonth() + 1}月${today.getDate()}日。今日も一日頑張りましょう！`,
-  };
-  return (
-    <div style={{ ...C, flex: 1, minWidth: 200 }}>
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 700,
-          color: "#64748b",
-          marginBottom: 10,
-        }}
-      >
-        📅 今日は何の日？
-      </div>
-      <div style={{ fontSize: 13, color: "#1e293b", lineHeight: 1.7 }}>
-        {fact.text}
       </div>
     </div>
   );
@@ -10502,7 +10508,6 @@ export default function App() {
                   >
                     <WeatherWidget />
                     <QuoteWidget />
-                    <TodayFactWidget />
                   </div>
                 </div>
               );
