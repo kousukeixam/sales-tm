@@ -9713,20 +9713,45 @@ export default function App() {
     }
   };
   // メンバー本人の振り返りコメント（day_comment）を編集・削除する
-  const updateMemberDayComment = async (date, userName, comment) => {
-    const { error } = await supabase
-      .from("logs")
-      .update({ day_comment: comment })
-      .eq("date", date)
-      .eq("user_name", userName);
+  const updateMemberDayComment = async (date, userName, comment, userId) => {
+    if (!userId) {
+      alert("更新に失敗しました: ユーザー情報が取得できませんでした");
+      return;
+    }
+    const trimmed = comment.trim();
+    const { error } = trimmed
+      ? await supabase
+          .from("day_comments")
+          .upsert(
+            { user_id: userId, user_name: userName, date, comment: trimmed },
+            { onConflict: "user_id,date" },
+          )
+      : await supabase
+          .from("day_comments")
+          .delete()
+          .eq("user_id", userId)
+          .eq("date", date);
     if (!error) {
-      setLogs((p) =>
-        p.map((l) =>
-          l.date === date && l.user === userName
-            ? { ...l, dayComment: comment }
+      setLogs((p) => {
+        const updated = p.map((l) =>
+          l.date === date && l.userId === userId
+            ? { ...l, dayComment: trimmed }
             : l,
-        ),
-      );
+        );
+        // コメントが空になり、かつ実業務行が無い（＝仮想エントリのみ）場合は
+        // 表示する理由がなくなるので仮想エントリ自体を取り除く
+        if (!trimmed) {
+          return updated.filter(
+            (l) =>
+              !(
+                l.date === date &&
+                l.userId === userId &&
+                l.task === "（コメントのみ）"
+              ),
+          );
+        }
+        return updated;
+      });
     } else {
       alert("更新に失敗しました: " + error.message);
     }
