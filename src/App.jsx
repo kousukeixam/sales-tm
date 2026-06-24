@@ -9896,7 +9896,6 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
           </div>
         </div>
       )}
-      </div>
 
       {loading ? (
         <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
