@@ -9671,6 +9671,9 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
     return d.toISOString().slice(0, 10);
   });
 
+  const [genYear, setGenYear] = useState(() => new Date().getFullYear());
+  const [genMonth, setGenMonth] = useState(() => new Date().getMonth() + 1);
+
   const teamMembers = useMemo(() => {
     if (!isAdmin) return [];
     return allUsers.filter((u) => {
@@ -9740,16 +9743,26 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
     setGenMsg("");
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const start = new Date(genStartDate);
-      const end = new Date(genStartDate);
-      end.setDate(end.getDate() + 6);
-      const fmt = (d) => d.toISOString().slice(0, 10);
-      const body = {
-        user_id: currentUser.id,
-        report_type: "weekly",
-        period_start: fmt(start),
-        period_end: fmt(end),
-      };
+      let body;
+      if (reportType === "weekly") {
+        const start = new Date(genStartDate);
+        const end = new Date(genStartDate);
+        end.setDate(end.getDate() + 6);
+        const fmt = (d) => d.toISOString().slice(0, 10);
+        body = {
+          user_id: currentUser.id,
+          report_type: "weekly",
+          period_start: fmt(start),
+          period_end: fmt(end),
+        };
+      } else {
+        body = {
+          user_id: currentUser.id,
+          report_type: "monthly",
+          year: genYear,
+          month: genMonth,
+        };
+      }
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
         {
@@ -9766,8 +9779,9 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
         setGenMsg("この期間に日報の記録がないため、レポートは作成されませんでした。");
       } else if (result.success) {
         setGenMsg("レポートを生成しました！");
+        const table = reportType === "weekly" ? "weekly_reports" : "monthly_reports";
         const { data } = await supabase
-          .from("weekly_reports")
+          .from(table)
           .select("*")
           .eq("user_id", currentUser.id);
         setReports(data || []);
@@ -9836,10 +9850,10 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
             </button>
           ))}
         </div>
-        {scope === "self" && reportType === "weekly" && (
+        {scope === "self" && (
           <div style={{ marginLeft: "auto" }}>
             <button onClick={() => setShowGenModal(true)} style={BP}>
-              期間を設定して生成
+              {reportType === "weekly" ? "期間を設定して生成" : "月を指定して生成"}
             </button>
           </div>
         )}
@@ -9856,30 +9870,55 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
           <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
-                期間を設定して生成
+                {reportType === "weekly" ? "期間を設定して生成" : "月を指定して生成"}
               </h3>
               <button onClick={() => setShowGenModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
                 <Icon name="x" size={18} />
               </button>
             </div>
-            <div style={{ marginBottom: 8 }}>
-              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>
-                開始日（1週間分が対象になります）
-              </label>
-              <input
-                type="date"
-                value={genStartDate}
-                onChange={(e) => setGenStartDate(e.target.value)}
-                style={I}
-              />
-            </div>
-            <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 20 }}>
-              対象期間：{genStartDate} 〜 {(() => {
-                const d = new Date(genStartDate);
-                d.setDate(d.getDate() + 6);
-                return d.toISOString().slice(0, 10);
-              })()}
-            </div>
+            {reportType === "weekly" ? (
+              <>
+                <div style={{ marginBottom: 8 }}>
+                  <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>
+                    開始日（1週間分が対象になります）
+                  </label>
+                  <input
+                    type="date"
+                    value={genStartDate}
+                    onChange={(e) => setGenStartDate(e.target.value)}
+                    style={I}
+                  />
+                </div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 20 }}>
+                  対象期間：{genStartDate} 〜 {(() => {
+                    const d = new Date(genStartDate);
+                    d.setDate(d.getDate() + 6);
+                    return d.toISOString().slice(0, 10);
+                  })()}
+                </div>
+              </>
+            ) : (
+              <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                <select
+                  value={genYear}
+                  onChange={(e) => setGenYear(parseInt(e.target.value))}
+                  style={{ ...I, width: "auto" }}
+                >
+                  {[genYear - 1, genYear, genYear + 1].map((y) => (
+                    <option key={y} value={y}>{y}年</option>
+                  ))}
+                </select>
+                <select
+                  value={genMonth}
+                  onChange={(e) => setGenMonth(parseInt(e.target.value))}
+                  style={{ ...I, width: "auto" }}
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                    <option key={m} value={m}>{m}月</option>
+                  ))}
+                </select>
+              </div>
+            )}
             {genMsg && (
               <div style={{ fontSize: 12, color: genMsg.includes("失敗") ? "#EF4444" : "#15803D", marginBottom: 14 }}>
                 {genMsg}
