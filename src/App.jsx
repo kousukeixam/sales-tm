@@ -9727,6 +9727,18 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
     ? periodGroups.find(([k]) => k === selectedPeriod)?.[1] || []
     : [];
 
+const deleteReport = async (r) => {
+    if (!window.confirm(`${periodLabel(r)} のレポートを削除しますか？この操作は取り消せません。`)) return;
+    const table = reportType === "weekly" ? "weekly_reports" : "monthly_reports";
+    const { error } = await supabase.from(table).delete().eq("id", r.id);
+    if (error) {
+      alert("削除に失敗しました: " + error.message);
+      return;
+    }
+    setReports((prev) => prev.filter((x) => x.id !== r.id));
+    setSelectedPeriod(null);
+  };
+
   const downloadReport = (r) => {
     const text = `${nameOf(r.user_id)} ${periodLabel(r)}\n生成日時: ${new Date(r.generated_at).toLocaleString("ja-JP")}\n\n${r.content}`;
     const blob = new Blob([text], { type: "text/plain;charset=utf-8;" });
@@ -10007,13 +10019,21 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
                           {nameOf(r.user_id)}
                         </span>
                       </div>
-                      <button
-                        onClick={() => downloadReport(r)}
-                        style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4 }}
-                      >
-                        <Icon name="download" size={13} />
-                        DL
-                      </button>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button
+                          onClick={() => downloadReport(r)}
+                          style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4 }}
+                        >
+                          <Icon name="download" size={13} />
+                          DL
+                        </button>
+                        <button
+                          onClick={() => deleteReport(r)}
+                          style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4, color: "#EF4444", borderColor: "#FECACA" }}
+                        >
+                          <Icon name="trash" size={13} />
+                        </button>
+                      </div>
                     </div>
                     <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
                       {r.content}
@@ -10040,13 +10060,22 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
                         {nameOf(r.user_id)}・{new Date(r.generated_at).toLocaleString("ja-JP")} 生成
                       </div>
                     </div>
-                    <button
-                      onClick={() => downloadReport(r)}
-                      style={{ ...BB, gap: 6 }}
-                    >
-                      <Icon name="download" size={14} />
-                      ダウンロード
-                    </button>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button
+                        onClick={() => downloadReport(r)}
+                        style={{ ...BB, gap: 6 }}
+                      >
+                        <Icon name="download" size={14} />
+                        ダウンロード
+                      </button>
+                      <button
+                        onClick={() => deleteReport(r)}
+                        style={{ ...BB, gap: 6, color: "#EF4444", borderColor: "#FECACA" }}
+                      >
+                        <Icon name="trash" size={14} />
+                        削除
+                      </button>
+                    </div>
                   </div>
                   {r.category_summary && (
                     <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: 12, marginBottom: 12 }}>
