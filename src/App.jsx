@@ -6423,6 +6423,9 @@ function MyPage({
   const [role, setRole] = useState(currentUser.role || "member");
   const [ok, setOk] = useState("");
   const [err, setErr] = useState("");
+  const [weeklySchedule, setWeeklySchedule] = useState({ mode: "scheduled", day_of_week: 1, time_of_day: "06:00" });
+  const [monthlySchedule, setMonthlySchedule] = useState({ mode: "scheduled", day_of_month: 1, time_of_day: "06:00" });
+  const [scheduleOk, setScheduleOk] = useState("");
   useEffect(() => {
     const fetchLatest = async () => {
       const { data } = await supabase
@@ -6438,6 +6441,34 @@ function MyPage({
       }
     };
     fetchLatest();
+  }, [currentUser.id]);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      const { data } = await supabase
+        .from("report_schedules")
+        .select("*")
+        .eq("user_id", currentUser.id);
+      if (data) {
+        const weekly = data.find((s) => s.report_type === "weekly");
+        const monthly = data.find((s) => s.report_type === "monthly");
+        if (weekly) {
+          setWeeklySchedule({
+            mode: weekly.mode,
+            day_of_week: weekly.day_of_week ?? 1,
+            time_of_day: (weekly.time_of_day || "06:00:00").slice(0, 5),
+          });
+        }
+        if (monthly) {
+          setMonthlySchedule({
+            mode: monthly.mode,
+            day_of_month: monthly.day_of_month ?? 1,
+            time_of_day: (monthly.time_of_day || "06:00:00").slice(0, 5),
+          });
+        }
+      }
+    };
+    fetchSchedules();
   }, [currentUser.id]);
 
   const managers = allUsers.filter(
@@ -6487,6 +6518,29 @@ function MyPage({
       setTimeout(() => setOk(""), 3000);
     } catch (e) {
       setErr("保存に失敗しました: " + e.message);
+    }
+  };
+
+  const handleSaveSchedule = async (type) => {
+    const sched = type === "weekly" ? weeklySchedule : monthlySchedule;
+    const payload = {
+      user_id: currentUser.id,
+      report_type: type,
+      mode: sched.mode,
+      time_of_day: sched.time_of_day,
+      day_of_week: type === "weekly" ? sched.day_of_week : null,
+      day_of_month: type === "monthly" ? sched.day_of_month : null,
+      updated_by: currentUser.id,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await supabase
+      .from("report_schedules")
+      .upsert(payload, { onConflict: "user_id,report_type" });
+    if (!error) {
+      setScheduleOk(`${type === "weekly" ? "週次" : "月次"}レポートの設定を保存しました！`);
+      setTimeout(() => setScheduleOk(""), 3000);
+    } else {
+      alert("設定の保存に失敗しました: " + error.message);
     }
   };
 
@@ -6852,6 +6906,156 @@ function MyPage({
           </div>
         </div>
 
+<div style={{ ...C, marginBottom: 16 }}>
+          <h3
+            style={{
+              margin: "0 0 16px",
+              fontSize: 15,
+              fontWeight: 700,
+              color: "var(--text-primary, #1e293b)",
+            }}
+          >
+            レポート自動生成設定
+          </h3>
+          {scheduleOk && (
+            <div
+              style={{
+                background: "#DCFCE7",
+                border: "1px solid #BBF7D0",
+                borderRadius: 8,
+                padding: "10px 14px",
+                marginBottom: 14,
+                color: "#15803D",
+                fontSize: 13,
+              }}
+            >
+              {scheduleOk}
+            </div>
+          )}
+
+          {/* 週次レポート */}
+          <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>
+              週次レポート
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              {[
+                ["scheduled", "自動生成"],
+                ["manual", "手動のみ"],
+              ].map(([m, label]) => (
+                <button
+                  key={m}
+                  onClick={() => setWeeklySchedule((p) => ({ ...p, mode: m }))}
+                  style={{
+                    padding: "7px 16px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: weeklySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
+                    background: weeklySchedule.mode === m ? "#EFF6FF" : "#fff",
+                    color: weeklySchedule.mode === m ? "#1D4ED8" : "#64748b",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {weeklySchedule.mode === "scheduled" && (
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <select
+                  value={weeklySchedule.day_of_week}
+                  onChange={(e) =>
+                    setWeeklySchedule((p) => ({ ...p, day_of_week: parseInt(e.target.value) }))
+                  }
+                  style={{ ...I, width: "auto" }}
+                >
+                  {["日", "月", "火", "水", "木", "金", "土"].map((d, i) => (
+                    <option key={i} value={i}>{d}曜日</option>
+                  ))}
+                </select>
+                <input
+                  type="time"
+                  value={weeklySchedule.time_of_day}
+                  onChange={(e) =>
+                    setWeeklySchedule((p) => ({ ...p, time_of_day: e.target.value }))
+                  }
+                  style={{ ...I, width: "auto" }}
+                />
+              </div>
+            )}
+            <button
+              onClick={() => handleSaveSchedule("weekly")}
+              style={{ ...BB, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
+            >
+              週次設定を保存
+            </button>
+          </div>
+
+          {/* 月次レポート */}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>
+              月次レポート
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              {[
+                ["scheduled", "自動生成"],
+                ["manual", "手動のみ"],
+              ].map(([m, label]) => (
+                <button
+                  key={m}
+                  onClick={() => setMonthlySchedule((p) => ({ ...p, mode: m }))}
+                  style={{
+                    padding: "7px 16px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: monthlySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
+                    background: monthlySchedule.mode === m ? "#EFF6FF" : "#fff",
+                    color: monthlySchedule.mode === m ? "#1D4ED8" : "#64748b",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            {monthlySchedule.mode === "scheduled" && (
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <select
+                  value={monthlySchedule.day_of_month}
+                  onChange={(e) =>
+                    setMonthlySchedule((p) => ({ ...p, day_of_month: parseInt(e.target.value) }))
+                  }
+                  style={{ ...I, width: "auto" }}
+                >
+                  {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                    <option key={d} value={d}>{d}日</option>
+                  ))}
+                </select>
+                <input
+                  type="time"
+                  value={monthlySchedule.time_of_day}
+                  onChange={(e) =>
+                    setMonthlySchedule((p) => ({ ...p, time_of_day: e.target.value }))
+                  }
+                  style={{ ...I, width: "auto" }}
+                />
+              </div>
+            )}
+            <button
+              onClick={() => handleSaveSchedule("monthly")}
+              style={{ ...BB, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
+            >
+              月次設定を保存
+            </button>
+          </div>
+        </div>
+        
         <button onClick={handleSave} style={BP}>
           <Icon name="save" size={14} />
           保存
