@@ -7055,7 +7055,7 @@ function MyPage({
             </button>
           </div>
         </div>
-        
+
         <button onClick={handleSave} style={BP}>
           <Icon name="save" size={14} />
           保存
@@ -9656,6 +9656,345 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
   );
 }
 
+function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
+  const [reportType, setReportType] = useState("weekly");
+  const [scope, setScope] = useState("self"); // "self" | "all" | memberId
+  const [reports, setReports] = useState([]);
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [genMsg, setGenMsg] = useState("");
+
+  const teamMembers = useMemo(() => {
+    if (!isAdmin) return [];
+    return allUsers.filter((u) => {
+      if (u.id === currentUser.id) return false;
+      if (u.role === "superadmin") return false;
+      if (isSA) return true;
+      return String(u.groupId) === String(currentUser.groupId);
+    });
+  }, [allUsers, currentUser, isAdmin, isSA]);
+
+  const nameOf = (userId) =>
+    allUsers.find((u) => u.id === userId)?.name || "不明なユーザー";
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      setLoading(true);
+      const table = reportType === "weekly" ? "weekly_reports" : "monthly_reports";
+      let query = supabase.from(table).select("*");
+      if (scope === "self") {
+        query = query.eq("user_id", currentUser.id);
+      } else if (scope === "all") {
+        const ids = teamMembers.map((m) => m.id);
+        query = query.in("user_id", ids.length > 0 ? ids : [currentUser.id]);
+      } else {
+        query = query.eq("user_id", scope);
+      }
+      const { data } = await query;
+      setReports(data || []);
+      setSelectedPeriod(null);
+      setLoading(false);
+    };
+    fetchReports();
+  }, [reportType, scope, currentUser.id, teamMembers]);
+
+  const periodKey = (r) =>
+    reportType === "weekly" ? `${r.period_start}_${r.period_end}` : `${r.year}_${String(r.month).padStart(2, "0")}`;
+  const periodLabel = (r) =>
+    reportType === "weekly" ? `${r.period_start} 〜 ${r.period_end}` : `${r.year}年${r.month}月`;
+
+  const periodGroups = useMemo(() => {
+    const g = {};
+    reports.forEach((r) => {
+      const k = periodKey(r);
+      if (!g[k]) g[k] = [];
+      g[k].push(r);
+    });
+    return Object.entries(g).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [reports, reportType]);
+
+  const selectedReports = selectedPeriod
+    ? periodGroups.find(([k]) => k === selectedPeriod)?.[1] || []
+    : [];
+
+  const downloadReport = (r) => {
+    const text = `${nameOf(r.user_id)} ${periodLabel(r)}\n生成日時: ${new Date(r.generated_at).toLocaleString("ja-JP")}\n\n${r.content}`;
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${reportType === "weekly" ? "週報" : "月報"}_${nameOf(r.user_id)}_${periodKey(r)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleGenerateNow = async () => {
+    setGenerating(true);
+    setGenMsg("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      let body;
+      if (reportType === "weekly") {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - 6);
+        const fmt = (d) => d.toISOString().slice(0, 10);
+        body = {
+          user_id: currentUser.id,
+          report_type: "weekly",
+          period_start: fmt(start),
+          period_end: fmt(end),
+        };
+      } else {
+        const now = new Date();
+        body = {
+          user_id: currentUser.id,
+          report_type: "monthly",
+          year: now.getFullYear(),
+          month: now.getMonth() + 1,
+        };
+      }
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify(body),
+        },
+      );
+      const result = await res.json();
+      if (result.skipped) {
+        setGenMsg("この期間に日報の記録がないため、レポートは作成されませんでした。");
+      } else if (result.success) {
+        setGenMsg("レポートを生成しました！");
+        // 再取得して一覧に反映
+        const table = reportType === "weekly" ? "weekly_reports" : "monthly_reports";
+        let query = supabase.from(table).select("*");
+        if (scope === "self") query = query.eq("user_id", currentUser.id);
+        else if (scope === "all") {
+          const ids = teamMembers.map((m) => m.id);
+          query = query.in("user_id", ids.length > 0 ? ids : [currentUser.id]);
+        } else query = query.eq("user_id", scope);
+        const { data } = await query;
+        setReports(data || []);
+      } else {
+        setGenMsg("生成に失敗しました: " + (result.error || "不明なエラー"));
+      }
+    } catch (e) {
+      setGenMsg("生成に失敗しました: " + e.message);
+    } finally {
+      setGenerating(false);
+      setTimeout(() => setGenMsg(""), 5000);
+    }
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          ...C,
+          marginBottom: 16,
+          display: "flex",
+          gap: 12,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        {isAdmin && (
+          <select
+            value={scope}
+            onChange={(e) => setScope(e.target.value)}
+            style={{ ...I, width: "auto" }}
+          >
+            <option value="self">自分</option>
+            {teamMembers.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name}
+              </option>
+            ))}
+            <option value="all">チーム全員</option>
+          </select>
+        )}
+        <div style={{ display: "flex", gap: 4 }}>
+          {[
+            ["weekly", "週次レポート"],
+            ["monthly", "月次レポート"],
+          ].map(([id, label]) => (
+            <button
+              key={id}
+              onClick={() => setReportType(id)}
+              style={{
+                padding: "7px 16px",
+                borderRadius: 8,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: reportType === id ? 600 : 400,
+                fontFamily: "inherit",
+                background: reportType === id ? "#3B82F6" : "transparent",
+                color: reportType === id ? "#fff" : "#64748b",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {scope === "self" && (
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+            {genMsg && (
+              <span style={{ fontSize: 12, color: genMsg.includes("失敗") ? "#EF4444" : "#15803D" }}>
+                {genMsg}
+              </span>
+            )}
+            <button
+              onClick={handleGenerateNow}
+              disabled={generating}
+              style={{ ...BP, opacity: generating ? 0.6 : 1 }}
+            >
+              {generating ? "生成中..." : "今すぐ生成"}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {loading ? (
+        <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
+          読み込み中...
+        </div>
+      ) : periodGroups.length === 0 ? (
+        <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
+          レポートがまだありません
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {periodGroups.map(([key, recs]) => (
+              <div
+                key={key}
+                onClick={() => setSelectedPeriod(key)}
+                style={{
+                  background: selectedPeriod === key ? "#EFF6FF" : "#fff",
+                  border: `1px solid ${selectedPeriod === key ? "#BFDBFE" : "#e2e8f0"}`,
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>
+                  {periodLabel(recs[0])}
+                </div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                  {scope === "all" ? `${recs.length}名分` : "生成済み"}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            {!selectedPeriod ? (
+              <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
+                左の一覧から期間を選んでください
+              </div>
+            ) : scope === "all" ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {selectedReports.map((r) => (
+                  <div key={r.id} style={C}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 10,
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#fff",
+                            fontSize: 13,
+                            fontWeight: 700,
+                          }}
+                        >
+                          {nameOf(r.user_id)[0]}
+                        </div>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "#1e293b" }}>
+                          {nameOf(r.user_id)}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => downloadReport(r)}
+                        style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4 }}
+                      >
+                        <Icon name="download" size={13} />
+                        DL
+                      </button>
+                    </div>
+                    <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                      {r.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              selectedReports.map((r) => (
+                <div key={r.id} style={C}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 12,
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "#1e293b" }}>
+                        {periodLabel(r)}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                        {nameOf(r.user_id)}・{new Date(r.generated_at).toLocaleString("ja-JP")} 生成
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => downloadReport(r)}
+                      style={{ ...BB, gap: 6 }}
+                    >
+                      <Icon name="download" size={14} />
+                      ダウンロード
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      borderTop: "1px solid #f1f5f9",
+                      paddingTop: 12,
+                      fontSize: 13,
+                      color: "#475569",
+                      lineHeight: 1.8,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {r.content}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -10342,6 +10681,7 @@ export default function App() {
     { id: "board", label: "ToDoリスト", icon: "board" },
     { id: "announcement", label: "📣 お知らせ", icon: "msg" },
     { id: "ranking", label: "🏆 ランキング", icon: "chart" },
+    { id: "report", label: "📊 レポート", icon: "list" },
     { id: "mypage", label: "マイページ", icon: "person" },
     ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
     ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
@@ -10357,6 +10697,7 @@ export default function App() {
     report: "日報入力",
     log: "自分の記録",
     mypage: "マイページ",
+    report: "レポート",
     board: "ToDoリスト",
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
@@ -10373,6 +10714,7 @@ export default function App() {
     report: "業務内容を入力します（行追加・詳細入力・高さ調整対応）",
     log: "自分の記録を確認できます（行をクリックで詳細・上司コメント表示）",
     mypage: "プロフィール・設定を管理できます",
+    report: "週次・月次レポートを確認・ダウンロードできます",
     board: "マイToDoリストと部署メンバーのToDoリストを確認できます",
     team: "部下を選んで記録・ダッシュボードを確認できます",
     member_detail:
@@ -10887,6 +11229,15 @@ export default function App() {
             onBack={backToTeam}
             onSaveManagerComment={saveMgrComment}
             onSaveDayComment={saveDayComment}
+          />
+        )}
+        {page === "report" && (
+          <ReportPage
+            currentUser={currentUser}
+            allUsers={users}
+            groups={groups}
+            isAdmin={isAdmin}
+            isSA={isSA}
           />
         )}
         {page === "mypage" && (
