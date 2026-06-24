@@ -6779,17 +6779,23 @@ function MyPage({
           </div>
         )}
 
-        <div style={{ ...C, marginBottom: 16 }}>
-          <h3
-            style={{
-              margin: "0 0 16px",
-              fontSize: 15,
-              fontWeight: 700,
-              color: "var(--text-primary, #1e293b)",
-            }}
-          >
-            表示設定
-          </h3>
+        <button onClick={handleSave} style={BP}>
+          <Icon name="save" size={14} />
+          保存
+        </button>
+      </div>
+
+      <div style={{ ...C, marginBottom: 16 }}>
+        <h3
+          style={{
+            margin: "0 0 16px",
+            fontSize: 15,
+            fontWeight: 700,
+            color: "var(--text-primary, #1e293b)",
+          }}
+        >
+          表示設定
+        </h3>
           <div style={{ marginBottom: 16 }}>
             <label
               style={{
@@ -7055,12 +7061,6 @@ function MyPage({
             </button>
           </div>
         </div>
-
-        <button onClick={handleSave} style={BP}>
-          <Icon name="save" size={14} />
-          保存
-        </button>
-      </div>
     </div>
   );
 }
