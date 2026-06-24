@@ -6994,7 +6994,7 @@ function MyPage({
             )}
             <button
               onClick={() => handleSaveSchedule("weekly")}
-              style={{ ...BB, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
+              style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
             >
               週次設定を保存
             </button>
@@ -7055,7 +7055,7 @@ function MyPage({
             )}
             <button
               onClick={() => handleSaveSchedule("monthly")}
-              style={{ ...BB, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
+              style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
             >
               月次設定を保存
             </button>
@@ -10048,10 +10048,21 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
                       ダウンロード
                     </button>
                   </div>
+                  {r.category_summary && (
+                    <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: 12, marginBottom: 12 }}>
+                      <PieChart
+                        data={Object.entries(CATEGORIES).map(([k, v]) => ({
+                          label: `${k}: ${v.label}`,
+                          value: r.category_summary[k] || 0,
+                          color: v.color,
+                        }))}
+                      />
+                    </div>
+                  )}
                   <div
                     style={{
-                      borderTop: "1px solid #f1f5f9",
-                      paddingTop: 12,
+                      borderTop: r.category_summary ? "none" : "1px solid #f1f5f9",
+                      paddingTop: r.category_summary ? 0 : 12,
                       fontSize: 13,
                       color: "#475569",
                       lineHeight: 1.8,
