@@ -9664,6 +9664,12 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [genMsg, setGenMsg] = useState("");
+  const [showGenModal, setShowGenModal] = useState(false);
+  const [genStartDate, setGenStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 6);
+    return d.toISOString().slice(0, 10);
+  });
 
   const teamMembers = useMemo(() => {
     if (!isAdmin) return [];
@@ -9734,27 +9740,16 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
     setGenMsg("");
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      let body;
-      if (reportType === "weekly") {
-        const end = new Date();
-        const start = new Date();
-        start.setDate(end.getDate() - 6);
-        const fmt = (d) => d.toISOString().slice(0, 10);
-        body = {
-          user_id: currentUser.id,
-          report_type: "weekly",
-          period_start: fmt(start),
-          period_end: fmt(end),
-        };
-      } else {
-        const now = new Date();
-        body = {
-          user_id: currentUser.id,
-          report_type: "monthly",
-          year: now.getFullYear(),
-          month: now.getMonth() + 1,
-        };
-      }
+      const start = new Date(genStartDate);
+      const end = new Date(genStartDate);
+      end.setDate(end.getDate() + 6);
+      const fmt = (d) => d.toISOString().slice(0, 10);
+      const body = {
+        user_id: currentUser.id,
+        report_type: "weekly",
+        period_start: fmt(start),
+        period_end: fmt(end),
+      };
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-report`,
         {
@@ -9771,16 +9766,15 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
         setGenMsg("この期間に日報の記録がないため、レポートは作成されませんでした。");
       } else if (result.success) {
         setGenMsg("レポートを生成しました！");
-        // 再取得して一覧に反映
-        const table = reportType === "weekly" ? "weekly_reports" : "monthly_reports";
-        let query = supabase.from(table).select("*");
-        if (scope === "self") query = query.eq("user_id", currentUser.id);
-        else if (scope === "all") {
-          const ids = teamMembers.map((m) => m.id);
-          query = query.in("user_id", ids.length > 0 ? ids : [currentUser.id]);
-        } else query = query.eq("user_id", scope);
-        const { data } = await query;
+        const { data } = await supabase
+          .from("weekly_reports")
+          .select("*")
+          .eq("user_id", currentUser.id);
         setReports(data || []);
+        setTimeout(() => {
+          setShowGenModal(false);
+          setGenMsg("");
+        }, 1500);
       } else {
         setGenMsg("生成に失敗しました: " + (result.error || "不明なエラー"));
       }
@@ -9788,7 +9782,6 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
       setGenMsg("生成に失敗しました: " + e.message);
     } finally {
       setGenerating(false);
-      setTimeout(() => setGenMsg(""), 5000);
     }
   };
 
@@ -9843,22 +9836,66 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
             </button>
           ))}
         </div>
-        {scope === "self" && (
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
-            {genMsg && (
-              <span style={{ fontSize: 12, color: genMsg.includes("失敗") ? "#EF4444" : "#15803D" }}>
-                {genMsg}
-              </span>
-            )}
-            <button
-              onClick={handleGenerateNow}
-              disabled={generating}
-              style={{ ...BP, opacity: generating ? 0.6 : 1 }}
-            >
-              {generating ? "生成中..." : "今すぐ生成"}
+        {scope === "self" && reportType === "weekly" && (
+          <div style={{ marginLeft: "auto" }}>
+            <button onClick={() => setShowGenModal(true)} style={BP}>
+              期間を設定して生成
             </button>
           </div>
         )}
+      </div>
+
+      {showGenModal && (
+        <div
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200,
+          }}
+          onClick={(e) => e.target === e.currentTarget && setShowGenModal(false)}
+        >
+          <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+                期間を設定して生成
+              </h3>
+              <button onClick={() => setShowGenModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
+                <Icon name="x" size={18} />
+              </button>
+            </div>
+            <div style={{ marginBottom: 8 }}>
+              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>
+                開始日（1週間分が対象になります）
+              </label>
+              <input
+                type="date"
+                value={genStartDate}
+                onChange={(e) => setGenStartDate(e.target.value)}
+                style={I}
+              />
+            </div>
+            <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 20 }}>
+              対象期間：{genStartDate} 〜 {(() => {
+                const d = new Date(genStartDate);
+                d.setDate(d.getDate() + 6);
+                return d.toISOString().slice(0, 10);
+              })()}
+            </div>
+            {genMsg && (
+              <div style={{ fontSize: 12, color: genMsg.includes("失敗") ? "#EF4444" : "#15803D", marginBottom: 14 }}>
+                {genMsg}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button onClick={() => setShowGenModal(false)} style={BB}>
+                キャンセル
+              </button>
+              <button onClick={handleGenerateNow} disabled={generating} style={{ ...BP, opacity: generating ? 0.6 : 1 }}>
+                {generating ? "生成中..." : "生成する"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
 
       {loading ? (
