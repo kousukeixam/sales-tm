@@ -10681,7 +10681,7 @@ export default function App() {
     { id: "board", label: "ToDoリスト", icon: "board" },
     { id: "announcement", label: "📣 お知らせ", icon: "msg" },
     { id: "ranking", label: "🏆 ランキング", icon: "chart" },
-    { id: "report", label: "📊 レポート", icon: "list" },
+    { id: "reports", label: "📊 レポート", icon: "list" },
     { id: "mypage", label: "マイページ", icon: "person" },
     ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
     ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
@@ -10697,7 +10697,7 @@ export default function App() {
     report: "日報入力",
     log: "自分の記録",
     mypage: "マイページ",
-    report: "レポート",
+    reports: "レポート",
     board: "ToDoリスト",
     team: "部下の記録",
     member_detail: selectedMember ? `${selectedMember.name} の記録` : "",
@@ -10714,7 +10714,7 @@ export default function App() {
     report: "業務内容を入力します（行追加・詳細入力・高さ調整対応）",
     log: "自分の記録を確認できます（行をクリックで詳細・上司コメント表示）",
     mypage: "プロフィール・設定を管理できます",
-    report: "週次・月次レポートを確認・ダウンロードできます",
+    reports: "週次・月次レポートを確認・ダウンロードできます",
     board: "マイToDoリストと部署メンバーのToDoリストを確認できます",
     team: "部下を選んで記録・ダッシュボードを確認できます",
     member_detail:
@@ -11231,7 +11231,7 @@ export default function App() {
             onSaveDayComment={saveDayComment}
           />
         )}
-        {page === "report" && (
+        {page === "reports" && (
           <ReportPage
             currentUser={currentUser}
             allUsers={users}
