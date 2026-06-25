@@ -95,6 +95,25 @@ const extractTags = (text) => {
   return matches.map((t) => t.slice(1));
 };
 
+// 通信が応答しないまま固まることを防ぐための共通タイムアウトヘルパー
+const withTimeout = (promise, ms = 10000) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("通信がタイムアウトしました")), ms)),
+  ]);
+
+// 一時的な通信の乱れであれば自動で再試行するための共通ヘルパー
+const withRetry = async (fn, retries = 2, delayMs = 800) => {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i === retries) throw e;
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+  }
+};
+
 function generateLogs() {
   const taskDetails = {
     A: [
@@ -10194,6 +10213,28 @@ export default function App() {
       setInviteSession(true);
     }
   }, []);
+  // タブが裏に回っていた後、操作可能な状態に戻ったタイミングでログイン状態を自動チェックする。
+  // 一時的な通信の乱れなら自動再試行で回復し、それでも失敗する場合のみ最終手段としてリロードする。
+  useEffect(() => {
+    const handleVisibility = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const { data } = await withRetry(
+          () => withTimeout(supabase.auth.getSession(), 8000),
+          2,
+          1000,
+        );
+        if (!data?.session && currentUser) {
+          window.location.reload();
+        }
+      } catch (e) {
+        console.error("セッション再確認に失敗しました:", e);
+        if (currentUser) window.location.reload();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [currentUser]);
   const [page, setPage] = useState("dashboard");
   const [logs, setLogs] = useState([]);
   const [reportDraft, _setReportDraft] = useState(() => {
