@@ -76,9 +76,8 @@ const addDays = (n) => {
   d.setDate(d.getDate() + n);
   return d.toISOString().split("T")[0];
 };
-let _rowId = 0;
 const newRow = () => ({
-  id: ++_rowId,
+  id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
   task: "",
   detail: "",
   start: "",
@@ -1844,6 +1843,18 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     } catch (e) {
       console.error("セッション確認エラー:", e);
       // セッション確認に失敗しても処理は継続する（誤って止まらないように）
+    }
+
+    // 「タイトル」が未入力なのに、他の項目（詳細・時間・区分）には何かしら入力されている行がある場合、
+    // 黙って転記対象から外すと内容が消えてしまうため、転記自体を止めて気づけるようにする
+    const incompleteRows = rows
+      .map((r, i) => ({ ...r, _index: i + 1 }))
+      .filter((r) => !r.task && (r.detail?.trim() || r.start || r.end || r.cat));
+    if (incompleteRows.length > 0) {
+      alert(
+        `タイトルが未入力の行があります（${incompleteRows.map((r) => `${r._index}行目`).join("・")}）。\nタイトルを入力するか、その行の内容をすべて削除してから転記してください。`,
+      );
+      return;
     }
 
     const valid = rows.filter(
