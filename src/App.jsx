@@ -535,14 +535,17 @@ function LoginPage({ onLogin }) {
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginSeconds, setLoginSeconds] = useState(0);
   const go = async () => {
     setLoading(true);
     setErr("");
+    setLoginSeconds(0);
+    const timer = setInterval(() => setLoginSeconds((s) => s + 1), 1000);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password: pass,
-      });
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password: pass }),
+        15000,
+      );
       if (error) {
         setErr("メールアドレスまたはパスワードが正しくありません");
         return;
@@ -553,11 +556,10 @@ function LoginPage({ onLogin }) {
       let profile = null;
       let lastError = null;
       for (let attempt = 1; attempt <= 3; attempt++) {
-        const { data: p, error: profileError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .single();
+        const { data: p, error: profileError } = await withTimeout(
+          supabase.from("profiles").select("*").eq("id", data.user.id).single(),
+          10000,
+        );
         if (p && !profileError) {
           profile = p;
           break;
@@ -575,9 +577,11 @@ function LoginPage({ onLogin }) {
       onLogin({ ...profile, email: data.user.email });
     } catch (e) {
       console.error("ログイン処理で例外発生:", e);
-      setErr("ログインに失敗しました。通信状況を確認し、もう一度お試しください。");
+      setErr("ログインに時間がかかっているか、失敗しました。通信状況をご確認の上、もう一度お試しください。");
     } finally {
+      clearInterval(timer);
       setLoading(false);
+      setLoginSeconds(0);
     }
   };
   const si = {
@@ -743,7 +747,7 @@ function LoginPage({ onLogin }) {
             fontFamily: "inherit",
           }}
         >
-          {loading ? "ログイン中..." : "ログイン"}
+          {loading ? `ログイン中...（${loginSeconds}秒経過）` : "ログイン"}
         </button>
         <div
           style={{
@@ -1806,8 +1810,30 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   const totalMins = rows.reduce((s, r) => s + getMins(r.start, r.end), 0);
   const [savedComment, setSavedComment] = useState(false);
 
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveSeconds, setSaveSeconds] = useState(0);
+
   // 転記（業務行があれば行＋コメント、なければコメントのみ）
   const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
+    setSaveError("");
+    setSaveSeconds(0);
+    const timer = setInterval(() => setSaveSeconds((s) => s + 1), 1000);
+    try {
+      await withTimeout(doSave(), 15000);
+    } catch (e) {
+      console.error("転記処理でエラー・タイムアウトが発生しました:", e);
+      setSaveError("保存に時間がかかっています。通信状況をご確認の上、ページを再読み込みしてから再度お試しください。");
+    } finally {
+      clearInterval(timer);
+      setSaving(false);
+      setSaveSeconds(0);
+    }
+  };
+
+  const doSave = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
@@ -2071,13 +2097,16 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
           </button>
           <button
             onClick={handleSave}
-            style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)" }}
+            disabled={saving}
+            style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)", opacity: saving ? 0.6 : 1 }}
           >
             {saved ? (
               <>
                 <Icon name="check" size={16} />
                 保存しました！
               </>
+            ) : saving ? (
+              <>転記中...（{saveSeconds}秒経過）</>
             ) : (
               <>
                 <Icon name="save" size={16} />
@@ -2086,19 +2115,29 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
             )}
           </button>
         </div>
-        {templateSaved && (
+        {saveError && (
           <div
             style={{
-              background: "#DCFCE7",
-              border: "1px solid #BBF7D0",
+              background: "#FEF2F2",
+              border: "1px solid #FECACA",
               borderRadius: 8,
-              padding: "8px 14px",
+              padding: "10px 14px",
               fontSize: 13,
-              color: "#15803D",
+              color: "#991B1B",
               marginTop: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
             }}
           >
-            ✅ テンプレートを保存しました！
+            <span>⚠️ {saveError}</span>
+            <button
+              onClick={() => window.location.reload()}
+              style={{ ...BB, padding: "4px 10px", fontSize: 12, flexShrink: 0 }}
+            >
+              再読み込み
+            </button>
           </div>
         )}
 
@@ -8701,6 +8740,8 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
   const [announcements, setAnnouncements] = useState([]);
   const [reads, setReads] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [loadSeconds, setLoadSeconds] = useState(0);
   const [form, setForm] = useState({
     title: "",
     content: "",
@@ -8711,20 +8752,41 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
   const [ok, setOk] = useState("");
   const [editId, setEditId] = useState(null);
 
-  useEffect(() => {
-    const fetchAll = async () => {
-      const { data: ann } = await supabase
-        .from("announcements")
-        .select("*")
-        .order("created_at", { ascending: false });
-      const { data: rd } = await supabase
-        .from("announcement_reads")
-        .select("announcement_id")
-        .eq("user_id", currentUser.id);
+  const fetchAll = async () => {
+    setLoading(true);
+    setLoadError(false);
+    setLoadSeconds(0);
+    const timer = setInterval(() => setLoadSeconds((s) => s + 1), 1000);
+    try {
+      const { data: ann } = await withRetry(
+        () => withTimeout(
+          supabase.from("announcements").select("*").order("created_at", { ascending: false }),
+          10000,
+        ),
+        1,
+        800,
+      );
+      const { data: rd } = await withRetry(
+        () => withTimeout(
+          supabase.from("announcement_reads").select("announcement_id").eq("user_id", currentUser.id),
+          10000,
+        ),
+        1,
+        800,
+      );
       if (ann) setAnnouncements(ann);
       if (rd) setReads(new Set(rd.map((r) => r.announcement_id)));
+    } catch (e) {
+      console.error("お知らせの取得に失敗しました:", e);
+      setLoadError(true);
+    } finally {
+      clearInterval(timer);
       setLoading(false);
-    };
+      setLoadSeconds(0);
+    }
+  };
+
+  useEffect(() => {
     fetchAll();
   }, []);
 
@@ -9030,7 +9092,16 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
         <div
           style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
         >
-          読み込み中...
+          読み込み中...（{loadSeconds}秒経過）
+        </div>
+      ) : loadError ? (
+        <div style={{ ...C, textAlign: "center", padding: 48 }}>
+          <p style={{ color: "#94a3b8", marginBottom: 14, fontSize: 13 }}>
+            読み込みに時間がかかっています。通信状況をご確認の上、再試行してください。
+          </p>
+          <button onClick={fetchAll} style={BP}>
+            再試行
+          </button>
         </div>
       ) : visibleAnnouncements.length === 0 ? (
         <div
