@@ -6475,7 +6475,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
   );
 }
 
-function AIReferenceManager({ currentUser, teamMembers }) {
+function AIReferenceManager({ currentUser, groups, teamMembers }) {
   const [selectedMemberId, setSelectedMemberId] = useState(teamMembers[0]?.id || "");
   const member = teamMembers.find((m) => m.id === selectedMemberId);
   const [settings, setSettings] = useState({
@@ -6494,6 +6494,15 @@ function AIReferenceManager({ currentUser, teamMembers }) {
   const [refReason, setRefReason] = useState("");
   const [uploadingRef, setUploadingRef] = useState(false);
 
+  const [actionPlanInfo, setActionPlanInfo] = useState({ filename: "", updatedAt: "" });
+  const [uploadingActionPlan, setUploadingActionPlan] = useState(false);
+  const [actionPlanMsg, setActionPlanMsg] = useState("");
+  const [challengeSheetInfo, setChallengeSheetInfo] = useState({ filename: "", updatedAt: "" });
+  const [uploadingChallengeSheet, setUploadingChallengeSheet] = useState(false);
+  const [challengeSheetMsg, setChallengeSheetMsg] = useState("");
+
+  const [openSection, setOpenSection] = useState(""); // "" | "docs" | "directions" | "refdocs"
+
   useEffect(() => {
     if (!member) return;
     setSettings({
@@ -6501,6 +6510,15 @@ function AIReferenceManager({ currentUser, teamMembers }) {
       ai_reference_level: member.ai_reference_level || "standard",
       use_action_plan: member.use_action_plan ?? true,
       use_challenge_sheet: member.use_challenge_sheet ?? true,
+    });
+    setChallengeSheetInfo({
+      filename: member.challenge_sheet_filename || "",
+      updatedAt: member.challenge_sheet_updated_at || "",
+    });
+    const g = groups.find((g) => String(g.id) === String(member.groupId));
+    setActionPlanInfo({
+      filename: g?.action_plan_filename || "",
+      updatedAt: g?.action_plan_updated_at || "",
     });
   }, [selectedMemberId]);
 
@@ -6620,22 +6638,106 @@ function AIReferenceManager({ currentUser, teamMembers }) {
     if (!error) setRefDocs((p) => p.filter((d) => d.id !== id));
   };
 
+  const handleUploadActionPlan = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !member?.groupId) return;
+    setUploadingActionPlan(true);
+    setActionPlanMsg("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("doc_type", "action_plan");
+      formData.append("target_user_id", String(member.groupId));
+      formData.append("uploaded_by", currentUser.id);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-excel`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: formData,
+        },
+      );
+      const result = await res.json();
+      if (result.success) {
+        setActionPlanInfo({ filename: result.filename, updatedAt: new Date().toISOString() });
+        setActionPlanMsg("アップロードしました！");
+      } else {
+        setActionPlanMsg("失敗しました: " + (result.error || "不明なエラー"));
+      }
+    } catch (err) {
+      setActionPlanMsg("失敗しました: " + err.message);
+    } finally {
+      setUploadingActionPlan(false);
+      setTimeout(() => setActionPlanMsg(""), 4000);
+      e.target.value = "";
+    }
+  };
+
+  const handleUploadChallengeSheet = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedMemberId) return;
+    setUploadingChallengeSheet(true);
+    setChallengeSheetMsg("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("doc_type", "challenge_sheet");
+      formData.append("target_user_id", selectedMemberId);
+      formData.append("uploaded_by", currentUser.id);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-excel`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: formData,
+        },
+      );
+      const result = await res.json();
+      if (result.success) {
+        setChallengeSheetInfo({ filename: result.filename, updatedAt: new Date().toISOString() });
+        setChallengeSheetMsg("アップロードしました！");
+      } else {
+        setChallengeSheetMsg("失敗しました: " + (result.error || "不明なエラー"));
+      }
+    } catch (err) {
+      setChallengeSheetMsg("失敗しました: " + err.message);
+    } finally {
+      setUploadingChallengeSheet(false);
+      setTimeout(() => setChallengeSheetMsg(""), 4000);
+      e.target.value = "";
+    }
+  };
+
   if (teamMembers.length === 0) return null;
+
+  const SectionHeader = ({ id, icon, label, count }) => (
+    <button
+      onClick={() => setOpenSection((p) => (p === id ? "" : id))}
+      style={{
+        width: "100%", display: "flex", alignItems: "center", gap: 8,
+        padding: "10px 4px", background: "none", border: "none", cursor: "pointer",
+        fontFamily: "inherit", textAlign: "left", borderTop: "1px solid #f1f5f9",
+      }}
+    >
+      <Icon name={icon} size={15} />
+      <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>
+        {label}{count !== undefined ? `（${count}件）` : ""}
+      </span>
+      <span style={{ marginLeft: "auto", fontSize: 11, color: "#94a3b8", transform: openSection === id ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+        ▼
+      </span>
+    </button>
+  );
 
   return (
     <div style={{ ...C, marginBottom: 16 }}>
-      <h3
-        style={{
-          margin: "0 0 4px",
-          fontSize: 15,
-          fontWeight: 700,
-          color: "var(--text-primary, #1e293b)",
-        }}
-      >
+      <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
         部下のAIレポート参考資料 設定
       </h3>
       <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-        部下ごとに、レポート生成時の参考情報の使用可否を設定できます
+        部下を選んで、レポート生成に使う参考情報を一括管理します
       </p>
 
       <select
@@ -6650,16 +6752,15 @@ function AIReferenceManager({ currentUser, teamMembers }) {
 
       {member && (
         <>
-          {/* ON/OFF・重さ設定 */}
-          <div style={{ background: "#f8fafc", borderRadius: 10, padding: 14, marginBottom: 16 }}>
+          <div style={{ background: "#f8fafc", borderRadius: 10, padding: 14, marginBottom: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>参考情報を使用する</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>この部下に参考情報を使用する</span>
               <button
                 onClick={() => setSettings((p) => ({ ...p, ai_reference_enabled: !p.ai_reference_enabled }))}
                 style={{
                   width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
                   background: settings.ai_reference_enabled ? "#3B82F6" : "#cbd5e1",
-                  position: "relative", transition: "background 0.2s",
+                  position: "relative", transition: "background 0.2s", marginLeft: "auto",
                 }}
               >
                 <div style={{
@@ -6725,99 +6826,126 @@ function AIReferenceManager({ currentUser, teamMembers }) {
             </div>
           </div>
 
-          {/* 上司から部下への期待 */}
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", marginBottom: 8 }}>
-              {member.name} さんへの期待・ディレクション
-            </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              <input
-                value={newDirection}
-                onChange={(e) => setNewDirection(e.target.value)}
-                placeholder="例：新規開拓よりも既存顧客のフォローを優先してほしい"
-                style={{ ...I, flex: 1 }}
-                onKeyDown={(e) => e.key === "Enter" && handlePostDirection()}
-              />
-              <button onClick={handlePostDirection} disabled={postingDirection || !newDirection.trim()} style={{ ...BP, fontSize: 12, padding: "8px 16px", opacity: newDirection.trim() ? 1 : 0.4 }}>
-                追加
-              </button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 200, overflowY: "auto" }}>
-              {directions.length === 0 && (
-                <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ記録がありません</div>
-              )}
-              {directions.map((d) => (
-                <div key={d.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 12, color: "#475569" }}>{d.content}</div>
-                    <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
-                      {new Date(d.created_at).toLocaleDateString("ja-JP")}
-                    </div>
-                  </div>
-                  <button onClick={() => handleDeleteDirection(d.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
-                    <Icon name="trash" size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+          <SectionHeader id="docs" icon="list" label="資料アップロード" />
+          {openSection === "docs" && (
+            <div style={{ padding: "10px 4px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
+                <span style={{ width: 110, color: "#64748b", flexShrink: 0 }}>実行計画書</span>
+                <span style={{ flex: 1, color: actionPlanInfo.filename ? "#15803D" : "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {actionPlanInfo.filename || "未アップロード"}
+                </span>
+                <label style={{ ...BB, padding: "4px 10px", fontSize: 11, cursor: "pointer", flexShrink: 0 }}>
+                  {uploadingActionPlan ? "..." : actionPlanInfo.filename ? "差替" : "選択"}
+                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadActionPlan} disabled={uploadingActionPlan} style={{ display: "none" }} />
+                </label>
+              </div>
+              {actionPlanMsg && <div style={{ fontSize: 11, color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{actionPlanMsg}</div>}
 
-          {/* その他資料 */}
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", marginBottom: 8 }}>
-              その他参考資料
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
+                <span style={{ width: 110, color: "#64748b", flexShrink: 0 }}>チャレンジシート</span>
+                <span style={{ flex: 1, color: challengeSheetInfo.filename ? "#15803D" : "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {challengeSheetInfo.filename || "未アップロード"}
+                </span>
+                <label style={{ ...BB, padding: "4px 10px", fontSize: 11, cursor: "pointer", flexShrink: 0 }}>
+                  {uploadingChallengeSheet ? "..." : challengeSheetInfo.filename ? "差替" : "選択"}
+                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
+                </label>
+              </div>
+              {challengeSheetMsg && <div style={{ fontSize: 11, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{challengeSheetMsg}</div>}
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={(e) => setRefFile(e.target.files?.[0] || null)}
-                style={{ fontSize: 12 }}
-              />
-              <input
-                value={refReason}
-                onChange={(e) => setRefReason(e.target.value)}
-                placeholder="この資料を使う理由（例：来期の新商品リスト。提案時に意識してほしい）"
-                style={I}
-              />
-              <button
-                onClick={handleUploadRef}
-                disabled={!refFile || uploadingRef}
-                style={{ ...BP, fontSize: 12, padding: "7px 14px", opacity: refFile ? 1 : 0.4, alignSelf: "flex-start" }}
-              >
-                {uploadingRef ? "アップロード中..." : "アップロード"}
-              </button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {refDocs.length === 0 && (
-                <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ資料がありません</div>
-              )}
-              {refDocs.map((doc) => (
-                <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
-                  <button
-                    onClick={() => toggleRefDocActive(doc)}
-                    style={{
-                      width: 32, height: 18, borderRadius: 9, border: "none", cursor: "pointer", flexShrink: 0,
-                      background: doc.is_active ? "#3B82F6" : "#cbd5e1", position: "relative",
-                    }}
-                  >
-                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
-                  </button>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {doc.filename}
+          )}
+
+          <SectionHeader id="directions" icon="msg" label="期待・ディレクション" count={directions.length} />
+          {openSection === "directions" && (
+            <div style={{ padding: "10px 4px 16px" }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                <input
+                  value={newDirection}
+                  onChange={(e) => setNewDirection(e.target.value)}
+                  placeholder="例：新規開拓よりも既存顧客のフォローを優先してほしい"
+                  style={{ ...I, flex: 1 }}
+                  onKeyDown={(e) => e.key === "Enter" && handlePostDirection()}
+                />
+                <button onClick={handlePostDirection} disabled={postingDirection || !newDirection.trim()} style={{ ...BP, fontSize: 12, padding: "8px 16px", opacity: newDirection.trim() ? 1 : 0.4 }}>
+                  追加
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 200, overflowY: "auto" }}>
+                {directions.length === 0 && (
+                  <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ記録がありません</div>
+                )}
+                {directions.map((d) => (
+                  <div key={d.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 12, color: "#475569" }}>{d.content}</div>
+                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                        {new Date(d.created_at).toLocaleDateString("ja-JP")}
+                      </div>
                     </div>
-                    {doc.reason && (
-                      <div style={{ fontSize: 11, color: "#94a3b8" }}>{doc.reason}</div>
-                    )}
+                    <button onClick={() => handleDeleteDirection(d.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
+                      <Icon name="trash" size={13} />
+                    </button>
                   </div>
-                  <button onClick={() => deleteRefDoc(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
-                    <Icon name="trash" size={13} />
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          <SectionHeader id="refdocs" icon="board" label="その他資料" count={refDocs.length} />
+          {openSection === "refdocs" && (
+            <div style={{ padding: "10px 4px 4px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={(e) => setRefFile(e.target.files?.[0] || null)}
+                  style={{ fontSize: 12 }}
+                />
+                <input
+                  value={refReason}
+                  onChange={(e) => setRefReason(e.target.value)}
+                  placeholder="この資料を使う理由（例：来期の新商品リスト。提案時に意識してほしい）"
+                  style={I}
+                />
+                <button
+                  onClick={handleUploadRef}
+                  disabled={!refFile || uploadingRef}
+                  style={{ ...BP, fontSize: 12, padding: "7px 14px", opacity: refFile ? 1 : 0.4, alignSelf: "flex-start" }}
+                >
+                  {uploadingRef ? "アップロード中..." : "アップロード"}
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {refDocs.length === 0 && (
+                  <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ資料がありません</div>
+                )}
+                {refDocs.map((doc) => (
+                  <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
+                    <button
+                      onClick={() => toggleRefDocActive(doc)}
+                      style={{
+                        width: 32, height: 18, borderRadius: 9, border: "none", cursor: "pointer", flexShrink: 0,
+                        background: doc.is_active ? "#3B82F6" : "#cbd5e1", position: "relative",
+                      }}
+                    >
+                      <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
+                    </button>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {doc.filename}
+                      </div>
+                      {doc.reason && (
+                        <div style={{ fontSize: 11, color: "#94a3b8" }}>{doc.reason}</div>
+                      )}
+                    </div>
+                    <button onClick={() => deleteRefDoc(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
+                      <Icon name="trash" size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -7351,87 +7479,12 @@ function MyPage({
           {isAdmin && (
             <AIReferenceManager
               currentUser={currentUser}
+              groups={groups}
               teamMembers={allUsers.filter(
                 (u) => String(u.groupId) === String(groupId) && u.id !== currentUser.id && u.role !== "superadmin",
               )}
             />
           )}
-
-          {isAdmin && groupId && (
-            <div style={{ ...C, marginBottom: 16 }}>
-              <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-                実行計画書（部署方針）
-              </h3>
-              <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-                所属部署の年度方針です。アップロードすると、部署メンバーのレポート生成時に参考情報として活用されます（メンバーごとの設定がONの場合のみ）
-              </p>
-              {actionPlanMsg && (
-                <div style={{ background: actionPlanMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${actionPlanMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 13 }}>
-                  {actionPlanMsg}
-                </div>
-              )}
-              {actionPlanInfo.filename ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed #cbd5e1", borderRadius: 10 }}>
-                  <Icon name="list" size={18} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {actionPlanInfo.filename}
-                    </div>
-                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                      {actionPlanInfo.updatedAt ? `${new Date(actionPlanInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
-                    </div>
-                  </div>
-                  <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
-                    {uploadingActionPlan ? "アップロード中..." : "差し替え"}
-                    <input type="file" accept=".xlsx,.xls" onChange={handleUploadActionPlan} disabled={uploadingActionPlan} style={{ display: "none" }} />
-                  </label>
-                </div>
-              ) : (
-                <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>
-                  <Icon name="plus" size={16} />
-                  {uploadingActionPlan ? "アップロード中..." : "クリックしてExcelファイルを選択"}
-                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadActionPlan} disabled={uploadingActionPlan} style={{ display: "none" }} />
-                </label>
-              )}
-            </div>
-          )}
-
-          <div style={{ ...C, marginBottom: 16 }}>
-            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-              チャレンジシート
-            </h3>
-            <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-              アップロードすると、レポート生成時の参考情報として活用されます（上司の設定がONの場合のみ）
-            </p>
-            {challengeSheetMsg && (
-              <div style={{ background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 13 }}>
-                {challengeSheetMsg}
-              </div>
-            )}
-            {challengeSheetInfo.filename ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, marginBottom: 10 }}>
-                <Icon name="list" size={18} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {challengeSheetInfo.filename}
-                  </div>
-                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                    {challengeSheetInfo.updatedAt ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
-                  </div>
-                </div>
-                <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
-                  {uploadingChallengeSheet ? "アップロード中..." : "差し替え"}
-                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
-                </label>
-              </div>
-            ) : (
-              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>
-                <Icon name="plus" size={16} />
-                {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
-                <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
-              </label>
-            )}
-          </div>
         </div>
       )}
 
