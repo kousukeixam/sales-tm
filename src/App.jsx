@@ -6474,6 +6474,356 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
     </div>
   );
 }
+
+function AIReferenceManager({ currentUser, teamMembers }) {
+  const [selectedMemberId, setSelectedMemberId] = useState(teamMembers[0]?.id || "");
+  const member = teamMembers.find((m) => m.id === selectedMemberId);
+  const [settings, setSettings] = useState({
+    ai_reference_enabled: false,
+    ai_reference_level: "standard",
+    use_action_plan: true,
+    use_challenge_sheet: true,
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsMsg, setSettingsMsg] = useState("");
+  const [directions, setDirections] = useState([]);
+  const [newDirection, setNewDirection] = useState("");
+  const [postingDirection, setPostingDirection] = useState(false);
+  const [refDocs, setRefDocs] = useState([]);
+  const [refFile, setRefFile] = useState(null);
+  const [refReason, setRefReason] = useState("");
+  const [uploadingRef, setUploadingRef] = useState(false);
+
+  useEffect(() => {
+    if (!member) return;
+    setSettings({
+      ai_reference_enabled: !!member.ai_reference_enabled,
+      ai_reference_level: member.ai_reference_level || "standard",
+      use_action_plan: member.use_action_plan ?? true,
+      use_challenge_sheet: member.use_challenge_sheet ?? true,
+    });
+  }, [selectedMemberId]);
+
+  useEffect(() => {
+    if (!selectedMemberId) return;
+    const fetchData = async () => {
+      const { data: dirs } = await supabase
+        .from("manager_directions")
+        .select("*")
+        .eq("target_user_id", selectedMemberId)
+        .order("created_at", { ascending: false });
+      setDirections(dirs || []);
+      const { data: docs } = await supabase
+        .from("reference_documents")
+        .select("*")
+        .eq("target_user_id", selectedMemberId)
+        .order("created_at", { ascending: false });
+      setRefDocs(docs || []);
+    };
+    fetchData();
+  }, [selectedMemberId]);
+
+  const handleSaveSettings = async () => {
+    if (!selectedMemberId) return;
+    setSavingSettings(true);
+    setSettingsMsg("");
+    const { error } = await supabase
+      .from("profiles")
+      .update(settings)
+      .eq("id", selectedMemberId);
+    if (!error) {
+      setSettingsMsg("保存しました！");
+    } else {
+      setSettingsMsg("失敗しました: " + error.message);
+    }
+    setSavingSettings(false);
+    setTimeout(() => setSettingsMsg(""), 3000);
+  };
+
+  const handlePostDirection = async () => {
+    if (!newDirection.trim() || !selectedMemberId) return;
+    setPostingDirection(true);
+    const { data, error } = await supabase
+      .from("manager_directions")
+      .insert({
+        target_user_id: selectedMemberId,
+        manager_id: currentUser.id,
+        content: newDirection.trim(),
+      })
+      .select()
+      .single();
+    if (!error && data) {
+      setDirections((p) => [data, ...p]);
+      setNewDirection("");
+    }
+    setPostingDirection(false);
+  };
+
+  const handleDeleteDirection = async (id) => {
+    if (!window.confirm("この内容を削除しますか？")) return;
+    const { error } = await supabase.from("manager_directions").delete().eq("id", id);
+    if (!error) setDirections((p) => p.filter((d) => d.id !== id));
+  };
+
+  const handleUploadRef = async () => {
+    if (!refFile || !selectedMemberId) return;
+    setUploadingRef(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append("file", refFile);
+      formData.append("doc_type", "reference");
+      formData.append("target_user_id", selectedMemberId);
+      formData.append("uploaded_by", currentUser.id);
+      formData.append("reason", refReason);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-excel`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: formData,
+        },
+      );
+      const result = await res.json();
+      if (result.success) {
+        const { data: docs } = await supabase
+          .from("reference_documents")
+          .select("*")
+          .eq("target_user_id", selectedMemberId)
+          .order("created_at", { ascending: false });
+        setRefDocs(docs || []);
+        setRefFile(null);
+        setRefReason("");
+      } else {
+        alert("アップロードに失敗しました: " + (result.error || "不明なエラー"));
+      }
+    } catch (e) {
+      alert("アップロードに失敗しました: " + e.message);
+    } finally {
+      setUploadingRef(false);
+    }
+  };
+
+  const toggleRefDocActive = async (doc) => {
+    const { error } = await supabase
+      .from("reference_documents")
+      .update({ is_active: !doc.is_active })
+      .eq("id", doc.id);
+    if (!error) {
+      setRefDocs((p) => p.map((d) => (d.id === doc.id ? { ...d, is_active: !d.is_active } : d)));
+    }
+  };
+
+  const deleteRefDoc = async (id) => {
+    if (!window.confirm("この資料を削除しますか？")) return;
+    const { error } = await supabase.from("reference_documents").delete().eq("id", id);
+    if (!error) setRefDocs((p) => p.filter((d) => d.id !== id));
+  };
+
+  if (teamMembers.length === 0) return null;
+
+  return (
+    <div style={{ ...C, marginBottom: 16 }}>
+      <h3
+        style={{
+          margin: "0 0 4px",
+          fontSize: 15,
+          fontWeight: 700,
+          color: "var(--text-primary, #1e293b)",
+        }}
+      >
+        部下のAIレポート参考資料 設定
+      </h3>
+      <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+        部下ごとに、レポート生成時の参考情報の使用可否を設定できます
+      </p>
+
+      <select
+        value={selectedMemberId}
+        onChange={(e) => setSelectedMemberId(e.target.value)}
+        style={{ ...I, width: "auto", marginBottom: 16 }}
+      >
+        {teamMembers.map((m) => (
+          <option key={m.id} value={m.id}>{m.name}</option>
+        ))}
+      </select>
+
+      {member && (
+        <>
+          {/* ON/OFF・重さ設定 */}
+          <div style={{ background: "#f8fafc", borderRadius: 10, padding: 14, marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>参考情報を使用する</span>
+              <button
+                onClick={() => setSettings((p) => ({ ...p, ai_reference_enabled: !p.ai_reference_enabled }))}
+                style={{
+                  width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
+                  background: settings.ai_reference_enabled ? "#3B82F6" : "#cbd5e1",
+                  position: "relative", transition: "background 0.2s",
+                }}
+              >
+                <div style={{
+                  width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                  position: "absolute", top: 2, left: settings.ai_reference_enabled ? 20 : 2,
+                  transition: "left 0.2s",
+                }} />
+              </button>
+            </div>
+
+            {settings.ai_reference_enabled && (
+              <>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 12, color: "#64748b", marginBottom: 6 }}>プロンプトの重さ</div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {[
+                      ["light", "軽め"],
+                      ["standard", "標準"],
+                      ["strong", "しっかり"],
+                    ].map(([v, label]) => (
+                      <button
+                        key={v}
+                        onClick={() => setSettings((p) => ({ ...p, ai_reference_level: v }))}
+                        style={{
+                          padding: "6px 14px", borderRadius: 8, border: "1px solid",
+                          borderColor: settings.ai_reference_level === v ? "#3B82F6" : "#e2e8f0",
+                          background: settings.ai_reference_level === v ? "#EFF6FF" : "#fff",
+                          color: settings.ai_reference_level === v ? "#1D4ED8" : "#64748b",
+                          fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 16 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#475569", cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={settings.use_action_plan}
+                      onChange={(e) => setSettings((p) => ({ ...p, use_action_plan: e.target.checked }))}
+                    />
+                    実行計画書を使う
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#475569", cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={settings.use_challenge_sheet}
+                      onChange={(e) => setSettings((p) => ({ ...p, use_challenge_sheet: e.target.checked }))}
+                    />
+                    チャレンジシートを使う
+                  </label>
+                </div>
+              </>
+            )}
+
+            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
+              <button onClick={handleSaveSettings} disabled={savingSettings} style={{ ...BP, fontSize: 12, padding: "6px 14px", opacity: savingSettings ? 0.6 : 1 }}>
+                {savingSettings ? "保存中..." : "設定を保存"}
+              </button>
+              {settingsMsg && <span style={{ fontSize: 12, color: "#15803D" }}>{settingsMsg}</span>}
+            </div>
+          </div>
+
+          {/* 上司から部下への期待 */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", marginBottom: 8 }}>
+              {member.name} さんへの期待・ディレクション
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              <input
+                value={newDirection}
+                onChange={(e) => setNewDirection(e.target.value)}
+                placeholder="例：新規開拓よりも既存顧客のフォローを優先してほしい"
+                style={{ ...I, flex: 1 }}
+                onKeyDown={(e) => e.key === "Enter" && handlePostDirection()}
+              />
+              <button onClick={handlePostDirection} disabled={postingDirection || !newDirection.trim()} style={{ ...BP, fontSize: 12, padding: "8px 16px", opacity: newDirection.trim() ? 1 : 0.4 }}>
+                追加
+              </button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 200, overflowY: "auto" }}>
+              {directions.length === 0 && (
+                <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ記録がありません</div>
+              )}
+              {directions.map((d) => (
+                <div key={d.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 12, color: "#475569" }}>{d.content}</div>
+                    <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                      {new Date(d.created_at).toLocaleDateString("ja-JP")}
+                    </div>
+                  </div>
+                  <button onClick={() => handleDeleteDirection(d.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
+                    <Icon name="trash" size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* その他資料 */}
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", marginBottom: 8 }}>
+              その他参考資料
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 10 }}>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={(e) => setRefFile(e.target.files?.[0] || null)}
+                style={{ fontSize: 12 }}
+              />
+              <input
+                value={refReason}
+                onChange={(e) => setRefReason(e.target.value)}
+                placeholder="この資料を使う理由（例：来期の新商品リスト。提案時に意識してほしい）"
+                style={I}
+              />
+              <button
+                onClick={handleUploadRef}
+                disabled={!refFile || uploadingRef}
+                style={{ ...BP, fontSize: 12, padding: "7px 14px", opacity: refFile ? 1 : 0.4, alignSelf: "flex-start" }}
+              >
+                {uploadingRef ? "アップロード中..." : "アップロード"}
+              </button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {refDocs.length === 0 && (
+                <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ資料がありません</div>
+              )}
+              {refDocs.map((doc) => (
+                <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
+                  <button
+                    onClick={() => toggleRefDocActive(doc)}
+                    style={{
+                      width: 32, height: 18, borderRadius: 9, border: "none", cursor: "pointer", flexShrink: 0,
+                      background: doc.is_active ? "#3B82F6" : "#cbd5e1", position: "relative",
+                    }}
+                  >
+                    <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
+                  </button>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {doc.filename}
+                    </div>
+                    {doc.reason && (
+                      <div style={{ fontSize: 11, color: "#94a3b8" }}>{doc.reason}</div>
+                    )}
+                  </div>
+                  <button onClick={() => deleteRefDoc(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
+                    <Icon name="trash" size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function MyPage({
   currentUser,
   allUsers,
@@ -7073,6 +7423,15 @@ function MyPage({
             </div>
           </div>
         </div>
+
+{isAdmin && (
+          <AIReferenceManager
+            currentUser={currentUser}
+            teamMembers={allUsers.filter(
+              (u) => String(u.groupId) === String(groupId) && u.id !== currentUser.id && u.role !== "superadmin",
+            )}
+          />
+        )}
 
 {isAdmin && groupId && (
           <div style={{ ...C, marginBottom: 16 }}>
