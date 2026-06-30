@@ -6485,6 +6485,7 @@ function MyPage({
   accentColor,
   setAccentColor,
 }) {
+  const isAdmin = currentUser.role === "admin" || isSA;
   const [name, setName] = useState(currentUser.name);
   const [newPassword, setNewPassword] = useState("");
   const [managerId, setManagerId] = useState(currentUser.manager_id || "");
@@ -6501,6 +6502,20 @@ function MyPage({
   });
   const [uploadingChallengeSheet, setUploadingChallengeSheet] = useState(false);
   const [challengeSheetMsg, setChallengeSheetMsg] = useState("");
+  const [actionPlanInfo, setActionPlanInfo] = useState({ filename: "", updatedAt: "" });
+  const [uploadingActionPlan, setUploadingActionPlan] = useState(false);
+  const [actionPlanMsg, setActionPlanMsg] = useState("");
+
+  useEffect(() => {
+    if (!isAdmin && !isSA) return;
+    const g = groups.find((g) => String(g.id) === String(groupId));
+    if (g) {
+      setActionPlanInfo({
+        filename: g.action_plan_filename || "",
+        updatedAt: g.action_plan_updated_at || "",
+      });
+    }
+  }, [groupId, groups]);
   useEffect(() => {
     const fetchLatest = async () => {
       const { data } = await supabase
@@ -6593,6 +6608,42 @@ function MyPage({
       setTimeout(() => setOk(""), 3000);
     } catch (e) {
       setErr("保存に失敗しました: " + e.message);
+    }
+  };
+
+  const handleUploadActionPlan = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !groupId) return;
+    setUploadingActionPlan(true);
+    setActionPlanMsg("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("doc_type", "action_plan");
+      formData.append("target_user_id", groupId);
+      formData.append("uploaded_by", currentUser.id);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-excel`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: formData,
+        },
+      );
+      const result = await res.json();
+      if (result.success) {
+        setActionPlanInfo({ filename: result.filename, updatedAt: new Date().toISOString() });
+        setActionPlanMsg("アップロードしました！");
+      } else {
+        setActionPlanMsg("失敗しました: " + (result.error || "不明なエラー"));
+      }
+    } catch (err) {
+      setActionPlanMsg("失敗しました: " + err.message);
+    } finally {
+      setUploadingActionPlan(false);
+      setTimeout(() => setActionPlanMsg(""), 4000);
+      e.target.value = "";
     }
   };
 
@@ -7022,6 +7073,98 @@ function MyPage({
             </div>
           </div>
         </div>
+
+{isAdmin && groupId && (
+          <div style={{ ...C, marginBottom: 16 }}>
+            <h3
+              style={{
+                margin: "0 0 4px",
+                fontSize: 15,
+                fontWeight: 700,
+                color: "var(--text-primary, #1e293b)",
+              }}
+            >
+              実行計画書（部署方針）
+            </h3>
+            <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+              所属部署の年度方針です。アップロードすると、部署メンバーのレポート生成時に参考情報として活用されます（メンバーごとの設定がONの場合のみ）
+            </p>
+            {actionPlanMsg && (
+              <div
+                style={{
+                  background: actionPlanMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7",
+                  border: `1px solid ${actionPlanMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`,
+                  borderRadius: 8,
+                  padding: "8px 14px",
+                  marginBottom: 12,
+                  color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D",
+                  fontSize: 13,
+                }}
+              >
+                {actionPlanMsg}
+              </div>
+            )}
+            {actionPlanInfo.filename ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 14px",
+                  border: "1px dashed #cbd5e1",
+                  borderRadius: 10,
+                }}
+              >
+                <Icon name="list" size={18} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {actionPlanInfo.filename}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    {actionPlanInfo.updatedAt
+                      ? `${new Date(actionPlanInfo.updatedAt).toLocaleString("ja-JP")} 更新`
+                      : ""}
+                  </div>
+                </div>
+                <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
+                  {uploadingActionPlan ? "アップロード中..." : "差し替え"}
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleUploadActionPlan}
+                    disabled={uploadingActionPlan}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </div>
+            ) : (
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  padding: "20px 14px",
+                  border: "1px dashed #cbd5e1",
+                  borderRadius: 10,
+                  color: "#94a3b8",
+                  cursor: "pointer",
+                  fontSize: 13,
+                }}
+              >
+                <Icon name="plus" size={16} />
+                {uploadingActionPlan ? "アップロード中..." : "クリックしてExcelファイルを選択"}
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleUploadActionPlan}
+                  disabled={uploadingActionPlan}
+                  style={{ display: "none" }}
+                />
+              </label>
+            )}
+          </div>
+        )}
 
 <div style={{ ...C, marginBottom: 16 }}>
           <h3
