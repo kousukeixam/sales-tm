@@ -6495,6 +6495,12 @@ function MyPage({
   const [weeklySchedule, setWeeklySchedule] = useState({ mode: "scheduled", day_of_week: 1, time_of_day: "06:00" });
   const [monthlySchedule, setMonthlySchedule] = useState({ mode: "scheduled", day_of_month: 1, time_of_day: "06:00" });
   const [scheduleOk, setScheduleOk] = useState("");
+  const [challengeSheetInfo, setChallengeSheetInfo] = useState({
+    filename: currentUser.challenge_sheet_filename || "",
+    updatedAt: currentUser.challenge_sheet_updated_at || "",
+  });
+  const [uploadingChallengeSheet, setUploadingChallengeSheet] = useState(false);
+  const [challengeSheetMsg, setChallengeSheetMsg] = useState("");
   useEffect(() => {
     const fetchLatest = async () => {
       const { data } = await supabase
@@ -6587,6 +6593,42 @@ function MyPage({
       setTimeout(() => setOk(""), 3000);
     } catch (e) {
       setErr("保存に失敗しました: " + e.message);
+    }
+  };
+
+  const handleUploadChallengeSheet = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingChallengeSheet(true);
+    setChallengeSheetMsg("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("doc_type", "challenge_sheet");
+      formData.append("target_user_id", currentUser.id);
+      formData.append("uploaded_by", currentUser.id);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-excel`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session?.access_token}` },
+          body: formData,
+        },
+      );
+      const result = await res.json();
+      if (result.success) {
+        setChallengeSheetInfo({ filename: result.filename, updatedAt: new Date().toISOString() });
+        setChallengeSheetMsg("アップロードしました！");
+      } else {
+        setChallengeSheetMsg("失敗しました: " + (result.error || "不明なエラー"));
+      }
+    } catch (err) {
+      setChallengeSheetMsg("失敗しました: " + err.message);
+    } finally {
+      setUploadingChallengeSheet(false);
+      setTimeout(() => setChallengeSheetMsg(""), 4000);
+      e.target.value = "";
     }
   };
 
@@ -6979,6 +7021,97 @@ function MyPage({
               ))}
             </div>
           </div>
+        </div>
+
+<div style={{ ...C, marginBottom: 16 }}>
+          <h3
+            style={{
+              margin: "0 0 4px",
+              fontSize: 15,
+              fontWeight: 700,
+              color: "var(--text-primary, #1e293b)",
+            }}
+          >
+            チャレンジシート
+          </h3>
+          <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+            アップロードすると、レポート生成時の参考情報として活用されます（上司の設定がONの場合のみ）
+          </p>
+          {challengeSheetMsg && (
+            <div
+              style={{
+                background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7",
+                border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`,
+                borderRadius: 8,
+                padding: "8px 14px",
+                marginBottom: 12,
+                color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D",
+                fontSize: 13,
+              }}
+            >
+              {challengeSheetMsg}
+            </div>
+          )}
+          {challengeSheetInfo.filename ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                border: "1px dashed #cbd5e1",
+                borderRadius: 10,
+                marginBottom: 10,
+              }}
+            >
+              <Icon name="list" size={18} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {challengeSheetInfo.filename}
+                </div>
+                <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                  {challengeSheetInfo.updatedAt
+                    ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新`
+                    : ""}
+                </div>
+              </div>
+              <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
+                {uploadingChallengeSheet ? "アップロード中..." : "差し替え"}
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleUploadChallengeSheet}
+                  disabled={uploadingChallengeSheet}
+                  style={{ display: "none" }}
+                />
+              </label>
+            </div>
+          ) : (
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "20px 14px",
+                border: "1px dashed #cbd5e1",
+                borderRadius: 10,
+                color: "#94a3b8",
+                cursor: "pointer",
+                fontSize: 13,
+              }}
+            >
+              <Icon name="plus" size={16} />
+              {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleUploadChallengeSheet}
+                disabled={uploadingChallengeSheet}
+                style={{ display: "none" }}
+              />
+            </label>
+          )}
         </div>
 
 <div style={{ ...C, marginBottom: 16 }}>
