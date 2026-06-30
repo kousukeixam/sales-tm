@@ -6836,6 +6836,7 @@ function MyPage({
   setAccentColor,
 }) {
   const isAdmin = currentUser.role === "admin" || isSA;
+  const [myPageTab, setMyPageTab] = useState("profile");
   const [name, setName] = useState(currentUser.name);
   const [newPassword, setNewPassword] = useState("");
   const [managerId, setManagerId] = useState(currentUser.manager_id || "");
@@ -6866,6 +6867,7 @@ function MyPage({
       });
     }
   }, [groupId, groups]);
+
   useEffect(() => {
     const fetchLatest = async () => {
       const { data } = await supabase
@@ -6919,25 +6921,19 @@ function MyPage({
     setOk("");
     setErr("");
     try {
-      // 名前を更新
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
           name,
-          // 全員グループ変更可（superadminへのロール変更は不可）
           group_id: groupId ? parseInt(groupId) : null,
-          // superadmin以外は member ↔ admin を自由に変更可
-          // superadmin自身のロールは変更不可
           ...(!isSA
             ? { role: role === "superadmin" ? currentUser.role : role }
             : {}),
-          // ロールがmemberのときのみmanager_idを保持
           manager_id: role === "member" ? managerId || null : null,
         })
         .eq("id", currentUser.id);
       if (profileError) throw profileError;
 
-      // パスワード変更
       if (newPassword) {
         const { error: passError } = await supabase.auth.updateUser({
           password: newPassword,
@@ -7057,266 +7053,131 @@ function MyPage({
   };
 
   return (
-    <div style={{ maxWidth: 600 }}>
-      <div style={{ ...C, marginBottom: 16 }}>
-        <h3
-          style={{
-            margin: "0 0 20px",
-            fontSize: 15,
-            fontWeight: 700,
-            color: "#1e293b",
-          }}
-        >
-          プロフィール設定
-        </h3>
-        {ok && (
-          <div
+    <div style={{ maxWidth: 680, display: "flex", gap: 20 }}>
+      <div style={{ width: 160, flexShrink: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+        {[
+          ["profile", "プロフィール", "person"],
+          ["display", "表示設定", "settings"],
+          ["report", "レポート設定", "chart"],
+        ].map(([id, label, icon]) => (
+          <button
+            key={id}
+            onClick={() => setMyPageTab(id)}
             style={{
-              background: "#DCFCE7",
-              border: "1px solid #BBF7D0",
-              borderRadius: 8,
-              padding: "10px 14px",
-              marginBottom: 14,
-              color: "#15803D",
-              fontSize: 13,
               display: "flex",
               alignItems: "center",
-              gap: 6,
-            }}
-          >
-            <Icon name="check" size={14} />
-            {ok}
-          </div>
-        )}
-        {err && (
-          <div
-            style={{
-              background: "#FEF2F2",
-              border: "1px solid #FECACA",
-              borderRadius: 8,
+              gap: 8,
               padding: "10px 14px",
-              marginBottom: 14,
-              color: "#991B1B",
+              borderRadius: 10,
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left",
               fontSize: 13,
+              fontFamily: "inherit",
+              background: myPageTab === id ? "var(--accent-light, #EFF6FF)" : "transparent",
+              color: myPageTab === id ? "var(--accent, #3B82F6)" : "#64748b",
+              fontWeight: myPageTab === id ? 600 : 400,
             }}
           >
-            {err}
-          </div>
-        )}
+            <Icon name={icon} size={15} />
+            {label}
+          </button>
+        ))}
+      </div>
 
-        <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              fontSize: 12,
-              color: "#64748b",
-              display: "block",
-              marginBottom: 5,
-            }}
-          >
-            氏名
-          </label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={I}
-            onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
-            onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-          />
-        </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
 
-        <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              fontSize: 12,
-              color: "#64748b",
-              display: "block",
-              marginBottom: 5,
-            }}
-          >
-            メールアドレス
-          </label>
-          <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
-            {currentUser.email}
-          </div>
-        </div>
+      {myPageTab === "profile" && (
+        <div style={{ ...C, marginBottom: 16 }}>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, fontWeight: 700, color: "#1e293b" }}>
+            プロフィール設定
+          </h3>
+          {ok && (
+            <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+              <Icon name="check" size={14} />
+              {ok}
+            </div>
+          )}
+          {err && (
+            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#991B1B", fontSize: 13 }}>
+              {err}
+            </div>
+          )}
 
-        {/* ロール選択 */}
-        {!isSA && (
           <div style={{ marginBottom: 14 }}>
-            <label
-              style={{
-                fontSize: 12,
-                color: "#64748b",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              ロール
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "9px 12px",
-                borderRadius: 8,
-                border: "1px solid #e2e8f0",
-                fontSize: 14,
-                background: "#fff",
-                color: "#1e293b",
-              }}
-            >
-              <option value="member">部下（member）</option>
-              <option value="admin">上司（admin）</option>
-            </select>
+            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>氏名</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} style={I} />
           </div>
-        )}
 
-        {/* グループ選択 */}
-        <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              fontSize: 12,
-              color: "#64748b",
-              display: "block",
-              marginBottom: 5,
-            }}
-          >
-            所属グループ
-          </label>
-          <select
-            value={groupId}
-            onChange={(e) => setGroupId(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "9px 12px",
-              borderRadius: 8,
-              border: "1px solid #e2e8f0",
-              fontSize: 14,
-              background: "#fff",
-              color: "#1e293b",
-            }}
-          >
-            <option value="">未所属</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* 上司選択（memberのみ表示） */}
-        {role === "member" && (
           <div style={{ marginBottom: 14 }}>
-            <label
-              style={{
-                fontSize: 12,
-                color: "#64748b",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              上司
-            </label>
-            <select
-              value={managerId}
-              onChange={(e) => setManagerId(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "9px 12px",
-                borderRadius: 8,
-                border: "1px solid #e2e8f0",
-                fontSize: 14,
-                background: "#fff",
-                color: "#1e293b",
-              }}
-            >
-              <option value="">未設定</option>
-              {managers.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
+            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>メールアドレス</label>
+            <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>{currentUser.email}</div>
+          </div>
+
+          {!isSA && (
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>ロール</label>
+              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, background: "#fff", color: "#1e293b" }}>
+                <option value="member">部下（member）</option>
+                <option value="admin">上司（admin）</option>
+              </select>
+            </div>
+          )}
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>所属グループ</label>
+            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, background: "#fff", color: "#1e293b" }}>
+              <option value="">未所属</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id}>{g.name}</option>
               ))}
             </select>
           </div>
-        )}
 
-        <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              fontSize: 12,
-              color: "#64748b",
-              display: "block",
-              marginBottom: 5,
-            }}
-          >
-            パスワード変更{" "}
-            <span style={{ fontWeight: 400, fontSize: 11 }}>
-              （変更しない場合は空欄）
-            </span>
-          </label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="新しいパスワード"
-            style={I}
-            onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
-            onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
-          />
-        </div>
+          {role === "member" && (
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>上司</label>
+              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, background: "#fff", color: "#1e293b" }}>
+                <option value="">未設定</option>
+                {managers.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        {isSA && (
-          <div style={{ marginBottom: 20 }}>
-            <label
-              style={{
-                fontSize: 12,
-                color: "#64748b",
-                display: "block",
-                marginBottom: 5,
-              }}
-            >
-              ロール
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>
+              パスワード変更 <span style={{ fontWeight: 400, fontSize: 11 }}>（変更しない場合は空欄）</span>
             </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={I}
-            >
-              <option value="member">部下</option>
-              <option value="admin">上司</option>
-              <option value="superadmin">管理者</option>
-            </select>
+            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="新しいパスワード" style={I} />
           </div>
-        )}
 
-        <button onClick={handleSave} style={BP}>
-          <Icon name="save" size={14} />
-          保存
-        </button>
-      </div>
+          {isSA && (
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>ロール</label>
+              <select value={role} onChange={(e) => setRole(e.target.value)} style={I}>
+                <option value="member">部下</option>
+                <option value="admin">上司</option>
+                <option value="superadmin">管理者</option>
+              </select>
+            </div>
+          )}
 
-      <div style={{ ...C, marginBottom: 16 }}>
-        <h3
-          style={{
-            margin: "0 0 16px",
-            fontSize: 15,
-            fontWeight: 700,
-            color: "var(--text-primary, #1e293b)",
-          }}
-        >
-          表示設定
-        </h3>
+          <button onClick={handleSave} style={BP}>
+            <Icon name="save" size={14} />
+            保存
+          </button>
+        </div>
+      )}
+
+      {myPageTab === "display" && (
+        <div style={{ ...C, marginBottom: 16 }}>
+          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+            表示設定
+          </h3>
           <div style={{ marginBottom: 16 }}>
-            <label
-              style={{
-                fontSize: 12,
-                color: "var(--text-secondary, #64748b)",
-                display: "block",
-                marginBottom: 8,
-              }}
-            >
+            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
               ダークモード
             </label>
             <div style={{ display: "flex", gap: 8 }}>
@@ -7332,25 +7193,11 @@ function MyPage({
                     localStorage.setItem("darkMode", String(isDark));
                   }}
                   style={{
-                    padding: "8px 20px",
-                    borderRadius: 8,
-                    border: "1px solid",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    borderColor:
-                      (darkMode ? "dark" : "light") === mode
-                        ? "var(--accent, #3B82F6)"
-                        : "#e2e8f0",
-                    background:
-                      (darkMode ? "dark" : "light") === mode
-                        ? "var(--accent-light, #EFF6FF)"
-                        : "#fff",
-                    color:
-                      (darkMode ? "dark" : "light") === mode
-                        ? "var(--accent, #3B82F6)"
-                        : "#64748b",
+                    padding: "8px 20px", borderRadius: 8, border: "1px solid", fontSize: 13, fontWeight: 600,
+                    cursor: "pointer", fontFamily: "inherit",
+                    borderColor: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#e2e8f0",
+                    background: (darkMode ? "dark" : "light") === mode ? "var(--accent-light, #EFF6FF)" : "#fff",
+                    color: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#64748b",
                   }}
                 >
                   {label}
@@ -7359,14 +7206,7 @@ function MyPage({
             </div>
           </div>
           <div>
-            <label
-              style={{
-                fontSize: 12,
-                color: "var(--text-secondary, #64748b)",
-                display: "block",
-                marginBottom: 8,
-              }}
-            >
+            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
               カラーテーマ
             </label>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -7385,37 +7225,15 @@ function MyPage({
                     localStorage.setItem("accentColor", key);
                   }}
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "10px 14px",
-                    borderRadius: 10,
-                    border: "2px solid",
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                    padding: "10px 14px", borderRadius: 10, border: "2px solid",
                     borderColor: accentColor === key ? color : "#e2e8f0",
                     background: accentColor === key ? color + "18" : "#fff",
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    transition: "all 0.15s",
+                    cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
                   }}
                 >
-                  <div
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: "50%",
-                      background: color,
-                      boxShadow:
-                        accentColor === key ? `0 0 0 3px ${color}44` : "none",
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: 11,
-                      color: accentColor === key ? color : "#64748b",
-                      fontWeight: accentColor === key ? 700 : 400,
-                    }}
-                  >
+                  <div style={{ width: 24, height: 24, borderRadius: "50%", background: color, boxShadow: accentColor === key ? `0 0 0 3px ${color}44` : "none" }} />
+                  <span style={{ fontSize: 11, color: accentColor === key ? color : "#64748b", fontWeight: accentColor === key ? 700 : 400 }}>
                     {label}
                   </span>
                 </button>
@@ -7423,351 +7241,205 @@ function MyPage({
             </div>
           </div>
         </div>
+      )}
 
-{isAdmin && (
-          <AIReferenceManager
-            currentUser={currentUser}
-            teamMembers={allUsers.filter(
-              (u) => String(u.groupId) === String(groupId) && u.id !== currentUser.id && u.role !== "superadmin",
-            )}
-          />
-        )}
-
-{isAdmin && groupId && (
+      {myPageTab === "report" && (
+        <div>
           <div style={{ ...C, marginBottom: 16 }}>
-            <h3
-              style={{
-                margin: "0 0 4px",
-                fontSize: 15,
-                fontWeight: 700,
-                color: "var(--text-primary, #1e293b)",
-              }}
-            >
-              実行計画書（部署方針）
+            <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+              レポート自動生成設定
             </h3>
-            <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-              所属部署の年度方針です。アップロードすると、部署メンバーのレポート生成時に参考情報として活用されます（メンバーごとの設定がONの場合のみ）
-            </p>
-            {actionPlanMsg && (
-              <div
-                style={{
-                  background: actionPlanMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7",
-                  border: `1px solid ${actionPlanMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`,
-                  borderRadius: 8,
-                  padding: "8px 14px",
-                  marginBottom: 12,
-                  color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D",
-                  fontSize: 13,
-                }}
-              >
-                {actionPlanMsg}
+            {scheduleOk && (
+              <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13 }}>
+                {scheduleOk}
               </div>
             )}
-            {actionPlanInfo.filename ? (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 14px",
-                  border: "1px dashed #cbd5e1",
-                  borderRadius: 10,
-                }}
-              >
+
+            <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>週次レポート</div>
+              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                {[
+                  ["scheduled", "自動生成"],
+                  ["manual", "手動のみ"],
+                ].map(([m, label]) => (
+                  <button
+                    key={m}
+                    onClick={() => setWeeklySchedule((p) => ({ ...p, mode: m }))}
+                    style={{
+                      padding: "7px 16px", borderRadius: 8, border: "1px solid",
+                      borderColor: weeklySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
+                      background: weeklySchedule.mode === m ? "#EFF6FF" : "#fff",
+                      color: weeklySchedule.mode === m ? "#1D4ED8" : "#64748b",
+                      fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {weeklySchedule.mode === "scheduled" && (
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <select
+                    value={weeklySchedule.day_of_week}
+                    onChange={(e) => setWeeklySchedule((p) => ({ ...p, day_of_week: parseInt(e.target.value) }))}
+                    style={{ ...I, width: "auto" }}
+                  >
+                    {["日", "月", "火", "水", "木", "金", "土"].map((d, i) => (
+                      <option key={i} value={i}>{d}曜日</option>
+                    ))}
+                  </select>
+                  <input
+                    type="time"
+                    value={weeklySchedule.time_of_day}
+                    onChange={(e) => setWeeklySchedule((p) => ({ ...p, time_of_day: e.target.value }))}
+                    style={{ ...I, width: "auto" }}
+                  />
+                </div>
+              )}
+              <button onClick={() => handleSaveSchedule("weekly")} style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}>
+                週次設定を保存
+              </button>
+            </div>
+
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>月次レポート</div>
+              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                {[
+                  ["scheduled", "自動生成"],
+                  ["manual", "手動のみ"],
+                ].map(([m, label]) => (
+                  <button
+                    key={m}
+                    onClick={() => setMonthlySchedule((p) => ({ ...p, mode: m }))}
+                    style={{
+                      padding: "7px 16px", borderRadius: 8, border: "1px solid",
+                      borderColor: monthlySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
+                      background: monthlySchedule.mode === m ? "#EFF6FF" : "#fff",
+                      color: monthlySchedule.mode === m ? "#1D4ED8" : "#64748b",
+                      fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {monthlySchedule.mode === "scheduled" && (
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <select
+                    value={monthlySchedule.day_of_month}
+                    onChange={(e) => setMonthlySchedule((p) => ({ ...p, day_of_month: parseInt(e.target.value) }))}
+                    style={{ ...I, width: "auto" }}
+                  >
+                    {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={d}>{d}日</option>
+                    ))}
+                  </select>
+                  <input
+                    type="time"
+                    value={monthlySchedule.time_of_day}
+                    onChange={(e) => setMonthlySchedule((p) => ({ ...p, time_of_day: e.target.value }))}
+                    style={{ ...I, width: "auto" }}
+                  />
+                </div>
+              )}
+              <button onClick={() => handleSaveSchedule("monthly")} style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}>
+                月次設定を保存
+              </button>
+            </div>
+          </div>
+
+          {isAdmin && (
+            <AIReferenceManager
+              currentUser={currentUser}
+              teamMembers={allUsers.filter(
+                (u) => String(u.groupId) === String(groupId) && u.id !== currentUser.id && u.role !== "superadmin",
+              )}
+            />
+          )}
+
+          {isAdmin && groupId && (
+            <div style={{ ...C, marginBottom: 16 }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+                実行計画書（部署方針）
+              </h3>
+              <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+                所属部署の年度方針です。アップロードすると、部署メンバーのレポート生成時に参考情報として活用されます（メンバーごとの設定がONの場合のみ）
+              </p>
+              {actionPlanMsg && (
+                <div style={{ background: actionPlanMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${actionPlanMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 13 }}>
+                  {actionPlanMsg}
+                </div>
+              )}
+              {actionPlanInfo.filename ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed #cbd5e1", borderRadius: 10 }}>
+                  <Icon name="list" size={18} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {actionPlanInfo.filename}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                      {actionPlanInfo.updatedAt ? `${new Date(actionPlanInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
+                    </div>
+                  </div>
+                  <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
+                    {uploadingActionPlan ? "アップロード中..." : "差し替え"}
+                    <input type="file" accept=".xlsx,.xls" onChange={handleUploadActionPlan} disabled={uploadingActionPlan} style={{ display: "none" }} />
+                  </label>
+                </div>
+              ) : (
+                <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>
+                  <Icon name="plus" size={16} />
+                  {uploadingActionPlan ? "アップロード中..." : "クリックしてExcelファイルを選択"}
+                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadActionPlan} disabled={uploadingActionPlan} style={{ display: "none" }} />
+                </label>
+              )}
+            </div>
+          )}
+
+          <div style={{ ...C, marginBottom: 16 }}>
+            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+              チャレンジシート
+            </h3>
+            <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+              アップロードすると、レポート生成時の参考情報として活用されます（上司の設定がONの場合のみ）
+            </p>
+            {challengeSheetMsg && (
+              <div style={{ background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 13 }}>
+                {challengeSheetMsg}
+              </div>
+            )}
+            {challengeSheetInfo.filename ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, marginBottom: 10 }}>
                 <Icon name="list" size={18} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {actionPlanInfo.filename}
+                    {challengeSheetInfo.filename}
                   </div>
                   <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                    {actionPlanInfo.updatedAt
-                      ? `${new Date(actionPlanInfo.updatedAt).toLocaleString("ja-JP")} 更新`
-                      : ""}
+                    {challengeSheetInfo.updatedAt ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
                   </div>
                 </div>
                 <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
-                  {uploadingActionPlan ? "アップロード中..." : "差し替え"}
-                  <input
-                    type="file"
-                    accept=".xlsx,.xls"
-                    onChange={handleUploadActionPlan}
-                    disabled={uploadingActionPlan}
-                    style={{ display: "none" }}
-                  />
+                  {uploadingChallengeSheet ? "アップロード中..." : "差し替え"}
+                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
                 </label>
               </div>
             ) : (
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  padding: "20px 14px",
-                  border: "1px dashed #cbd5e1",
-                  borderRadius: 10,
-                  color: "#94a3b8",
-                  cursor: "pointer",
-                  fontSize: 13,
-                }}
-              >
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>
                 <Icon name="plus" size={16} />
-                {uploadingActionPlan ? "アップロード中..." : "クリックしてExcelファイルを選択"}
-                <input
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleUploadActionPlan}
-                  disabled={uploadingActionPlan}
-                  style={{ display: "none" }}
-                />
+                {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
+                <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
               </label>
             )}
           </div>
-        )}
-
-<div style={{ ...C, marginBottom: 16 }}>
-          <h3
-            style={{
-              margin: "0 0 4px",
-              fontSize: 15,
-              fontWeight: 700,
-              color: "var(--text-primary, #1e293b)",
-            }}
-          >
-            チャレンジシート
-          </h3>
-          <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
-            アップロードすると、レポート生成時の参考情報として活用されます（上司の設定がONの場合のみ）
-          </p>
-          {challengeSheetMsg && (
-            <div
-              style={{
-                background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7",
-                border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`,
-                borderRadius: 8,
-                padding: "8px 14px",
-                marginBottom: 12,
-                color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D",
-                fontSize: 13,
-              }}
-            >
-              {challengeSheetMsg}
-            </div>
-          )}
-          {challengeSheetInfo.filename ? (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "10px 14px",
-                border: "1px dashed #cbd5e1",
-                borderRadius: 10,
-                marginBottom: 10,
-              }}
-            >
-              <Icon name="list" size={18} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {challengeSheetInfo.filename}
-                </div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>
-                  {challengeSheetInfo.updatedAt
-                    ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新`
-                    : ""}
-                </div>
-              </div>
-              <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
-                {uploadingChallengeSheet ? "アップロード中..." : "差し替え"}
-                <input
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleUploadChallengeSheet}
-                  disabled={uploadingChallengeSheet}
-                  style={{ display: "none" }}
-                />
-              </label>
-            </div>
-          ) : (
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                padding: "20px 14px",
-                border: "1px dashed #cbd5e1",
-                borderRadius: 10,
-                color: "#94a3b8",
-                cursor: "pointer",
-                fontSize: 13,
-              }}
-            >
-              <Icon name="plus" size={16} />
-              {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
-              <input
-                type="file"
-                accept=".xlsx,.xls"
-                onChange={handleUploadChallengeSheet}
-                disabled={uploadingChallengeSheet}
-                style={{ display: "none" }}
-              />
-            </label>
-          )}
         </div>
+      )}
 
-<div style={{ ...C, marginBottom: 16 }}>
-          <h3
-            style={{
-              margin: "0 0 16px",
-              fontSize: 15,
-              fontWeight: 700,
-              color: "var(--text-primary, #1e293b)",
-            }}
-          >
-            レポート自動生成設定
-          </h3>
-          {scheduleOk && (
-            <div
-              style={{
-                background: "#DCFCE7",
-                border: "1px solid #BBF7D0",
-                borderRadius: 8,
-                padding: "10px 14px",
-                marginBottom: 14,
-                color: "#15803D",
-                fontSize: 13,
-              }}
-            >
-              {scheduleOk}
-            </div>
-          )}
-
-          {/* 週次レポート */}
-          <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>
-              週次レポート
-            </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              {[
-                ["scheduled", "自動生成"],
-                ["manual", "手動のみ"],
-              ].map(([m, label]) => (
-                <button
-                  key={m}
-                  onClick={() => setWeeklySchedule((p) => ({ ...p, mode: m }))}
-                  style={{
-                    padding: "7px 16px",
-                    borderRadius: 8,
-                    border: "1px solid",
-                    borderColor: weeklySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
-                    background: weeklySchedule.mode === m ? "#EFF6FF" : "#fff",
-                    color: weeklySchedule.mode === m ? "#1D4ED8" : "#64748b",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            {weeklySchedule.mode === "scheduled" && (
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <select
-                  value={weeklySchedule.day_of_week}
-                  onChange={(e) =>
-                    setWeeklySchedule((p) => ({ ...p, day_of_week: parseInt(e.target.value) }))
-                  }
-                  style={{ ...I, width: "auto" }}
-                >
-                  {["日", "月", "火", "水", "木", "金", "土"].map((d, i) => (
-                    <option key={i} value={i}>{d}曜日</option>
-                  ))}
-                </select>
-                <input
-                  type="time"
-                  value={weeklySchedule.time_of_day}
-                  onChange={(e) =>
-                    setWeeklySchedule((p) => ({ ...p, time_of_day: e.target.value }))
-                  }
-                  style={{ ...I, width: "auto" }}
-                />
-              </div>
-            )}
-            <button
-              onClick={() => handleSaveSchedule("weekly")}
-              style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
-            >
-              週次設定を保存
-            </button>
-          </div>
-
-          {/* 月次レポート */}
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>
-              月次レポート
-            </div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              {[
-                ["scheduled", "自動生成"],
-                ["manual", "手動のみ"],
-              ].map(([m, label]) => (
-                <button
-                  key={m}
-                  onClick={() => setMonthlySchedule((p) => ({ ...p, mode: m }))}
-                  style={{
-                    padding: "7px 16px",
-                    borderRadius: 8,
-                    border: "1px solid",
-                    borderColor: monthlySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
-                    background: monthlySchedule.mode === m ? "#EFF6FF" : "#fff",
-                    color: monthlySchedule.mode === m ? "#1D4ED8" : "#64748b",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-            {monthlySchedule.mode === "scheduled" && (
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <select
-                  value={monthlySchedule.day_of_month}
-                  onChange={(e) =>
-                    setMonthlySchedule((p) => ({ ...p, day_of_month: parseInt(e.target.value) }))
-                  }
-                  style={{ ...I, width: "auto" }}
-                >
-                  {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-                    <option key={d} value={d}>{d}日</option>
-                  ))}
-                </select>
-                <input
-                  type="time"
-                  value={monthlySchedule.time_of_day}
-                  onChange={(e) =>
-                    setMonthlySchedule((p) => ({ ...p, time_of_day: e.target.value }))
-                  }
-                  style={{ ...I, width: "auto" }}
-                />
-              </div>
-            )}
-            <button
-              onClick={() => handleSaveSchedule("monthly")}
-              style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}
-            >
-              月次設定を保存
-            </button>
-          </div>
-        </div>
+      </div>
     </div>
   );
 }
+
 function GroupForm({ groups, setGroups }) {
   const [name, setName] = useState("");
   const [color, setColor] = useState("#3B82F6");
