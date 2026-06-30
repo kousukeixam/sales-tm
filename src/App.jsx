@@ -6476,8 +6476,11 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
 }
 
 function AIReferenceManager({ currentUser, groups, teamMembers }) {
-  const [selectedMemberId, setSelectedMemberId] = useState(teamMembers[0]?.id || "");
-  const member = teamMembers.find((m) => m.id === selectedMemberId);
+  const [selectedMemberId, setSelectedMemberId] = useState("self");
+  const member =
+    selectedMemberId === "self"
+      ? { ...currentUser, groupId: currentUser.groupId ?? currentUser.group_id }
+      : teamMembers.find((m) => m.id === selectedMemberId);
   const [settings, setSettings] = useState({
     ai_reference_enabled: false,
     ai_reference_level: "standard",
@@ -6524,17 +6527,18 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
 
   useEffect(() => {
     if (!selectedMemberId) return;
+    const targetId = selectedMemberId === "self" ? currentUser.id : selectedMemberId;
     const fetchData = async () => {
       const { data: dirs } = await supabase
         .from("manager_directions")
         .select("*")
-        .eq("target_user_id", selectedMemberId)
+        .eq("target_user_id", targetId)
         .order("created_at", { ascending: false });
       setDirections(dirs || []);
       const { data: docs } = await supabase
         .from("reference_documents")
         .select("*")
-        .eq("target_user_id", selectedMemberId)
+        .eq("target_user_id", targetId)
         .order("created_at", { ascending: false });
       setRefDocs(docs || []);
     };
@@ -6543,12 +6547,13 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
 
   const handleSaveSettings = async () => {
     if (!selectedMemberId) return;
+    const targetId = selectedMemberId === "self" ? currentUser.id : selectedMemberId;
     setSavingSettings(true);
     setSettingsMsg("");
     const { error } = await supabase
       .from("profiles")
       .update(settings)
-      .eq("id", selectedMemberId);
+      .eq("id", targetId);
     if (!error) {
       setSettingsMsg("保存しました！");
     } else {
@@ -6560,11 +6565,12 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
 
   const handlePostDirection = async () => {
     if (!newDirection.trim() || !selectedMemberId) return;
+    const targetId = selectedMemberId === "self" ? currentUser.id : selectedMemberId;
     setPostingDirection(true);
     const { data, error } = await supabase
       .from("manager_directions")
       .insert({
-        target_user_id: selectedMemberId,
+        target_user_id: targetId,
         manager_id: currentUser.id,
         content: newDirection.trim(),
       })
@@ -6585,13 +6591,14 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
 
   const handleUploadRef = async () => {
     if (!refFile || !selectedMemberId) return;
+    const targetId = selectedMemberId === "self" ? currentUser.id : selectedMemberId;
     setUploadingRef(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const formData = new FormData();
       formData.append("file", refFile);
       formData.append("doc_type", "reference");
-      formData.append("target_user_id", selectedMemberId);
+      formData.append("target_user_id", targetId);
       formData.append("uploaded_by", currentUser.id);
       formData.append("reason", refReason);
       const res = await fetch(
@@ -6607,7 +6614,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
         const { data: docs } = await supabase
           .from("reference_documents")
           .select("*")
-          .eq("target_user_id", selectedMemberId)
+          .eq("target_user_id", targetId)
           .order("created_at", { ascending: false });
         setRefDocs(docs || []);
         setRefFile(null);
@@ -6684,7 +6691,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("doc_type", "challenge_sheet");
-      formData.append("target_user_id", selectedMemberId);
+      formData.append("target_user_id", selectedMemberId === "self" ? currentUser.id : selectedMemberId);
       formData.append("uploaded_by", currentUser.id);
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-excel`,
@@ -6745,6 +6752,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
         onChange={(e) => setSelectedMemberId(e.target.value)}
         style={{ ...I, width: "auto", marginBottom: 16 }}
       >
+        <option value="self">自分（{currentUser.name}）</option>
         {teamMembers.map((m) => (
           <option key={m.id} value={m.id}>{m.name}</option>
         ))}
