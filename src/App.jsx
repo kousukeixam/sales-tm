@@ -8457,6 +8457,33 @@ function SuperAdminPage({
   onRefreshUsers,
 }) {
   const [tab, setTab] = useState("users");
+  const [aiRefEnabled, setAiRefEnabled] = useState(false);
+  const [aiRefSaving, setAiRefSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchSetting = async () => {
+      const { data } = await supabase
+        .from("ai_reference_settings")
+        .select("is_enabled")
+        .eq("id", 1)
+        .single();
+      if (data) setAiRefEnabled(data.is_enabled);
+    };
+    fetchSetting();
+  }, []);
+
+  const toggleAiRefEnabled = async () => {
+    setAiRefSaving(true);
+    const next = !aiRefEnabled;
+    const { error } = await supabase
+      .from("ai_reference_settings")
+      .update({ is_enabled: next })
+      .eq("id", 1);
+    if (!error) setAiRefEnabled(next);
+    else alert("変更に失敗しました: " + error.message);
+    setAiRefSaving(false);
+  };
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -8604,6 +8631,34 @@ function SuperAdminPage({
           </button>
         ))}
       </div>
+
+      <div style={{ ...C, marginBottom: 20, display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
+            AIレポート参考資料 機能
+          </div>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+            実行計画書・チャレンジシート等を週報・月報生成の参考情報として使う機能の全体スイッチです
+          </div>
+        </div>
+        <button
+          onClick={toggleAiRefEnabled}
+          disabled={aiRefSaving}
+          style={{
+            width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", flexShrink: 0,
+            background: aiRefEnabled ? "#3B82F6" : "#cbd5e1", position: "relative", opacity: aiRefSaving ? 0.6 : 1,
+          }}
+        >
+          <div style={{
+            width: 20, height: 20, borderRadius: "50%", background: "#fff",
+            position: "absolute", top: 3, left: aiRefEnabled ? 25 : 3, transition: "left 0.2s",
+          }} />
+        </button>
+        <span style={{ fontSize: 12, fontWeight: 600, color: aiRefEnabled ? "#1D4ED8" : "#94a3b8", width: 36 }}>
+          {aiRefEnabled ? "ON" : "OFF"}
+        </span>
+      </div>
+
       {tab === "users" && (
         <div
           style={{
