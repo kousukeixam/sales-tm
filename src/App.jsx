@@ -7382,6 +7382,43 @@ function MyPage({
       {myPageTab === "report" && (
         <div>
           <div style={{ ...C, marginBottom: 16 }}>
+            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+              チャレンジシート
+            </h3>
+            <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+              アップロードすると、上司がONに設定した場合にレポート生成の参考情報として活用されます
+            </p>
+            {challengeSheetMsg && (
+              <div style={{ background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 13 }}>
+                {challengeSheetMsg}
+              </div>
+            )}
+            {challengeSheetInfo.filename ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed #cbd5e1", borderRadius: 10 }}>
+                <Icon name="list" size={18} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {challengeSheetInfo.filename}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                    {challengeSheetInfo.updatedAt ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
+                  </div>
+                </div>
+                <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
+                  {uploadingChallengeSheet ? "アップロード中..." : "差し替え"}
+                  <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
+                </label>
+              </div>
+            ) : (
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>
+                <Icon name="plus" size={16} />
+                {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
+                <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
+              </label>
+            )}
+          </div>
+          
+          <div style={{ ...C, marginBottom: 16 }}>
             <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
               レポート自動生成設定
             </h3>
