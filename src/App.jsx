@@ -1796,13 +1796,23 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
     const v = eh * 60 + em - (sh * 60 + sm);
     return v > 0 ? v : 0;
   };
-  const upd = useCallback(
-    (id, field, val) =>
-      setRows((r) =>
-        r.map((row) => (row.id === id ? { ...row, [field]: val } : row)),
-      ),
-    [],
-  );
+  const updTimers = {};
+const upd = useCallback(
+  (id, field, val) => {
+    setRows((r) =>
+      r.map((row) => (row.id === id ? { ...row, [field]: val } : row)),
+    );
+    if (field === "end") {
+      clearTimeout(updTimers[id]);
+      updTimers[id] = setTimeout(() => {
+        setRows((p) =>
+          p.map((r) => (r.id === id ? { ...r, _minsVisible: true } : r))
+        );
+      }, 300);
+    }
+  },
+  [],
+);
   const addRow_fn = () => setRows((r) => [...r, newRow()]);
   const delRow = (id) =>
     setRows((r) => (r.length > 1 ? r.filter((row) => row.id !== id) : r));
@@ -2635,7 +2645,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
                       outline: "none",
                     }}
                   />
-                  {mins > 0 && (
+                    {row._minsVisible && mins > 0 && (
                     <span
                       style={{
                         fontSize: 12,
@@ -7417,7 +7427,7 @@ function MyPage({
               </label>
             )}
           </div>
-          
+
           <div style={{ ...C, marginBottom: 16 }}>
             <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
               レポート自動生成設定
