@@ -4153,14 +4153,27 @@ function DateGroup({
   const userIdForComment = recs[0]?.userId;
   const [editMemberComment, setEditMemberComment] = useState(false);
   const [memberCommentDraft, setMemberCommentDraft] = useState(memberDayComment);
+  // 振り返り・総括は、書かれているとき（または編集中）だけ表示する
+  const showMember = !!memberDayComment || editMemberComment;
+  const showManager = !!managerDayComment || editDay;
   return (
-    <div style={{ marginBottom: 20 }}>
+    <div
+      style={{
+        marginBottom: 16,
+        background: "var(--card-bg, #fff)",
+        borderRadius: 10,
+        border: "1px solid var(--card-border, #e2e8f0)",
+        boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
+        overflow: "hidden",
+      }}
+    >
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: 10,
-          marginBottom: 8,
+          padding: "14px 16px 10px",
+          borderBottom: "1px solid var(--line-soft, #f1f5f9)",
         }}
       >
         <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
@@ -4197,16 +4210,7 @@ function DateGroup({
           </button>
         )}
       </div>
-      <div
-        style={{
-          background: "var(--card-bg, #fff)",
-          borderRadius: 10,
-          border: "1px solid var(--card-border, #e2e8f0)",
-          overflow: "hidden",
-          boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
-          marginBottom: 8,
-        }}
-      >
+      <div>
         {recs.map((rec) => (
           <LogCard
             key={rec.id}
@@ -4221,13 +4225,11 @@ function DateGroup({
           />
         ))}
       </div>
+      {(showMember || showManager) && (
       <div
         style={{
-          background: "var(--card-bg, #fff)",
-          borderRadius: 10,
-          border: "1px solid var(--card-border, #e2e8f0)",
-          boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
-          padding: "14px 16px",
+          borderTop: "1px solid var(--line-soft, #f1f5f9)",
+          padding: "12px 16px 14px",
         }}
       >
         <div
@@ -4244,7 +4246,8 @@ function DateGroup({
           <Icon name="msg" size={13} />
           本日の振り返り・総括
         </div>
-        <div style={{ marginBottom: 10 }}>
+        {showMember && (
+        <div style={{ marginBottom: showManager ? 10 : 0 }}>
           <div
             style={{
               display: "flex",
@@ -4330,7 +4333,7 @@ function DateGroup({
                 </button>
               </div>
             </div>
-          ) : memberDayComment ? (
+          ) : (
             <div
               style={{
                 fontSize: 14,
@@ -4344,20 +4347,10 @@ function DateGroup({
             >
               {memberDayComment}
             </div>
-          ) : (
-            <div
-              style={{
-                fontSize: 13,
-                color: "var(--text-muted, #94a3b8)",
-                background: "var(--surface-2, #f8fafc)",
-                padding: "8px 12px",
-                borderRadius: 8,
-              }}
-            >
-              （振り返りなし）
-            </div>
           )}
         </div>
+        )}
+        {showManager && (
         <div
           style={{
             background: "var(--note-bg, #FFFBEB)",
@@ -4454,19 +4447,25 @@ function DateGroup({
                 </button>
               </div>
             </div>
-          ) : managerDayComment ? (
-            <div style={{ fontSize: 14, color: "var(--note-ink, #92400E)", lineHeight: 1.7 }}>
-              {managerDayComment}
-            </div>
           ) : (
-            <div style={{ fontSize: 13, color: "var(--note-ink, #D97706)", opacity: 0.5 }}>
-              {isAdmin
-                ? "（総括コメントを追加できます）"
-                : "（上司からの総括コメントはまだありません）"}
+            <div style={{ fontSize: 14, color: "var(--note-ink, #92400E)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+              {managerDayComment}
             </div>
           )}
         </div>
+        )}
       </div>
+      )}
+      {isAdmin && !showManager && (
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 16px 12px" }}>
+          <button
+            onClick={() => setEditDay(true)}
+            style={{ ...BB, padding: "6px 12px", fontSize: 13 }}
+          >
+            総括コメントを追加
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -4614,16 +4613,28 @@ function CardLogView({
                 onClick={() => toggleMonth(month)}
                 compact={!!selectedDate}
               />
-              {isExpanded && dates.map(([date, recs]) => (
-                <DayCard
-                  key={date}
-                  date={date}
-                  recs={recs}
-                  selected={selectedDate === date}
-                  compact={!!selectedDate}
-                  onClick={() => handleSelect(date)}
-                />
-              ))}
+              {isExpanded && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: selectedDate
+                      ? "1fr"
+                      : "repeat(auto-fill, minmax(200px, 1fr))",
+                    gap: 10,
+                  }}
+                >
+                {dates.map(([date, recs]) => (
+                  <DayCard
+                    key={date}
+                    date={date}
+                    recs={recs}
+                    selected={selectedDate === date}
+                    compact={!!selectedDate}
+                    onClick={() => handleSelect(date)}
+                  />
+                ))}
+                </div>
+              )}
             </div>
           );
         })}
@@ -4670,19 +4681,26 @@ function DayCard({ date, recs, selected, compact, onClick }) {
   const dateObj = new Date(date);
   const weekday = ["日", "月", "火", "水", "木", "金", "土"][dateObj.getDay()];
   const displayDate = `${dateObj.getMonth() + 1}月${dateObj.getDate()}日（${weekday}）`;
+  // 上司のコメント（業務ごと・一日全体）がある日には印を付ける
+  const hasComment = recs.some((r) => r.managerComment || r.managerDayComment);
 
   return (
     <div
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-pressed={selected}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onClick()}
       style={{
         background: "var(--card-bg, #fff)",
         border: `1px solid ${selected ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)"}`,
-        borderRadius: 10,
-        padding: compact ? "10px 12px" : "13px 16px",
-        marginBottom: 8,
+        borderRadius: 8,
+        padding: compact ? "10px 12px" : "12px 14px",
         cursor: "pointer",
-        transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
-        boxShadow: selected ? "0 2px 8px rgba(59,130,246,0.12)" : "none",
+        transition: "border-color 0.15s",
+        boxShadow: selected
+          ? "0 0 0 2px color-mix(in srgb, var(--accent, #3B82F6) 30%, transparent)"
+          : "none",
       }}
       onMouseEnter={(e) => {
         if (!selected) e.currentTarget.style.borderColor = "var(--line-strong, #cbd5e1)";
@@ -4696,72 +4714,59 @@ function DayCard({ date, recs, selected, compact, onClick }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom: compact ? 0 : 7,
+          gap: 6,
         }}
       >
-        <div
-          style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}
+        <span
+          style={{
+            fontSize: compact ? 14 : 15,
+            fontWeight: 700,
+            color: "var(--text-primary, #1e293b)",
+            whiteSpace: "nowrap",
+          }}
         >
+          {displayDate}
+        </span>
+        {hasComment && (
           <span
             style={{
-              fontSize: compact ? 13 : 14,
-              fontWeight: 600,
-              color: "var(--text-primary, #1e293b)",
+              fontSize: 11.5,
+              fontWeight: 700,
               whiteSpace: "nowrap",
+              color: "var(--note-ink, #92400E)",
+              background: "var(--note-bg, #FFFBEB)",
+              border: "1px solid var(--note-line, #FDE68A)",
+              borderRadius: 8,
+              padding: "0 6px",
             }}
           >
-            {displayDate}
+            コメント
           </span>
-          {!compact && (
-            <span
-              style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", whiteSpace: "nowrap" }}
-            >
-              {recs.length}件 / {Math.floor(totMins / 60)}h
-              {totMins % 60 > 0 ? `${totMins % 60}m` : ""}
-            </span>
+        )}
+      </div>
+      <div
+        style={{
+          fontSize: 13,
+          color: "var(--text-secondary, #64748b)",
+          margin: compact ? "2px 0 0" : "2px 0 8px",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        <span style={{ marginRight: 10 }}>{recs.length}件</span>
+        {Math.round((totMins / 60) * 10) / 10}時間
+      </div>
+      {!compact && totMins > 0 && (
+        <div style={{ display: "flex", height: 8, gap: 2 }}>
+          {Object.entries(CATEGORIES).map(([k, v]) =>
+            catMins[k] > 0 ? (
+              <div
+                key={k}
+                title={`${k}: ${v.label} ${Math.round((catMins[k] / 60) * 10) / 10}時間`}
+                style={{ flex: catMins[k], background: v.color, borderRadius: 2 }}
+              />
+            ) : null,
           )}
         </div>
-        <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", flexShrink: 0 }}>▶</span>
-      </div>
-      {!compact && (
-        <>
-          <div
-            style={{
-              display: "flex",
-              height: 5,
-              borderRadius: 3,
-              overflow: "hidden",
-              gap: 1,
-              marginTop: 6,
-            }}
-          >
-            {Object.entries(CATEGORIES).map(([k, v]) => {
-              const w = totMins > 0 ? (catMins[k] / totMins) * 100 : 0;
-              return w > 0 ? (
-                <div
-                  key={k}
-                  style={{
-                    width: `${w}%`,
-                    background: v.color,
-                    borderRadius: 3,
-                  }}
-                />
-              ) : null;
-            })}
-          </div>
-          <div
-            style={{ display: "flex", gap: 8, marginTop: 5, flexWrap: "wrap" }}
-          >
-            {Object.entries(CATEGORIES)
-              .filter(([k]) => catMins[k] > 0)
-              .map(([k, v]) => (
-                <span key={k} style={{ fontSize: 11, color: v.color }}>
-                  {k}: {Math.floor(catMins[k] / 60)}h
-                  {catMins[k] % 60 > 0 ? `${catMins[k] % 60}m` : ""}
-                </span>
-              ))}
-          </div>
-        </>
       )}
     </div>
   );
