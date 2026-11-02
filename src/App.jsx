@@ -609,7 +609,7 @@ function LoginPage({ onLogin }) {
         alignItems: "center",
         justifyContent: "center",
         background:
-          "linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%)",
+          "#13203A",
         fontFamily: "'Noto Sans JP','Helvetica Neue',sans-serif",
         position: "relative",
         overflow: "hidden",
@@ -644,21 +644,6 @@ function LoginPage({ onLogin }) {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 16px",
-              fontSize: 24,
-            }}
-          >
-            📊
-          </div>
           <h1
             style={{
               color: "#fff",
@@ -744,7 +729,7 @@ function LoginPage({ onLogin }) {
             border: "none",
             background: loading
               ? "rgba(59,130,246,0.4)"
-              : "linear-gradient(135deg,#3B82F6,#6366F1)",
+              : "var(--accent, #3B82F6)",
             color: "#fff",
             fontSize: 15,
             fontWeight: 600,
@@ -1363,7 +1348,7 @@ function QuoteWidget() {
           marginBottom: 10,
         }}
       >
-        💬 今日の名言
+        今日の名言
       </div>
       <div
         style={{
@@ -2469,7 +2454,7 @@ const upd = useCallback(
                     color: "var(--text-primary, #1e293b)",
                   }}
                 >
-                  📋 テンプレートを選択
+                  テンプレートを選択
                 </h3>
                 <button
                   onClick={() => setShowTemplateModal(false)}
@@ -2495,8 +2480,8 @@ const upd = useCallback(
                 }}
               >
                 {[
-                  ["report", "📋 日報テンプレート"],
-                  ["row", "📌 業務行テンプレート"],
+                  ["report", "日報テンプレート"],
+                  ["row", "業務行テンプレート"],
                 ].map(([tab, label]) => (
                   <button
                     key={tab}
@@ -2687,7 +2672,7 @@ const upd = useCallback(
                     color: "var(--text-primary, #1e293b)",
                   }}
                 >
-                  💾 テンプレートとして保存
+                  テンプレートとして保存
                 </h3>
                 <button
                   onClick={() => setShowSaveTemplate(false)}
@@ -2712,8 +2697,8 @@ const upd = useCallback(
                 }}
               >
                 {[
-                  ["report", "📋 日報全体"],
-                  ["row", "📌 業務行1行"],
+                  ["report", "日報全体"],
+                  ["row", "業務行1行"],
                 ].map(([type, label]) => {
                   const isActive = templateRowTarget
                     ? type === "row"
@@ -3370,7 +3355,7 @@ const upd = useCallback(
                       gap: 8,
                     }}
                   >
-                    <span style={{ fontSize: 14, flexShrink: 0 }}>👑</span>
+                    <span style={{ flexShrink: 0, display: "inline-flex", color: "var(--note-ink, #92400E)" }}><Icon name="msg" size={14} /></span>
                     <div>
                       <div
                         style={{
@@ -3848,7 +3833,7 @@ function LogCard({
                 fontWeight: 600,
               }}
             >
-              👑コメントあり
+              上司コメントあり
             </span>
           )}
           <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
@@ -3941,7 +3926,7 @@ function LogCard({
               }}
             >
               <span style={{ fontSize: 12, fontWeight: 700, color: "#D97706" }}>
-                👑 上司コメント（この業務について）
+                上司コメント（この業務について）
               </span>
               {isAdmin && !editing && (
                 <button
@@ -4058,7 +4043,7 @@ function LogCard({
                     cursor: "pointer",
                   }}
                 >
-                  📋 この行を複製
+                  この行を複製
                 </button>
               )}
               <button
@@ -4235,7 +4220,7 @@ function DateGroup({
               fontFamily: "inherit",
             }}
           >
-            📋 この日を複製
+            この日を複製
           </button>
         )}
       </div>
@@ -4417,7 +4402,7 @@ function DateGroup({
             }}
           >
             <span style={{ fontSize: 12, fontWeight: 700, color: "#D97706" }}>
-              👑 上司からの総括コメント
+              上司からの総括コメント
             </span>
             {isAdmin && !editDay && (
               <button
@@ -4947,7 +4932,7 @@ function LogListPage({
             gap: 8,
           }}
         >
-          <span>👑</span>
+          <span style={{ display: "inline-flex" }}><Icon name="msg" size={14} /></span>
           各業務行をクリックして展開すると、コメント・総括コメントを入力できます。
         </div>
       )}
@@ -5323,7 +5308,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                   height: 44,
                   borderRadius: 12,
                   flexShrink: 0,
-                  background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                  background: "var(--accent, #3B82F6)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -5482,7 +5467,7 @@ function MemberDetailPage({
             width: 40,
             height: 40,
             borderRadius: 10,
-            background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+            background: "var(--accent, #3B82F6)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -5516,8 +5501,8 @@ function MemberDetailPage({
         }}
       >
         {[
-          ["dashboard", "📊 ダッシュボード"],
-          ["log", "💬 記録一覧・コメント入力"],
+          ["dashboard", "ダッシュボード"],
+          ["log", "記録一覧・コメント入力"],
         ].map(([id, label]) => (
           <button
             key={id}
@@ -5566,9 +5551,9 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
   const [comments, setComments] = useState(card?.comments || []);
   const [newCmt, setNewCmt] = useState("");
   const pm = {
-    high: { bg: "#FEF2F2", c: "#991B1B", l: "🔴 高" },
-    mid: { bg: "#FFFBEB", c: "#92400E", l: "🟡 中" },
-    low: { bg: "#F0FDF4", c: "#166534", l: "🟢 低" },
+    high: { bg: "#FEF2F2", c: "#991B1B", l: "優先度 高" },
+    mid: { bg: "#FFFBEB", c: "#92400E", l: "優先度 中" },
+    low: { bg: "#F0FDF4", c: "#166534", l: "優先度 低" },
   };
   const addCmt = () => {
     if (!newCmt.trim()) return;
@@ -5724,9 +5709,9 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                   onChange={(e) => setPrio(e.target.value)}
                   style={I}
                 >
-                  <option value="high">🔴 高</option>
-                  <option value="mid">🟡 中</option>
-                  <option value="low">🟢 低</option>
+                  <option value="high">高</option>
+                  <option value="mid">中</option>
+                  <option value="low">低</option>
                 </select>
               </div>
               <div>
@@ -5804,7 +5789,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                     fontWeight: 600,
                   }}
                 >
-                  📅 {card.due}
+                  期日 {card.due}
                 </span>
               )}
             </div>
@@ -5819,7 +5804,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               marginBottom: 10,
             }}
           >
-            💬 コメント（{comments.length}件）
+            コメント（{comments.length}件）
           </div>
           {comments.length > 0 && (
             <div
@@ -6086,12 +6071,12 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
                     : "#64748b",
             }}
           >
-            📅 {card.due}
+            期日 {card.due}
           </span>
         )}
         {card.comments?.length > 0 && (
           <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginLeft: "auto" }}>
-            💬 {card.comments.length}
+            コメント {card.comments.length}
           </span>
         )}
       </div>
@@ -6571,7 +6556,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               width: 20,
               height: 20,
               borderRadius: "50%",
-              background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+              background: "var(--accent, #3B82F6)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6604,7 +6589,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 width: 20,
                 height: 20,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg,#06B6D4,#3B82F6)",
+                background: "var(--accent, #3B82F6)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -6670,9 +6655,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             style={{ ...I, width: "auto", padding: "7px 12px" }}
           >
             <option value="">優先度：すべて</option>
-            <option value="high">🔴 高</option>
-            <option value="mid">🟡 中</option>
-            <option value="low">🟢 低</option>
+            <option value="high">高</option>
+            <option value="mid">中</option>
+            <option value="low">低</option>
           </select>
         </div>
       </div>
@@ -8566,8 +8551,8 @@ function SuperAdminPage({
     }
   };
   const rm = {
-    superadmin: { l: "管理者 ⚙️", bg: "#FEF2F2", c: "#991B1B", b: "#FECACA" },
-    admin: { l: "上司 👑", bg: "#FEF3C7", c: "#D97706", b: "#FDE68A" },
+    superadmin: { l: "管理者", bg: "#FEF2F2", c: "#991B1B", b: "#FECACA" },
+    admin: { l: "上司", bg: "#FEF3C7", c: "#D97706", b: "#FDE68A" },
     member: { l: "部下", bg: "#EFF6FF", c: "#1D4ED8", b: "#BFDBFE" },
   };
   const exportCSV = () => {
@@ -8620,9 +8605,9 @@ function SuperAdminPage({
         }}
       >
         {[
-          ["users", "👥 ユーザー管理"],
-          ["groups", "🏢 グループ管理"],
-          ["export", "📥 CSVエクスポート"],
+          ["users", "ユーザー管理"],
+          ["groups", "グループ管理"],
+          ["export", "CSVエクスポート"],
         ].map(([id, label]) => (
           <button
             key={id}
@@ -8857,10 +8842,10 @@ function SuperAdminPage({
                         flexShrink: 0,
                         background:
                           u.role === "superadmin"
-                            ? "linear-gradient(135deg,#EF4444,#F59E0B)"
+                            ? "#DC2626"
                             : u.role === "admin"
-                              ? "linear-gradient(135deg,#F59E0B,#EF4444)"
-                              : "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                              ? "#D97706"
+                              : "var(--accent, #3B82F6)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -9042,7 +9027,7 @@ function SuperAdminPage({
                               height: 26,
                               borderRadius: 8,
                               background:
-                                "linear-gradient(135deg,#F59E0B,#EF4444)",
+                                "#D97706",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -9098,7 +9083,7 @@ function SuperAdminPage({
                               height: 26,
                               borderRadius: 8,
                               background:
-                                "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                                "var(--accent, #3B82F6)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -9144,7 +9129,7 @@ function SuperAdminPage({
               color: "var(--text-primary, #1e293b)",
             }}
           >
-            📥 CSVエクスポート
+            CSVエクスポート
           </h3>
           <p
             style={{
@@ -9263,7 +9248,12 @@ function RankingPage({ logs, users, currentUser }) {
       .sort((a, b) => b.count - a.count);
   }, [logs, users, period]);
 
-  const medals = ["🥇", "🥈", "🥉"];
+  // 1〜3位は金・銀・銅の丸で表示する
+  const medals = [
+    { bg: "#E9B949", c: "#4A3300" },
+    { bg: "#C9CED6", c: "#2E3540" },
+    { bg: "#D69A6A", c: "#3D2210" },
+  ];
   const periodLabel = { day: "今日", week: "今週", month: "今月" };
 
   return (
@@ -9313,8 +9303,8 @@ function RankingPage({ logs, users, currentUser }) {
           const medal = medals[i] || null;
           const avatarBg =
             u.role === "admin"
-              ? "linear-gradient(135deg,#F59E0B,#EF4444)"
-              : "linear-gradient(135deg,#3B82F6,#8B5CF6)";
+              ? "#D97706"
+              : "var(--accent, #3B82F6)";
           const maxCount = ranking[0]?.count || 1;
 
           return (
@@ -9336,7 +9326,22 @@ function RankingPage({ logs, users, currentUser }) {
             >
               <div style={{ width: 32, textAlign: "center", flexShrink: 0 }}>
                 {medal && u.count > 0 ? (
-                  <span style={{ fontSize: 22 }}>{medal}</span>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      width: 30,
+                      height: 30,
+                      borderRadius: "50%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      background: medal.bg,
+                      color: medal.c,
+                    }}
+                  >
+                    {rank}
+                  </span>
                 ) : (
                   <span
                     style={{ fontSize: 15, fontWeight: 700, color: "var(--text-muted, #94a3b8)" }}
@@ -9596,7 +9601,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
       bg: "#FEF2F2",
       color: "#991B1B",
       border: "#FECACA",
-      label: "🚨 緊急",
+      label: "緊急",
     },
   };
 
@@ -9712,7 +9717,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
               >
                 <option value="normal">通常</option>
                 <option value="important">重要</option>
-                <option value="urgent">🚨 緊急</option>
+                <option value="urgent">緊急</option>
               </select>
             </div>
             <div>
@@ -9882,7 +9887,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                             border: "1px solid var(--card-border, #e2e8f0)",
                           }}
                         >
-                          🏢 {targetGroup.name}
+                          宛先：{targetGroup.name}
                         </span>
                       )}
                       {!targetGroup && (
@@ -9896,7 +9901,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                             border: "1px solid var(--card-border, #e2e8f0)",
                           }}
                         >
-                          👥 全員
+                          宛先：全員
                         </span>
                       )}
                       {!isRead && (
@@ -10202,7 +10207,7 @@ function FeedbackAdminPage() {
                     width: 32,
                     height: 32,
                     borderRadius: 8,
-                    background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                    background: "var(--accent, #3B82F6)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -10426,7 +10431,7 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#92400E" }}>⏰ 期日が近いタスク</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#92400E" }}>期日が近いタスク</span>
         <span style={{ fontSize: 11, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>
           {urgentCards.length}件
         </span>
@@ -10445,7 +10450,7 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
         minWidth: 260,
       }}
     >
-      <span style={{ fontSize: 16 }}>📣</span>
+      <span style={{ display: "inline-flex", color: "var(--accent-ink, #1D4ED8)" }}><Icon name="megaphone" size={17} /></span>
       <span style={{ fontSize: 13, color: "#1D4ED8", fontWeight: 600 }}>
         未読のお知らせが {unreadCount}件 あります
       </span>
@@ -10808,7 +10813,7 @@ const deleteReport = async (r) => {
                             width: 32,
                             height: 32,
                             borderRadius: "50%",
-                            background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
+                            background: "var(--accent, #3B82F6)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -11371,7 +11376,7 @@ export default function App() {
           alignItems: "center",
           justifyContent: "center",
           background:
-            "linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%)",
+            "#13203A",
           fontFamily: "'Noto Sans JP','Helvetica Neue',sans-serif",
         }}
       >
@@ -11387,21 +11392,6 @@ export default function App() {
           }}
         >
           <div style={{ textAlign: "center", marginBottom: 36 }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 16,
-                background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 16px",
-                fontSize: 24,
-              }}
-            >
-              📊
-            </div>
             <h1
               style={{
                 color: "#fff",
@@ -11446,7 +11436,7 @@ export default function App() {
                   padding: "8px 20px",
                   borderRadius: 8,
                   border: "none",
-                  background: "linear-gradient(135deg,#3B82F6,#6366F1)",
+                  background: "var(--accent, #3B82F6)",
                   color: "#fff",
                   fontSize: 13,
                   fontWeight: 600,
@@ -11502,7 +11492,7 @@ export default function App() {
                   padding: 13,
                   borderRadius: 10,
                   border: "none",
-                  background: "linear-gradient(135deg,#3B82F6,#6366F1)",
+                  background: "var(--accent, #3B82F6)",
                   color: "#fff",
                   fontSize: 15,
                   fontWeight: 600,
