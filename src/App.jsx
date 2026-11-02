@@ -2353,43 +2353,8 @@ const upd = useCallback(
               {currentUser.name}
             </div>
           </div>
-          {totalMins > 0 && (
-            <div
-              style={{
-                padding: "8px 16px",
-                background: "var(--accent-light, #EFF6FF)",
-                borderRadius: 8,
-                border: "1px solid var(--accent-border, #BFDBFE)",
-              }}
-            >
-              <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>本日合計 </span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: "var(--accent, #3B82F6)" }}>
-                {Math.floor(totalMins / 60)}h
-                {totalMins % 60 > 0 ? `${totalMins % 60}m` : ""}
-              </span>
-            </div>
-          )}
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          {draftSavedAt && (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
-                fontSize: 13.5,
-                color: "var(--text-secondary, #64748b)",
-                marginRight: 4,
-              }}
-            >
-              <span style={{ color: "#16A34A", display: "inline-flex" }}>
-                <Icon name="check" size={14} />
-              </span>
-              下書きを自動保存しました（
-              {String(draftSavedAt.getHours()).padStart(2, "0")}:
-              {String(draftSavedAt.getMinutes()).padStart(2, "0")}）
-            </span>
-          )}
           <button onClick={() => setShowTemplateModal(true)} style={{ ...BB }}>
             <Icon name="list" size={15} />
             テンプレート
@@ -2398,51 +2363,7 @@ const upd = useCallback(
             <Icon name="save" size={15} />
             テンプレート保存
           </button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            style={{ ...BP, opacity: saving ? 0.6 : 1 }}
-          >
-            {saved ? (
-              <>
-                <Icon name="check" size={16} />
-                保存しました！
-              </>
-            ) : saving ? (
-              <>転記中...（{saveSeconds}秒経過）</>
-            ) : (
-              <>
-                <Icon name="save" size={16} />
-                転記する
-              </>
-            )}
-          </button>
         </div>
-        {saveError && (
-          <div
-            style={{
-              background: "#FEF2F2",
-              border: "1px solid #FECACA",
-              borderRadius: 8,
-              padding: "10px 14px",
-              fontSize: 14,
-              color: "#991B1B",
-              marginTop: 8,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 10,
-            }}
-          >
-            <span>⚠️ {saveError}</span>
-            <button
-              onClick={() => window.location.reload()}
-              style={{ ...BB, padding: "4px 10px", fontSize: 13, flexShrink: 0 }}
-            >
-              再読み込み
-            </button>
-          </div>
-        )}
 
         {/* テンプレート呼び出しモーダル */}
         {showTemplateModal && (
@@ -2896,207 +2817,15 @@ const upd = useCallback(
                 >
                   {i + 1}
                 </span>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <input
-                    type="time"
-                    value={row.start}
-                    onChange={(e) => upd(row.id, "start", e.target.value)}
-                    style={{
-                      padding: "7px 10px",
-                      borderRadius: 7,
-                      border: "1px solid var(--card-border, #e2e8f0)",
-                      fontSize: 15,
-                      outline: "none",
-                    }}
-                  />
-                  <span style={{ color: "var(--text-muted, #94a3b8)", fontSize: 14 }}>〜</span>
-                  <input
-                    type="time"
-                    value={row.end}
-                    onChange={(e) => upd(row.id, "end", e.target.value)}
-                    style={{
-                      padding: "7px 10px",
-                      borderRadius: 7,
-                      border: "1px solid var(--card-border, #e2e8f0)",
-                      fontSize: 15,
-                      outline: "none",
-                    }}
-                  />
-                    {row._minsVisible && mins > 0 && (
-                    <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: cc,
-                        background: cb,
-                        padding: "3px 8px",
-                        borderRadius: 5,
-                        border: `1px solid ${cc}33`,
-                      }}
-                    >
-                      {mins}分
-                    </span>
-                  )}
-                </div>
-                {/* 区分：A〜E のボタンで選ぶ（選んだときの処理は従来のプルダウンと同じ upd） */}
-                <div role="group" aria-label="業務区分" style={{ display: "flex", gap: 4 }}>
-                  {Object.entries(CATEGORIES).map(([k, v]) => {
-                    const on = row.cat === k;
-                    return (
-                      <button
-                        key={k}
-                        type="button"
-                        title={`${k}: ${v.label}（${v.desc}）`}
-                        aria-pressed={on}
-                        onClick={() => upd(row.id, "cat", k)}
-                        style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 6,
-                          border: `1px solid ${on ? v.color : "var(--card-border, #e2e8f0)"}`,
-                          background: on ? v.color : "var(--card-bg, #fff)",
-                          color: on ? "#fff" : "var(--text-secondary, #64748b)",
-                          fontSize: 15,
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          fontFamily: "inherit",
-                          padding: 0,
-                        }}
-                      >
-                        {k}
-                      </button>
-                    );
-                  })}
-                  {row.cat && CATEGORIES[row.cat] && (
-                    <span
-                      style={{
-                        alignSelf: "center",
-                        marginLeft: 6,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "var(--text-secondary, #64748b)",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {CATEGORIES[row.cat].label}
-                    </span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    marginLeft: "auto",
-                    display: "flex",
-                    gap: 6,
-                    flexShrink: 0,
-                  }}
-                >
-                  {row.task && (
-                    <>
-                      <button
-                        onClick={() => {
-                          setRows((p) => [
-                            ...p,
-                            {
-                              ...newRow(),
-                              task: row.task,
-                              detail: row.detail,
-                              start: row.start,
-                              end: row.end,
-                              cat: row.cat,
-                            },
-                          ]);
-                        }}
-                        style={{
-                          background: "var(--accent-light, #EFF6FF)",
-                          border: "1px solid var(--accent-border, #BFDBFE)",
-                          cursor: "pointer",
-                          color: "var(--accent, #3B82F6)",
-                          padding: "4px 8px",
-                          borderRadius: 6,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          fontFamily: "inherit",
-                        }}
-                      >
-                        複製
-                      </button>
-                      <button
-                        onClick={() => {
-                          setTemplateType("row");
-                          setTemplateRowTarget(row);
-                          setShowSaveTemplate(true);
-                        }}
-                        style={{
-                          background: "#F5F3FF",
-                          border: "1px solid #DDD6FE",
-                          cursor: "pointer",
-                          color: "#8B5CF6",
-                          padding: "4px 8px",
-                          borderRadius: 6,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          fontFamily: "inherit",
-                        }}
-                      >
-                        保存
-                      </button>
-                    </>
-                  )}
-                  {rows.length > 1 && (
-                    <button
-                      onClick={() => delRow(row.id)}
-                      style={{
-                        background: "#FEF2F2",
-                        border: "1px solid #FECACA",
-                        cursor: "pointer",
-                        color: "#EF4444",
-                        padding: "4px 8px",
-                        borderRadius: 6,
-                        display: "flex",
-                        flexShrink: 0,
-                        fontSize: 13,
-                        fontWeight: 700,
-                      }}
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div
-                style={{
-                  padding: "12px 14px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                }}
-              >
-                <div>
-                  <label
-                    style={{
-                      fontSize: 13.5,
-                      color: "var(--text-secondary, #64748b)",
-                      fontWeight: 600,
-                      display: "block",
-                      marginBottom: 4,
-                    }}
-                  >
-                    タイトル <span style={{ color: "#ef4444" }}>*</span>
-                  </label>
+                <div style={{ flex: "1 1 260px", minWidth: 220 }}>
                   <div style={{ position: "relative" }}>
                     <input
                       value={row.task}
                       onChange={(e) =>
                         handleTagInput(row.id, "task", e.target.value)
                       }
-                      placeholder="業務タイトル（#タグで分類できます）"
+                      placeholder="業務名（必須）例：〇〇社 見積提出　#タグで分類できます"
+                      aria-label={`${i + 1}件目の業務名`}
                       style={{
                         width: "100%",
                         padding: "10px 12px",
@@ -3203,6 +2932,191 @@ const upd = useCallback(
                     )}
                   </div>
                 </div>
+                {/* 区分：A〜E のボタンで選ぶ（選んだときの処理は従来のプルダウンと同じ upd） */}
+                <div role="group" aria-label="業務区分" style={{ display: "flex", gap: 4 }}>
+                  {Object.entries(CATEGORIES).map(([k, v]) => {
+                    const on = row.cat === k;
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        title={`${k}: ${v.label}（${v.desc}）`}
+                        aria-pressed={on}
+                        onClick={() => upd(row.id, "cat", k)}
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 6,
+                          border: `1px solid ${on ? v.color : "var(--card-border, #e2e8f0)"}`,
+                          background: on ? v.color : "var(--card-bg, #fff)",
+                          color: on ? "#fff" : "var(--text-secondary, #64748b)",
+                          fontSize: 15,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          padding: 0,
+                        }}
+                      >
+                        {k}
+                      </button>
+                    );
+                  })}
+                  {row.cat && CATEGORIES[row.cat] && (
+                    <span
+                      style={{
+                        alignSelf: "center",
+                        marginLeft: 6,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "var(--text-secondary, #64748b)",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {CATEGORIES[row.cat].label}
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <input
+                    type="time"
+                    value={row.start}
+                    onChange={(e) => upd(row.id, "start", e.target.value)}
+                    style={{
+                      padding: "7px 10px",
+                      borderRadius: 7,
+                      border: "1px solid var(--card-border, #e2e8f0)",
+                      fontSize: 15,
+                      outline: "none",
+                    }}
+                  />
+                  <span style={{ color: "var(--text-muted, #94a3b8)", fontSize: 14 }}>〜</span>
+                  <input
+                    type="time"
+                    value={row.end}
+                    onChange={(e) => upd(row.id, "end", e.target.value)}
+                    style={{
+                      padding: "7px 10px",
+                      borderRadius: 7,
+                      border: "1px solid var(--card-border, #e2e8f0)",
+                      fontSize: 15,
+                      outline: "none",
+                    }}
+                  />
+                    {row._minsVisible && mins > 0 && (
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: cc,
+                        background: cb,
+                        padding: "3px 8px",
+                        borderRadius: 5,
+                        border: `1px solid ${cc}33`,
+                      }}
+                    >
+                      {mins}分
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    marginLeft: "auto",
+                    alignItems: "center",
+                    display: "flex",
+                    gap: 6,
+                    flexShrink: 0,
+                  }}
+                >
+                  {row.task && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setRows((p) => [
+                            ...p,
+                            {
+                              ...newRow(),
+                              task: row.task,
+                              detail: row.detail,
+                              start: row.start,
+                              end: row.end,
+                              cat: row.cat,
+                            },
+                          ]);
+                        }}
+                        style={{
+                          background: "var(--accent-light, #EFF6FF)",
+                          border: "1px solid var(--accent-border, #BFDBFE)",
+                          cursor: "pointer",
+                          color: "var(--accent, #3B82F6)",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        複製
+                      </button>
+                      <button
+                        onClick={() => {
+                          setTemplateType("row");
+                          setTemplateRowTarget(row);
+                          setShowSaveTemplate(true);
+                        }}
+                        style={{
+                          background: "var(--card-bg, #fff)",
+                          border: "1px solid var(--card-border, #e2e8f0)",
+                          cursor: "pointer",
+                          color: "var(--text-secondary, #64748b)",
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          fontFamily: "inherit",
+                        }}
+                        title="この業務をテンプレートとして保存"
+                      >
+                        テンプレ保存
+                      </button>
+                    </>
+                  )}
+                  {rows.length > 1 && (
+                    <button
+                      onClick={() => delRow(row.id)}
+                      aria-label={`${i + 1}件目を削除`}
+                      style={{
+                        background: "var(--card-bg, #fff)",
+                        border: "1px solid var(--danger-border, #FECACA)",
+                        cursor: "pointer",
+                        color: "var(--danger, #DC2626)",
+                        padding: "4px 8px",
+                        borderRadius: 6,
+                        display: "flex",
+                        flexShrink: 0,
+                        fontSize: 13,
+                        fontWeight: 700,
+                      }}
+                    >
+                      削除
+                    </button>
+                  )}
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "12px 14px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
                 <div>
                   <label
                     style={{
@@ -3409,6 +3323,24 @@ const upd = useCallback(
         <Icon name="plus" size={16} />
         行を追加する（現在 {rows.length} 行）
       </button>
+      <div style={{ display: "flex", justifyContent: "flex-end", margin: "-6px 0 14px" }}>
+          {totalMins > 0 && (
+            <div
+              style={{
+                padding: "8px 16px",
+                background: "var(--accent-light, #EFF6FF)",
+                borderRadius: 8,
+                border: "1px solid var(--accent-border, #BFDBFE)",
+              }}
+            >
+              <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>本日合計 </span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "var(--accent, #3B82F6)" }}>
+                {Math.floor(totalMins / 60)}h
+                {totalMins % 60 > 0 ? `${totalMins % 60}m` : ""}
+              </span>
+            </div>
+          )}
+      </div>
       <div style={{ ...C, marginBottom: 14 }}>
         <label
           style={{
@@ -3489,6 +3421,91 @@ const upd = useCallback(
               <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>{v.desc}</span>
             </div>
           ))}
+        </div>
+      </div>
+      {/* 画面下に固定する保存バー（転記ボタン・自動保存の表示・エラー） */}
+      <div
+        style={{
+          position: "sticky",
+          bottom: 0,
+          zIndex: 20,
+          marginTop: 14,
+          padding: "12px 0",
+          background: "linear-gradient(transparent, var(--bg, #f1f5f9) 30%)",
+        }}
+      >
+        {saveError && (
+          <div
+            style={{
+              background: "#FEF2F2",
+              border: "1px solid #FECACA",
+              borderRadius: 8,
+              padding: "10px 14px",
+              fontSize: 14,
+              color: "#991B1B",
+              marginTop: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+            }}
+          >
+            <span>⚠️ {saveError}</span>
+            <button
+              onClick={() => window.location.reload()}
+              style={{ ...BB, padding: "4px 10px", fontSize: 13, flexShrink: 0 }}
+            >
+              再読み込み
+            </button>
+          </div>
+        )}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          {draftSavedAt && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                fontSize: 13.5,
+                color: "var(--text-secondary, #64748b)",
+                marginRight: "auto",
+              }}
+            >
+              <span style={{ color: "#16A34A", display: "inline-flex" }}>
+                <Icon name="check" size={14} />
+              </span>
+              下書きを自動保存しました（
+              {String(draftSavedAt.getHours()).padStart(2, "0")}:
+              {String(draftSavedAt.getMinutes()).padStart(2, "0")}）
+            </span>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{ ...BP, opacity: saving ? 0.6 : 1 }}
+          >
+            {saved ? (
+              <>
+                <Icon name="check" size={16} />
+                保存しました！
+              </>
+            ) : saving ? (
+              <>転記中...（{saveSeconds}秒経過）</>
+            ) : (
+              <>
+                <Icon name="save" size={16} />
+                転記する
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>
