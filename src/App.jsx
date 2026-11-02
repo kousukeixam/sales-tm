@@ -1383,7 +1383,7 @@ function QuoteWidget() {
   );
 }
 
-function SummaryPanel({ logs, subtitle }) {
+function SummaryPanel({ logs, subtitle, deptData }) {
   const today = new Date();
   const pad = (n) => String(n).padStart(2, "0");
   const firstDay = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-01`;
@@ -1393,6 +1393,22 @@ function SummaryPanel({ logs, subtitle }) {
   })();
   const [df, setDf] = useState(firstDay);
   const [dt, setDt] = useState(lastDay);
+  // ワンタッチで選べる期間（今週は月曜はじまり）
+  const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const quickRanges = (() => {
+    const mon = new Date(today);
+    mon.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    const sun = new Date(mon);
+    sun.setDate(mon.getDate() + 6);
+    const lmFirst = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const lmLast = new Date(today.getFullYear(), today.getMonth(), 0);
+    return [
+      ["今週", ymd(mon), ymd(sun)],
+      ["今月", firstDay, lastDay],
+      ["先月", ymd(lmFirst), ymd(lmLast)],
+      ["今年", `${today.getFullYear()}-01-01`, `${today.getFullYear()}-12-31`],
+    ];
+  })();
   const { cs, md, totM, totC } = useMemo(() => {
     const f = logs.filter((l) => l.date >= df && l.date <= dt);
     const cs = {};
@@ -1455,6 +1471,41 @@ function SummaryPanel({ logs, subtitle }) {
           </span>
         )}
         <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>集計期間</span>
+        <div
+          style={{
+            display: "inline-flex",
+            gap: 2,
+            padding: 3,
+            border: "1px solid var(--card-border, #e2e8f0)",
+            borderRadius: 8,
+          }}
+        >
+          {quickRanges.map(([label, from, to]) => {
+            const on = df === from && dt === to;
+            return (
+              <button
+                key={label}
+                onClick={() => {
+                  setDf(from);
+                  setDt(to);
+                }}
+                style={{
+                  border: "none",
+                  borderRadius: 6,
+                  padding: "5px 12px",
+                  fontSize: 13,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  fontWeight: on ? 700 : 400,
+                  background: on ? "var(--accent, #3B82F6)" : "transparent",
+                  color: on ? "#fff" : "var(--text-secondary, #64748b)",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
         <input
           type="date"
           value={df}
@@ -1638,9 +1689,191 @@ function SummaryPanel({ logs, subtitle }) {
         </div>
         <MonthBar monthlyData={md} />
       </div>
+      {deptData && <DeptShare {...deptData} df={df} dt={dt} />}
     </div>
   );
 }
+
+// 部署ごとの区分の割合（選んだ期間・1人あたりの平均時間）。表示だけで保存はしない
+function DeptShare({ logs, users, groups, myGroupId, df, dt }) {
+  const rows = groups
+    .map((g) => {
+      const members = users.filter(
+        (u) => u.role !== "superadmin" && String(u.groupId) === String(g.id),
+      );
+      const ids = new Set(members.map((u) => u.id));
+      const f = logs.filter(
+        (l) => ids.has(l.userId) && l.date >= df && l.date <= dt && CATEGORIES[l.cat],
+      );
+      const cat = Object.keys(CATEGORIES).map((k) => [
+        k,
+        f.filter((l) => l.cat === k).reduce((s, l) => s + (l.minutes || 0), 0),
+      ]);
+      const total = cat.reduce((s, [, v]) => s + v, 0);
+      return { g, people: members.length, cat, total };
+    })
+    .filter((r) => r.people > 0);
+  if (rows.length === 0) return null;
+  return (
+    <div style={{ ...C, marginTop: 20 }}>
+      <h3
+        style={{
+          margin: "0 0 4px",
+          fontSize: 14,
+          fontWeight: 600,
+          color: "var(--text-primary, #1e293b)",
+        }}
+      >
+        部署ごとの区分の割合
+      </h3>
+      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginBottom: 12 }}>
+        集計期間の合計時間に占める割合と、1人あたりの平均時間
+      </div>
+      {rows.map(({ g, people, cat, total }) => {
+        const mine = String(g.id) === String(myGroupId);
+        return (
+          <div
+            key={g.id}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              flexWrap: "wrap",
+              padding: "9px 0",
+              borderTop: "1px solid var(--line-soft, #f1f5f9)",
+            }}
+          >
+            <div
+              style={{
+                width: 180,
+                fontSize: 13.5,
+                fontWeight: mine ? 700 : 400,
+                color: "var(--text-primary, #1e293b)",
+              }}
+            >
+              {g.name}
+              {mine && "（所属）"}
+            </div>
+            <div style={{ flex: 1, minWidth: 180, display: "flex", height: 18, gap: 2 }}>
+              {total > 0 ? (
+                cat
+                  .filter(([, v]) => v > 0)
+                  .map(([k, v]) => (
+                    <div
+                      key={k}
+                      title={`${g.name} ${k}: ${CATEGORIES[k].label} ${Math.round((v / total) * 100)}%`}
+                      style={{ flex: v, background: CATEGORIES[k].color, borderRadius: 3 }}
+                    />
+                  ))
+              ) : (
+                <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+                  この期間の記録はありません
+                </span>
+              )}
+            </div>
+            <div
+              style={{
+                width: 80,
+                textAlign: "right",
+                fontSize: 13,
+                color: "var(--text-secondary, #64748b)",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {Math.round((total / 60 / people) * 10) / 10}h/人
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 10 }}>
+        {Object.entries(CATEGORIES).map(([k, v]) => (
+          <span
+            key={k}
+            style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11.5, color: "var(--text-secondary, #64748b)" }}
+          >
+            <span style={{ width: 10, height: 10, borderRadius: 2, background: v.color }} />
+            {k}: {v.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 上司からのコメント（自分の記録についたものを新しい順に3件）。表示だけで保存はしない
+function ManagerCommentsWidget({ logs, currentUser, onOpen }) {
+  const items = [];
+  const seenDay = new Set();
+  logs
+    .filter((l) => l.userId === currentUser.id)
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .forEach((l) => {
+      if (l.managerComment) items.push({ key: `t_${l.id}`, date: l.date, title: l.task, text: l.managerComment });
+      if (l.managerDayComment && !seenDay.has(l.date)) {
+        seenDay.add(l.date);
+        items.push({ key: `d_${l.date}`, date: l.date, title: "この日へのコメント", text: l.managerDayComment });
+      }
+    });
+  const latest = items.slice(0, 3);
+  return (
+    <div style={{ ...C, flex: 1, minWidth: 260 }}>
+      <div style={{ fontWeight: 700, fontSize: 14, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>
+        上司からのコメント
+      </div>
+      {latest.length === 0 ? (
+        <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>まだコメントはありません</div>
+      ) : (
+        latest.map((it) => (
+          <div key={it.key} style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+              {Number(it.date.slice(5, 7))}月{Number(it.date.slice(8, 10))}日
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>{it.title}</div>
+            <div
+              style={{
+                marginTop: 4,
+                padding: "8px 12px",
+                background: darkSafeNote.bg,
+                borderLeft: `3px solid ${darkSafeNote.line}`,
+                borderRadius: "0 6px 6px 0",
+                fontSize: 13,
+                color: "var(--text-primary, #1e293b)",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: darkSafeNote.ink, marginBottom: 2 }}>上司より</div>
+              {it.text}
+            </div>
+          </div>
+        ))
+      )}
+      {latest.length > 0 && (
+        <button
+          onClick={onOpen}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            fontSize: 13,
+            color: "var(--accent-ink, #1D4ED8)",
+            textDecoration: "underline",
+          }}
+        >
+          自分の記録をすべて見る
+        </button>
+      )}
+    </div>
+  );
+}
+// 付箋風の色（ライト・ダーク両方で読めるよう、テーマ変数に予備値を付ける）
+const darkSafeNote = {
+  bg: "var(--note-bg, #FFF8E6)",
+  line: "var(--note-line, #E9B949)",
+  ink: "var(--note-ink, #6B4A00)",
+};
 
 function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   const today = new Date().toISOString().slice(0, 10);
@@ -11393,6 +11626,9 @@ export default function App() {
     "--danger": darkMode ? "#F87171" : "#DC2626",
     "--danger-border": darkMode ? "#7F1D1D" : "#FECACA",
     "--danger-soft": darkMode ? "#3A1818" : "#FEF2F2",
+    "--note-bg": darkMode ? "#2A2410" : "#FFF8E6",
+    "--note-line": darkMode ? "#B8902E" : "#E9B949",
+    "--note-ink": darkMode ? "#F1D58A" : "#6B4A00",
     "--input-bg": darkMode ? "#0f172a" : "#fafafa",
     "--input-border": darkMode ? "#334155" : "#e2e8f0",
   };
@@ -11881,6 +12117,12 @@ export default function App() {
                   <SummaryPanel
                     logs={dashboardLogs}
                     subtitle={dashboardSubtitle}
+                    deptData={{
+                      logs,
+                      users,
+                      groups,
+                      myGroupId: currentUser.groupId,
+                    }}
                   />
                   <div
                     style={{
@@ -11892,6 +12134,13 @@ export default function App() {
                   >
                     <WeatherWidget />
                     <QuoteWidget />
+                    {currentUser.role === "member" && (
+                      <ManagerCommentsWidget
+                        logs={logs}
+                        currentUser={currentUser}
+                        onOpen={() => setPage("log")}
+                      />
+                    )}
                   </div>
                 </div>
               );
