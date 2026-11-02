@@ -2911,91 +2911,48 @@ const upd = useCallback(
                     </span>
                   )}
                 </div>
-                <div style={{ position: "relative" }}>
-                  <button
-                    type="button"
-                    onClick={() => upd(row.id, "_showCat", !row._showCat)}
-                    style={{
-                      padding: "6px 10px",
-                      borderRadius: 7,
-                      border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "var(--card-border, #e2e8f0)"}`,
-                      fontSize: 14,
-                      color: row.cat ? CATEGORIES[row.cat].color : "var(--text-muted, #94a3b8)",
-                      fontWeight: row.cat ? 700 : 400,
-                      background: cb,
-                      cursor: "pointer",
-                      fontFamily: "inherit",
-                      minWidth: 140,
-                      textAlign: "left",
-                    }}
-                  >
-                    {row.cat
-                      ? `${row.cat}: ${CATEGORIES[row.cat].label}`
-                      : "区分を選択 ▼"}
-                  </button>
-                  {row._showCat && (
-                    <div
+                {/* 区分：A〜E のボタンで選ぶ（選んだときの処理は従来のプルダウンと同じ upd） */}
+                <div role="group" aria-label="業務区分" style={{ display: "flex", gap: 4 }}>
+                  {Object.entries(CATEGORIES).map(([k, v]) => {
+                    const on = row.cat === k;
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        title={`${k}: ${v.label}（${v.desc}）`}
+                        aria-pressed={on}
+                        onClick={() => upd(row.id, "cat", k)}
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 6,
+                          border: `1px solid ${on ? v.color : "var(--card-border, #e2e8f0)"}`,
+                          background: on ? v.color : "var(--card-bg, #fff)",
+                          color: on ? "#fff" : "var(--text-secondary, #64748b)",
+                          fontSize: 15,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "inherit",
+                          padding: 0,
+                        }}
+                      >
+                        {k}
+                      </button>
+                    );
+                  })}
+                  {row.cat && CATEGORIES[row.cat] && (
+                    <span
                       style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        zIndex: 50,
-                        background: "var(--card-bg, #fff)",
-                        border: "1px solid var(--card-border, #e2e8f0)",
-                        borderRadius: 8,
-                        boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                        overflow: "hidden",
-                        minWidth: 180,
+                        alignSelf: "center",
+                        marginLeft: 6,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "var(--text-secondary, #64748b)",
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {Object.entries(CATEGORIES).map(([k, v]) => (
-                        <div
-                          key={k}
-                          onClick={() => {
-                            upd(row.id, "cat", k);
-                            upd(row.id, "_showCat", false);
-                          }}
-                          style={{
-                            padding: "10px 14px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 10,
-                            background: row.cat === k ? v.bg : "var(--card-bg, #fff)",
-                            borderLeft: `3px solid ${row.cat === k ? v.color : "transparent"}`,
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.currentTarget.style.background = v.bg)
-                          }
-                          onMouseLeave={(e) =>
-                            (e.currentTarget.style.background =
-                              row.cat === k ? v.bg : "#fff")
-                          }
-                        >
-                          <div
-                            style={{
-                              width: 10,
-                              height: 10,
-                              borderRadius: "50%",
-                              background: v.color,
-                              flexShrink: 0,
-                            }}
-                          />
-                          <span
-                            style={{
-                              fontSize: 14,
-                              fontWeight: 600,
-                              color: v.color,
-                            }}
-                          >
-                            {k}
-                          </span>
-                          <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>
-                            {v.label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                      {CATEGORIES[row.cat].label}
+                    </span>
                   )}
                 </div>
                 <div
