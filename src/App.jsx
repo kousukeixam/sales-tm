@@ -1527,7 +1527,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(5,1fr)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
           gap: 12,
           marginBottom: 20,
         }}
@@ -1539,7 +1539,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
               background: "var(--card-bg, #fff)",
               borderRadius: 10,
               padding: 16,
-              border: `1px solid ${v.color}22`,
+              border: "1px solid var(--card-border, #e2e8f0)",
               boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
               borderTop: `3px solid ${v.color}`,
             }}
@@ -1551,27 +1551,56 @@ function SummaryPanel({ logs, subtitle, deptData }) {
                 marginBottom: 8,
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 700, color: v.color }}>
-                {k}
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  color: "var(--text-primary, #1e293b)",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 20,
+                    height: 20,
+                    borderRadius: 4,
+                    background: v.color,
+                    color: "#fff",
+                    fontSize: 12,
+                  }}
+                >
+                  {k}
+                </span>
+                {v.label}
               </span>
-              <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+              <span style={{ fontSize: 12.5, color: "var(--text-muted, #94a3b8)" }}>
                 {cs[k].count}件
               </span>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+            <div
+              style={{
+                fontSize: 26,
+                fontWeight: 700,
+                lineHeight: 1.2,
+                color: "var(--text-primary, #1e293b)",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
               {Math.round((cs[k].minutes / 60) * 10) / 10}
-              <span style={{ fontSize: 13, fontWeight: 400, color: "var(--text-secondary, #64748b)" }}>
-                h
+              <span style={{ fontSize: 13, fontWeight: 400, color: "var(--text-secondary, #64748b)", marginLeft: 2 }}>
+                時間
               </span>
-            </div>
-            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
-              {v.label}
             </div>
             {totM > 0 && (
               <div
                 style={{
-                  marginTop: 8,
-                  height: 3,
+                  marginTop: 10,
+                  height: 6,
                   background: "var(--surface-3, #f1f5f9)",
                   borderRadius: 2,
                 }}
@@ -1587,13 +1616,18 @@ function SummaryPanel({ logs, subtitle, deptData }) {
                 />
               </div>
             )}
+            {totM > 0 && (
+              <div style={{ fontSize: 12.5, color: "var(--text-secondary, #64748b)", marginTop: 4 }}>
+                全体の {Math.round((cs[k].minutes / totM) * 100)}%
+              </div>
+            )}
           </div>
         ))}
       </div>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
           gap: 16,
           marginBottom: 16,
         }}
