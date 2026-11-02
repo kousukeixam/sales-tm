@@ -7496,8 +7496,16 @@ function MyPage({
   };
 
   return (
-    <div style={{ maxWidth: 680, display: "flex", gap: 20 }}>
-      <div style={{ width: 160, flexShrink: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+    <div style={{ maxWidth: 760, display: "flex", flexDirection: "column", gap: 18 }}>
+      <div
+        role="tablist"
+        style={{
+          display: "flex",
+          gap: 4,
+          flexWrap: "wrap",
+          borderBottom: "1px solid var(--card-border, #e2e8f0)",
+        }}
+      >
         {[
           ["profile", "プロフィール", "person"],
           ["report", "レポート設定", "chart"],
@@ -7505,20 +7513,21 @@ function MyPage({
           <button
             key={id}
             onClick={() => setMyPageTab(id)}
+            aria-selected={myPageTab === id}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 8,
-              padding: "10px 14px",
-              borderRadius: 8,
+              padding: "10px 16px",
               border: "none",
+              borderBottom: `2px solid ${myPageTab === id ? "var(--accent, #3B82F6)" : "transparent"}`,
+              marginBottom: -1,
               cursor: "pointer",
-              textAlign: "left",
-              fontSize: 14,
+              fontSize: 15,
               fontFamily: "inherit",
-              background: myPageTab === id ? "var(--accent-light, #EFF6FF)" : "transparent",
-              color: myPageTab === id ? "var(--accent, #3B82F6)" : "#64748b",
-              fontWeight: myPageTab === id ? 600 : 400,
+              background: "transparent",
+              color: myPageTab === id ? "var(--accent-ink, #1D4ED8)" : "var(--text-secondary, #64748b)",
+              fontWeight: myPageTab === id ? 700 : 400,
             }}
           >
             <Icon name={icon} size={15} />
