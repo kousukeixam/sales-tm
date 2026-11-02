@@ -7340,7 +7340,8 @@ function MyPage({
         .update({
           name,
           group_id: groupId ? parseInt(groupId) : null,
-          ...(!isSA
+          // 部下は自分のロールを変更できない（送信内容にも含めない）
+          ...(!isSA && currentUser.role !== "member"
             ? { role: role === "superadmin" ? currentUser.role : role }
             : {}),
           manager_id: role === "member" ? managerId || null : null,
@@ -7539,10 +7540,17 @@ function MyPage({
           {!isSA && (
             <div style={{ marginBottom: 14 }}>
               <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 15, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
-                <option value="member">部下（member）</option>
-                <option value="admin">上司（admin）</option>
-              </select>
+              {currentUser.role === "member" ? (
+                // 部下は表示のみ（変更は管理者の画面から）
+                <div style={{ ...I, background: "var(--surface-3, #f1f5f9)", color: "var(--text-secondary, #64748b)" }}>
+                  部下（member）
+                </div>
+              ) : (
+                <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 15, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
+                  <option value="member">部下（member）</option>
+                  <option value="admin">上司（admin）</option>
+                </select>
+              )}
             </div>
           )}
 
