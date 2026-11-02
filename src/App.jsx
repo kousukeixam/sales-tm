@@ -488,16 +488,16 @@ const Icon = ({ name, size = 16 }) => (
 
 const C = {
   background: "var(--card-bg, #fff)",
-  borderRadius: 14,
+  borderRadius: 10,
   border: "1px solid var(--card-border, #e2e8f0)",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-  padding: "16px 20px",
+  boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
+  padding: "18px 22px",
 };
 const I = {
   padding: "9px 12px",
   borderRadius: 8,
   border: "1px solid var(--input-border, #e2e8f0)",
-  fontSize: 13,
+  fontSize: 14,
   color: "var(--text-primary, #1e293b)",
   outline: "none",
   background: "var(--input-bg, #fafafa)",
@@ -510,11 +510,11 @@ const BB = {
   alignItems: "center",
   gap: 6,
   padding: "9px 18px",
-  borderRadius: 10,
+  borderRadius: 8,
   border: "1px solid var(--card-border, #e2e8f0)",
   background: "var(--card-bg, #fff)",
   color: "var(--text-primary, #1e293b)",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 600,
   cursor: "pointer",
   transition: "all 0.15s",
@@ -528,8 +528,8 @@ const BP = {
   background: "var(--accent, #3B82F6)",
   color: "#fff",
   border: "none",
-  borderRadius: 10,
-  fontSize: 13,
+  borderRadius: 8,
+  fontSize: 14,
   fontWeight: 600,
   cursor: "pointer",
   fontFamily: "inherit",
@@ -594,9 +594,9 @@ function LoginPage({ onLogin }) {
     padding: "12px 14px",
     background: "rgba(255,255,255,0.07)",
     border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 10,
+    borderRadius: 8,
     color: "#fff",
-    fontSize: 14,
+    fontSize: 15,
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "inherit",
@@ -658,7 +658,7 @@ function LoginPage({ onLogin }) {
           <p
             style={{
               color: "rgba(255,255,255,0.45)",
-              fontSize: 13,
+              fontSize: 14,
               margin: "6px 0 0",
             }}
           >
@@ -670,11 +670,11 @@ function LoginPage({ onLogin }) {
             style={{
               background: "rgba(239,68,68,0.12)",
               border: "1px solid rgba(239,68,68,0.3)",
-              borderRadius: 10,
+              borderRadius: 8,
               padding: "10px 14px",
               marginBottom: 20,
               color: "#fca5a5",
-              fontSize: 13,
+              fontSize: 14,
             }}
           >
             {err}
@@ -684,7 +684,7 @@ function LoginPage({ onLogin }) {
           <label
             style={{
               color: "rgba(255,255,255,0.6)",
-              fontSize: 12,
+              fontSize: 13,
               display: "block",
               marginBottom: 6,
             }}
@@ -703,7 +703,7 @@ function LoginPage({ onLogin }) {
           <label
             style={{
               color: "rgba(255,255,255,0.6)",
-              fontSize: 12,
+              fontSize: 13,
               display: "block",
               marginBottom: 6,
             }}
@@ -725,7 +725,7 @@ function LoginPage({ onLogin }) {
           style={{
             width: "100%",
             padding: 13,
-            borderRadius: 10,
+            borderRadius: 8,
             border: "none",
             background: loading
               ? "rgba(59,130,246,0.4)"
@@ -744,14 +744,14 @@ function LoginPage({ onLogin }) {
             marginTop: 24,
             padding: 16,
             background: "rgba(255,255,255,0.04)",
-            borderRadius: 10,
+            borderRadius: 8,
             border: "1px solid rgba(255,255,255,0.07)",
           }}
         >
           <p
             style={{
               color: "rgba(255,255,255,0.4)",
-              fontSize: 11,
+              fontSize: 12,
               margin: "0 0 8px",
               textAlign: "center",
             }}
@@ -769,7 +769,7 @@ function LoginPage({ onLogin }) {
                 padding: "5px 8px",
                 borderRadius: 6,
                 cursor: "pointer",
-                fontSize: 12,
+                fontSize: 13,
                 color: "rgba(255,255,255,0.6)",
                 display: "flex",
                 justifyContent: "space-between",
@@ -786,9 +786,9 @@ function LoginPage({ onLogin }) {
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <span
                   style={{
-                    fontSize: 10,
+                    fontSize: 11,
                     padding: "1px 7px",
-                    borderRadius: 10,
+                    borderRadius: 8,
                     background:
                       u.role === "superadmin"
                         ? "rgba(239,68,68,0.2)"
@@ -830,7 +830,7 @@ function PieChart({ data }) {
           textAlign: "center",
           color: "var(--text-muted, #94a3b8)",
           padding: "40px 0",
-          fontSize: 13,
+          fontSize: 14,
         }}
       >
         データなし
@@ -874,7 +874,7 @@ function PieChart({ data }) {
               display: "flex",
               alignItems: "center",
               gap: 8,
-              fontSize: 12,
+              fontSize: 13,
             }}
           >
             <div
@@ -914,7 +914,7 @@ function BarChart({ data }) {
             display: "flex",
             alignItems: "center",
             gap: 10,
-            fontSize: 12,
+            fontSize: 13,
           }}
         >
           <div
@@ -954,7 +954,7 @@ function BarChart({ data }) {
                 <span
                   style={{
                     color: "#fff",
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 600,
                     whiteSpace: "nowrap",
                   }}
@@ -1020,7 +1020,7 @@ function MonthBar({ monthlyData }) {
                 ) : null;
               })}
             </div>
-            <div style={{ fontSize: 10, color: "var(--text-muted, #94a3b8)" }}>{mi + 1}月</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>{mi + 1}月</div>
           </div>
         ))}
       </div>
@@ -1157,20 +1157,20 @@ function WeatherWidget() {
   if (error) {
     return (
       <div style={{ ...C, flex: 1, minWidth: 220 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary, #64748b)", marginBottom: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-secondary, #64748b)", marginBottom: 10 }}>
           今日の天気
         </div>
-        <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>{error}</div>
+        <div style={{ fontSize: 14, color: "var(--text-muted, #94a3b8)" }}>{error}</div>
       </div>
     );
   }
   if (!data) {
     return (
       <div style={{ ...C, flex: 1, minWidth: 220 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary, #64748b)", marginBottom: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-secondary, #64748b)", marginBottom: 10 }}>
           今日の天気
         </div>
-        <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>取得中...</div>
+        <div style={{ fontSize: 14, color: "var(--text-muted, #94a3b8)" }}>取得中...</div>
       </div>
     );
   }
@@ -1194,7 +1194,7 @@ function WeatherWidget() {
           <button
             onClick={() => setTab("today")}
             style={{
-              fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
+              fontSize: 14, padding: "6px 14px", borderRadius: 8, border: "1px solid",
               borderColor: tab === "today" ? "var(--accent-border, #93c5fd)" : "#e2e8f0",
               background: tab === "today" ? "var(--accent-light, #EFF6FF)" : "transparent",
               color: tab === "today" ? "var(--accent-ink, #1d4ed8)" : "#64748b",
@@ -1206,7 +1206,7 @@ function WeatherWidget() {
           <button
             onClick={() => setTab("week")}
             style={{
-              fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
+              fontSize: 14, padding: "6px 14px", borderRadius: 8, border: "1px solid",
               borderColor: tab === "week" ? "var(--accent-border, #93c5fd)" : "#e2e8f0",
               background: tab === "week" ? "var(--accent-light, #EFF6FF)" : "transparent",
               color: tab === "week" ? "var(--accent-ink, #1d4ed8)" : "#64748b",
@@ -1220,7 +1220,7 @@ function WeatherWidget() {
           href="https://www.msn.com/ja-jp/weather/forecast"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
+          style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
         >
           詳細 ↗
         </a>
@@ -1235,14 +1235,14 @@ function WeatherWidget() {
                 <div style={{ fontSize: 32, fontWeight: 700, color: "var(--text-primary, #1e293b)", lineHeight: 1 }}>
                   {Math.round(data.current.temperature_2m)}°
                 </div>
-                <div style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", marginTop: 2 }}>{current.label}</div>
+                <div style={{ fontSize: 15, color: "var(--text-secondary, #64748b)", marginTop: 2 }}>{current.label}</div>
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 14, color: "var(--text-secondary, #64748b)" }}>
+              <div style={{ fontSize: 15, color: "var(--text-secondary, #64748b)" }}>
                 最高 <b style={{ color: "var(--text-primary, #1e293b)" }}>{todayMax}°</b> / 最低 <b style={{ color: "var(--text-primary, #1e293b)" }}>{todayMin}°</b>
               </div>
-              <div style={{ fontSize: 13, color: "#3B82F6", marginTop: 4 }}>降水確率 {todayPop}%</div>
+              <div style={{ fontSize: 14, color: "#3B82F6", marginTop: 4 }}>降水確率 {todayPop}%</div>
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: `repeat(${hourlyIdx.length}, 1fr)`, gap: 4, paddingTop: 14, borderTop: "1px solid var(--line-soft, #f1f5f9)" }}>
@@ -1256,14 +1256,14 @@ function WeatherWidget() {
               const info = code !== null ? wmoInfo(code) : null;
               return (
                 <div key={h} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginBottom: 6 }}>{h}時</div>
+                  <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", marginBottom: 6 }}>{h}時</div>
                   {info ? (
                     <WeatherIcon type={info.type} size={22} color={info.type === "rain" || info.type === "storm" ? "#3B82F6" : "#64748b"} night={isNight} />
                   ) : (
-                    <span style={{ fontSize: 12, color: "var(--text-muted, #cbd5e1)" }}>—</span>
+                    <span style={{ fontSize: 13, color: "var(--text-muted, #cbd5e1)" }}>—</span>
                   )}
-                  <div style={{ fontSize: 13, color: "var(--text-primary, #1e293b)", marginTop: 6 }}>{temp !== null ? `${temp}°` : ""}</div>
-                  <div style={{ fontSize: 11, color: "#3B82F6", marginTop: 2 }}>{pop !== null ? `${pop}%` : ""}</div>
+                  <div style={{ fontSize: 14, color: "var(--text-primary, #1e293b)", marginTop: 6 }}>{temp !== null ? `${temp}°` : ""}</div>
+                  <div style={{ fontSize: 12, color: "#3B82F6", marginTop: 2 }}>{pop !== null ? `${pop}%` : ""}</div>
                 </div>
               );
             })}
@@ -1277,14 +1277,14 @@ function WeatherWidget() {
             const info = wmoInfo(data.daily.weather_code[i]);
             return (
               <div key={dateStr} style={{
-                display: "flex", alignItems: "center", gap: 14, fontSize: 14,
+                display: "flex", alignItems: "center", gap: 14, fontSize: 15,
                 padding: "10px 0", borderBottom: i < data.daily.time.length - 1 ? "1px solid var(--line-soft, #f1f5f9)" : "none",
               }}>
                 <span style={{ width: 64, color: "var(--text-secondary, #64748b)" }}>{label}</span>
                 <span style={{ width: 26, display: "flex" }}>
                   <WeatherIcon type={info.type} size={22} color="#3B82F6" />
                 </span>
-                <span style={{ width: 70, fontSize: 13, color: "#3B82F6" }}>
+                <span style={{ width: 70, fontSize: 14, color: "#3B82F6" }}>
                   {data.daily.precipitation_probability_max[i]}%
                 </span>
                 <span style={{ marginLeft: "auto", fontSize: 15 }}>
@@ -1342,7 +1342,7 @@ function QuoteWidget() {
     <div style={{ ...C, flex: 1, minWidth: 200 }}>
       <div
         style={{
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: 700,
           color: "var(--text-secondary, #64748b)",
           marginBottom: 10,
@@ -1352,7 +1352,7 @@ function QuoteWidget() {
       </div>
       <div
         style={{
-          fontSize: 14,
+          fontSize: 15,
           color: "var(--text-primary, #1e293b)",
           lineHeight: 1.7,
           fontStyle: "italic",
@@ -1361,7 +1361,7 @@ function QuoteWidget() {
       >
         「{quote.text}」
       </div>
-      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", textAlign: "right" }}>
+      <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", textAlign: "right" }}>
         — {quote.author}
       </div>
     </div>
@@ -1446,7 +1446,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
         {subtitle && (
           <span
             style={{
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 600,
               color: "var(--text-primary, #1e293b)",
               marginRight: 4,
@@ -1455,7 +1455,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
             {subtitle}
           </span>
         )}
-        <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>集計期間</span>
+        <span style={{ fontSize: 14, color: "var(--text-secondary, #64748b)" }}>集計期間</span>
         <div
           style={{
             display: "inline-flex",
@@ -1478,7 +1478,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
                   border: "none",
                   borderRadius: 6,
                   padding: "5px 12px",
-                  fontSize: 13,
+                  fontSize: 14,
                   cursor: "pointer",
                   fontFamily: "inherit",
                   fontWeight: on ? 700 : 400,
@@ -1499,7 +1499,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
             padding: "8px 12px",
             borderRadius: 8,
             border: "1px solid var(--card-border, #e2e8f0)",
-            fontSize: 13,
+            fontSize: 14,
             outline: "none",
           }}
         />
@@ -1512,11 +1512,11 @@ function SummaryPanel({ logs, subtitle, deptData }) {
             padding: "8px 12px",
             borderRadius: 8,
             border: "1px solid var(--card-border, #e2e8f0)",
-            fontSize: 13,
+            fontSize: 14,
             outline: "none",
           }}
         />
-        <div style={{ marginLeft: "auto", fontSize: 13 }}>
+        <div style={{ marginLeft: "auto", fontSize: 14 }}>
           <b style={{ color: "var(--text-primary, #1e293b)" }}>{totC}件</b>
           <span style={{ color: "var(--text-muted, #94a3b8)", margin: "0 6px" }}>/</span>
           <b style={{ color: "var(--text-primary, #1e293b)" }}>
@@ -1537,10 +1537,10 @@ function SummaryPanel({ logs, subtitle, deptData }) {
             key={k}
             style={{
               background: "var(--card-bg, #fff)",
-              borderRadius: 14,
+              borderRadius: 10,
               padding: 16,
               border: `1px solid ${v.color}22`,
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
               borderTop: `3px solid ${v.color}`,
             }}
           >
@@ -1551,20 +1551,20 @@ function SummaryPanel({ logs, subtitle, deptData }) {
                 marginBottom: 8,
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 700, color: v.color }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: v.color }}>
                 {k}
               </span>
-              <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
+              <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                 {cs[k].count}件
               </span>
             </div>
             <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
               {Math.round((cs[k].minutes / 60) * 10) / 10}
-              <span style={{ fontSize: 12, fontWeight: 400, color: "var(--text-secondary, #64748b)" }}>
+              <span style={{ fontSize: 13, fontWeight: 400, color: "var(--text-secondary, #64748b)" }}>
                 h
               </span>
             </div>
-            <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
               {v.label}
             </div>
             {totM > 0 && (
@@ -1602,7 +1602,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
           <h3
             style={{
               margin: "0 0 16px",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               color: "var(--text-primary, #1e293b)",
             }}
@@ -1615,7 +1615,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
           <h3
             style={{
               margin: "0 0 16px",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               color: "var(--text-primary, #1e293b)",
             }}
@@ -1639,7 +1639,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
           <h3
             style={{
               margin: 0,
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               color: "var(--text-primary, #1e293b)",
             }}
@@ -1654,7 +1654,7 @@ function SummaryPanel({ logs, subtitle, deptData }) {
                   display: "flex",
                   alignItems: "center",
                   gap: 4,
-                  fontSize: 11,
+                  fontSize: 12,
                 }}
               >
                 <div
@@ -1704,14 +1704,14 @@ function DeptShare({ logs, users, groups, myGroupId, df, dt }) {
       <h3
         style={{
           margin: "0 0 4px",
-          fontSize: 14,
+          fontSize: 15,
           fontWeight: 600,
           color: "var(--text-primary, #1e293b)",
         }}
       >
         部署ごとの区分の割合
       </h3>
-      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginBottom: 12 }}>
+      <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", marginBottom: 12 }}>
         集計期間の合計時間に占める割合と、1人あたりの平均時間
       </div>
       {rows.map(({ g, people, cat, total }) => {
@@ -1731,7 +1731,7 @@ function DeptShare({ logs, users, groups, myGroupId, df, dt }) {
             <div
               style={{
                 width: 180,
-                fontSize: 13.5,
+                fontSize: 14.5,
                 fontWeight: mine ? 700 : 400,
                 color: "var(--text-primary, #1e293b)",
               }}
@@ -1751,7 +1751,7 @@ function DeptShare({ logs, users, groups, myGroupId, df, dt }) {
                     />
                   ))
               ) : (
-                <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+                <span style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
                   この期間の記録はありません
                 </span>
               )}
@@ -1760,7 +1760,7 @@ function DeptShare({ logs, users, groups, myGroupId, df, dt }) {
               style={{
                 width: 80,
                 textAlign: "right",
-                fontSize: 13,
+                fontSize: 14,
                 color: "var(--text-secondary, #64748b)",
                 fontVariantNumeric: "tabular-nums",
               }}
@@ -1774,7 +1774,7 @@ function DeptShare({ logs, users, groups, myGroupId, df, dt }) {
         {Object.entries(CATEGORIES).map(([k, v]) => (
           <span
             key={k}
-            style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11.5, color: "var(--text-secondary, #64748b)" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, color: "var(--text-secondary, #64748b)" }}
           >
             <span style={{ width: 10, height: 10, borderRadius: 2, background: v.color }} />
             {k}: {v.label}
@@ -1803,18 +1803,18 @@ function ManagerCommentsWidget({ logs, currentUser, onOpen }) {
   const latest = items.slice(0, 3);
   return (
     <div style={{ ...C, flex: 1, minWidth: 260 }}>
-      <div style={{ fontWeight: 700, fontSize: 14, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>
+      <div style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>
         上司からのコメント
       </div>
       {latest.length === 0 ? (
-        <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>まだコメントはありません</div>
+        <div style={{ fontSize: 14, color: "var(--text-muted, #94a3b8)" }}>まだコメントはありません</div>
       ) : (
         latest.map((it) => (
           <div key={it.key} style={{ marginBottom: 10 }}>
-            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+            <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
               {Number(it.date.slice(5, 7))}月{Number(it.date.slice(8, 10))}日
             </div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>{it.title}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>{it.title}</div>
             <div
               style={{
                 marginTop: 4,
@@ -1822,12 +1822,12 @@ function ManagerCommentsWidget({ logs, currentUser, onOpen }) {
                 background: darkSafeNote.bg,
                 borderLeft: `3px solid ${darkSafeNote.line}`,
                 borderRadius: "0 6px 6px 0",
-                fontSize: 13,
+                fontSize: 14,
                 color: "var(--text-primary, #1e293b)",
                 whiteSpace: "pre-wrap",
               }}
             >
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: darkSafeNote.ink, marginBottom: 2 }}>上司より</div>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: darkSafeNote.ink, marginBottom: 2 }}>上司より</div>
               {it.text}
             </div>
           </div>
@@ -1842,7 +1842,7 @@ function ManagerCommentsWidget({ logs, currentUser, onOpen }) {
             padding: 0,
             cursor: "pointer",
             fontFamily: "inherit",
-            fontSize: 13,
+            fontSize: 14,
             color: "var(--accent-ink, #1D4ED8)",
             textDecoration: "underline",
           }}
@@ -2280,7 +2280,7 @@ const upd = useCallback(
           <div>
             <label
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 4,
@@ -2296,18 +2296,18 @@ const upd = useCallback(
                 padding: "8px 12px",
                 borderRadius: 8,
                 border: "1px solid var(--card-border, #e2e8f0)",
-                fontSize: 14,
+                fontSize: 15,
                 outline: "none",
               }}
             />
           </div>
           <div>
-            <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", marginBottom: 4 }}>
+            <div style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", marginBottom: 4 }}>
               氏名
             </div>
             <div
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 600,
                 color: "var(--text-primary, #1e293b)",
                 padding: "8px 12px",
@@ -2328,7 +2328,7 @@ const upd = useCallback(
                 border: "1px solid var(--accent-border, #BFDBFE)",
               }}
             >
-              <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>本日合計 </span>
+              <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>本日合計 </span>
               <span style={{ fontSize: 16, fontWeight: 700, color: "var(--accent, #3B82F6)" }}>
                 {Math.floor(totalMins / 60)}h
                 {totalMins % 60 > 0 ? `${totalMins % 60}m` : ""}
@@ -2343,7 +2343,7 @@ const upd = useCallback(
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 5,
-                fontSize: 12.5,
+                fontSize: 13.5,
                 color: "var(--text-secondary, #64748b)",
                 marginRight: 4,
               }}
@@ -2391,7 +2391,7 @@ const upd = useCallback(
               border: "1px solid #FECACA",
               borderRadius: 8,
               padding: "10px 14px",
-              fontSize: 13,
+              fontSize: 14,
               color: "#991B1B",
               marginTop: 8,
               display: "flex",
@@ -2403,7 +2403,7 @@ const upd = useCallback(
             <span>⚠️ {saveError}</span>
             <button
               onClick={() => window.location.reload()}
-              style={{ ...BB, padding: "4px 10px", fontSize: 12, flexShrink: 0 }}
+              style={{ ...BB, padding: "4px 10px", fontSize: 13, flexShrink: 0 }}
             >
               再読み込み
             </button>
@@ -2429,7 +2429,7 @@ const upd = useCallback(
             <div
               style={{
                 background: "var(--card-bg, #fff)",
-                borderRadius: 18,
+                borderRadius: 12,
                 padding: 28,
                 width: 500,
                 maxWidth: "95vw",
@@ -2475,7 +2475,7 @@ const upd = useCallback(
                   gap: 4,
                   marginBottom: 16,
                   background: "var(--surface-3, #f1f5f9)",
-                  borderRadius: 10,
+                  borderRadius: 8,
                   padding: 4,
                 }}
               >
@@ -2492,7 +2492,7 @@ const upd = useCallback(
                       borderRadius: 8,
                       border: "none",
                       cursor: "pointer",
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: templateTab === tab ? 600 : 400,
                       fontFamily: "inherit",
                       background: templateTab === tab ? "var(--card-bg, #fff)" : "transparent",
@@ -2518,7 +2518,7 @@ const upd = useCallback(
                         textAlign: "center",
                         color: "var(--text-muted, #94a3b8)",
                         padding: "32px 0",
-                        fontSize: 13,
+                        fontSize: 14,
                       }}
                     >
                       保存済みのテンプレートがありません
@@ -2537,7 +2537,7 @@ const upd = useCallback(
                         key={t.id}
                         style={{
                           background: "var(--surface-2, #f8fafc)",
-                          borderRadius: 10,
+                          borderRadius: 8,
                           padding: "12px 14px",
                           border: "1px solid var(--card-border, #e2e8f0)",
                         }}
@@ -2552,7 +2552,7 @@ const upd = useCallback(
                         >
                           <span
                             style={{
-                              fontSize: 14,
+                              fontSize: 15,
                               fontWeight: 700,
                               color: "var(--text-primary, #1e293b)",
                               flex: 1,
@@ -2562,7 +2562,7 @@ const upd = useCallback(
                           </span>
                           <button
                             onClick={() => handleLoadTemplate(t)}
-                            style={{ ...BP, padding: "5px 14px", fontSize: 12 }}
+                            style={{ ...BP, padding: "5px 14px", fontSize: 13 }}
                           >
                             追加
                           </button>
@@ -2571,7 +2571,7 @@ const upd = useCallback(
                             style={{
                               ...BB,
                               padding: "5px 10px",
-                              fontSize: 12,
+                              fontSize: 13,
                               color: "var(--danger, #DC2626)",
                               borderColor: "var(--danger-border, #FECACA)",
                             }}
@@ -2596,7 +2596,7 @@ const upd = useCallback(
                             <div
                               key={i}
                               style={{
-                                fontSize: 12,
+                                fontSize: 13,
                                 color: "var(--text-secondary, #64748b)",
                                 display: "flex",
                                 gap: 8,
@@ -2649,7 +2649,7 @@ const upd = useCallback(
             <div
               style={{
                 background: "var(--card-bg, #fff)",
-                borderRadius: 18,
+                borderRadius: 12,
                 padding: 28,
                 width: 420,
                 maxWidth: "95vw",
@@ -2692,7 +2692,7 @@ const upd = useCallback(
                   gap: 4,
                   marginBottom: 16,
                   background: "var(--surface-3, #f1f5f9)",
-                  borderRadius: 10,
+                  borderRadius: 8,
                   padding: 4,
                 }}
               >
@@ -2721,7 +2721,7 @@ const upd = useCallback(
                         borderRadius: 8,
                         border: "none",
                         cursor: "pointer",
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: isActive ? 600 : 400,
                         fontFamily: "inherit",
                         background: isActive ? "var(--card-bg, #fff)" : "transparent",
@@ -2740,7 +2740,7 @@ const upd = useCallback(
                 <div style={{ marginBottom: 12 }}>
                   <label
                     style={{
-                      fontSize: 12,
+                      fontSize: 13,
                       color: "var(--text-secondary, #64748b)",
                       display: "block",
                       marginBottom: 5,
@@ -2771,7 +2771,7 @@ const upd = useCallback(
               <div style={{ marginBottom: 16 }}>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
@@ -2827,10 +2827,10 @@ const upd = useCallback(
               key={row.id}
               style={{
                 background: "var(--card-bg, #fff)",
-                borderRadius: 14,
+                borderRadius: 10,
                 border: "1px solid var(--card-border, #e2e8f0)",
                 borderLeft: `4px solid ${valid ? cc : "var(--card-border, #e2e8f0)"}`,
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+                boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
                 overflow: "hidden",
               }}
             >
@@ -2852,7 +2852,7 @@ const upd = useCallback(
                     borderRadius: 6,
                     background: valid ? cc : "var(--card-border, #e2e8f0)",
                     color: "#fff",
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 700,
                     display: "flex",
                     alignItems: "center",
@@ -2878,11 +2878,11 @@ const upd = useCallback(
                       padding: "7px 10px",
                       borderRadius: 7,
                       border: "1px solid var(--card-border, #e2e8f0)",
-                      fontSize: 14,
+                      fontSize: 15,
                       outline: "none",
                     }}
                   />
-                  <span style={{ color: "var(--text-muted, #94a3b8)", fontSize: 13 }}>〜</span>
+                  <span style={{ color: "var(--text-muted, #94a3b8)", fontSize: 14 }}>〜</span>
                   <input
                     type="time"
                     value={row.end}
@@ -2891,14 +2891,14 @@ const upd = useCallback(
                       padding: "7px 10px",
                       borderRadius: 7,
                       border: "1px solid var(--card-border, #e2e8f0)",
-                      fontSize: 14,
+                      fontSize: 15,
                       outline: "none",
                     }}
                   />
                     {row._minsVisible && mins > 0 && (
                     <span
                       style={{
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: 700,
                         color: cc,
                         background: cb,
@@ -2919,7 +2919,7 @@ const upd = useCallback(
                       padding: "6px 10px",
                       borderRadius: 7,
                       border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "var(--card-border, #e2e8f0)"}`,
-                      fontSize: 13,
+                      fontSize: 14,
                       color: row.cat ? CATEGORIES[row.cat].color : "var(--text-muted, #94a3b8)",
                       fontWeight: row.cat ? 700 : 400,
                       background: cb,
@@ -2942,7 +2942,7 @@ const upd = useCallback(
                         zIndex: 50,
                         background: "var(--card-bg, #fff)",
                         border: "1px solid var(--card-border, #e2e8f0)",
-                        borderRadius: 10,
+                        borderRadius: 8,
                         boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                         overflow: "hidden",
                         minWidth: 180,
@@ -2983,14 +2983,14 @@ const upd = useCallback(
                           />
                           <span
                             style={{
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: 600,
                               color: v.color,
                             }}
                           >
                             {k}
                           </span>
-                          <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
+                          <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>
                             {v.label}
                           </span>
                         </div>
@@ -3029,7 +3029,7 @@ const upd = useCallback(
                           color: "var(--accent, #3B82F6)",
                           padding: "4px 8px",
                           borderRadius: 6,
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: 600,
                           fontFamily: "inherit",
                         }}
@@ -3049,7 +3049,7 @@ const upd = useCallback(
                           color: "#8B5CF6",
                           padding: "4px 8px",
                           borderRadius: 6,
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: 600,
                           fontFamily: "inherit",
                         }}
@@ -3070,7 +3070,7 @@ const upd = useCallback(
                         borderRadius: 6,
                         display: "flex",
                         flexShrink: 0,
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: 700,
                       }}
                     >
@@ -3090,7 +3090,7 @@ const upd = useCallback(
                 <div>
                   <label
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       color: "var(--text-secondary, #64748b)",
                       fontWeight: 600,
                       display: "block",
@@ -3144,7 +3144,7 @@ const upd = useCallback(
                             zIndex: 50,
                             background: "var(--card-bg, #fff)",
                             border: "1px solid var(--card-border, #e2e8f0)",
-                            borderRadius: 10,
+                            borderRadius: 8,
                             boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                             overflow: "hidden",
                             minWidth: 180,
@@ -3160,7 +3160,7 @@ const upd = useCallback(
                               style={{
                                 padding: "8px 14px",
                                 cursor: "pointer",
-                                fontSize: 13,
+                                fontSize: 14,
                                 color: "#6D28D9",
                                 display: "flex",
                                 alignItems: "center",
@@ -3197,10 +3197,10 @@ const upd = useCallback(
                             style={{
                               display: "inline-block",
                               padding: "2px 8px",
-                              borderRadius: 10,
+                              borderRadius: 8,
                               background: "#F5F3FF",
                               color: "#6D28D9",
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: 600,
                               border: "1px solid #DDD6FE",
                             }}
@@ -3215,7 +3215,7 @@ const upd = useCallback(
                 <div>
                   <label
                     style={{
-                      fontSize: 12.5,
+                      fontSize: 13.5,
                       color: "var(--text-secondary, #64748b)",
                       fontWeight: 600,
                       display: "block",
@@ -3223,7 +3223,7 @@ const upd = useCallback(
                     }}
                   >
                     詳細{" "}
-                    <span style={{ fontWeight: 400, fontSize: 11.5, color: "var(--text-muted, #94a3b8)" }}>
+                    <span style={{ fontWeight: 400, fontSize: 12.5, color: "var(--text-muted, #94a3b8)" }}>
                       （右下をドラッグして高さを調整できます）
                     </span>
                   </label>
@@ -3276,7 +3276,7 @@ const upd = useCallback(
                             zIndex: 50,
                             background: "var(--card-bg, #fff)",
                             border: "1px solid var(--card-border, #e2e8f0)",
-                            borderRadius: 10,
+                            borderRadius: 8,
                             boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                             overflow: "hidden",
                             minWidth: 180,
@@ -3292,7 +3292,7 @@ const upd = useCallback(
                               style={{
                                 padding: "8px 14px",
                                 cursor: "pointer",
-                                fontSize: 13,
+                                fontSize: 14,
                                 color: "#6D28D9",
                                 display: "flex",
                                 alignItems: "center",
@@ -3329,10 +3329,10 @@ const upd = useCallback(
                             style={{
                               display: "inline-block",
                               padding: "2px 8px",
-                              borderRadius: 10,
+                              borderRadius: 8,
                               background: "#F5F3FF",
                               color: "#6D28D9",
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: 600,
                               border: "1px solid #DDD6FE",
                             }}
@@ -3359,7 +3359,7 @@ const upd = useCallback(
                     <div>
                       <div
                         style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: 700,
                           color: "#D97706",
                           marginBottom: 2,
@@ -3369,7 +3369,7 @@ const upd = useCallback(
                       </div>
                       <div
                         style={{
-                          fontSize: 13,
+                          fontSize: 14,
                           color: "#92400E",
                           lineHeight: 1.6,
                         }}
@@ -3389,11 +3389,11 @@ const upd = useCallback(
         style={{
           width: "100%",
           padding: "11px",
-          borderRadius: 12,
+          borderRadius: 10,
           border: "2px dashed var(--line-strong, #cbd5e1)",
           background: "transparent",
           color: "var(--text-secondary, #64748b)",
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: 600,
           cursor: "pointer",
           display: "flex",
@@ -3421,7 +3421,7 @@ const upd = useCallback(
       <div style={{ ...C, marginBottom: 14 }}>
         <label
           style={{
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 700,
             color: "var(--text-primary, #1e293b)",
             display: "flex",
@@ -3434,7 +3434,7 @@ const upd = useCallback(
           本日の振り返り・総括コメント
           <span
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-muted, #94a3b8)",
               fontWeight: 400,
               marginLeft: 4,
@@ -3471,7 +3471,7 @@ const upd = useCallback(
         <p
           style={{
             margin: "0 0 8px",
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 600,
             color: "var(--text-secondary, #64748b)",
           }}
@@ -3492,10 +3492,10 @@ const upd = useCallback(
                 border: `1px solid ${v.color}33`,
               }}
             >
-              <span style={{ fontWeight: 700, color: v.color, fontSize: 13 }}>
+              <span style={{ fontWeight: 700, color: v.color, fontSize: 14 }}>
                 {k}
               </span>
-              <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>{v.desc}</span>
+              <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>{v.desc}</span>
             </div>
           ))}
         </div>
@@ -3538,7 +3538,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
       <div style={{ marginBottom: 14 }}>
         <label
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: "var(--text-secondary, #64748b)",
             display: "block",
             marginBottom: 5,
@@ -3555,7 +3555,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
       <div style={{ marginBottom: 14 }}>
         <label
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: "var(--text-secondary, #64748b)",
             display: "block",
             marginBottom: 5,
@@ -3576,7 +3576,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
         <div>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -3594,7 +3594,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
         <div>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -3614,7 +3614,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
             style={{
               alignSelf: "flex-end",
               paddingBottom: 9,
-              fontSize: 13,
+              fontSize: 14,
               color: "var(--text-secondary, #64748b)",
             }}
           >
@@ -3625,7 +3625,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
       <div style={{ marginBottom: 20 }}>
         <label
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: "var(--text-secondary, #64748b)",
             display: "block",
             marginBottom: 5,
@@ -3641,7 +3641,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
               padding: "9px 12px",
               borderRadius: 8,
               border: `1px solid ${cat ? CATEGORIES[cat].color : "var(--card-border, #e2e8f0)"}`,
-              fontSize: 13,
+              fontSize: 14,
               color: cat ? CATEGORIES[cat].color : "var(--text-muted, #94a3b8)",
               fontWeight: cat ? 700 : 400,
               background: cat ? CATEGORIES[cat].bg : "var(--card-bg, #fff)",
@@ -3662,7 +3662,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
                 zIndex: 50,
                 background: "var(--card-bg, #fff)",
                 border: "1px solid var(--card-border, #e2e8f0)",
-                borderRadius: 10,
+                borderRadius: 8,
                 boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                 overflow: "hidden",
                 minWidth: 180,
@@ -3693,11 +3693,11 @@ function EditLogForm({ rec, onSave, onCancel }) {
                   }
                 >
                   <span
-                    style={{ fontSize: 13, fontWeight: 600, color: v.color }}
+                    style={{ fontSize: 14, fontWeight: 600, color: v.color }}
                   >
                     {k}
                   </span>
-                  <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
+                  <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>
                     {v.label}
                   </span>
                 </div>
@@ -3769,7 +3769,7 @@ function LogCard({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              fontSize: 14,
+              fontSize: 15,
               color: "var(--text-primary, #1e293b)",
               fontWeight: 600,
               overflow: "hidden",
@@ -3801,7 +3801,7 @@ function LogCard({
           {rec.detail && !expanded && (
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-muted, #94a3b8)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -3824,7 +3824,7 @@ function LogCard({
           {rec.managerComment && (
             <span
               style={{
-                fontSize: 10,
+                fontSize: 11,
                 background: "#FEF3C7",
                 color: "#D97706",
                 padding: "2px 6px",
@@ -3836,12 +3836,12 @@ function LogCard({
               上司コメントあり
             </span>
           )}
-          <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
+          <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>
             {rec.start}〜{rec.end}
           </span>
           <span
             style={{
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 700,
               color: cat.color,
               background: cat.bg,
@@ -3853,7 +3853,7 @@ function LogCard({
           </span>
           <span
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               width: 36,
               textAlign: "right",
@@ -3863,7 +3863,7 @@ function LogCard({
           </span>
           <span
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: "var(--text-muted, #94a3b8)",
               transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 0.2s",
@@ -3885,7 +3885,7 @@ function LogCard({
             <div style={{ marginBottom: 12 }}>
               <div
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: "var(--text-muted, #94a3b8)",
                   fontWeight: 600,
                   marginBottom: 4,
@@ -3895,7 +3895,7 @@ function LogCard({
               </div>
               <div
                 style={{
-                  fontSize: 13,
+                  fontSize: 14,
                   color: "var(--text-body, #475569)",
                   lineHeight: 1.7,
                   background: "var(--surface-2, #f8fafc)",
@@ -3912,7 +3912,7 @@ function LogCard({
             style={{
               background: "#FFFBEB",
               border: "1px solid #FDE68A",
-              borderRadius: 10,
+              borderRadius: 8,
               padding: "10px 14px",
               marginBottom: 10,
             }}
@@ -3925,7 +3925,7 @@ function LogCard({
                 marginBottom: 6,
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#D97706" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#D97706" }}>
                 上司コメント（この業務について）
               </span>
               {isAdmin && !editing && (
@@ -3935,7 +3935,7 @@ function LogCard({
                     setEditing(true);
                   }}
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     color: "#D97706",
                     background: "#FEF3C7",
                     border: "1px solid #FDE68A",
@@ -3961,7 +3961,7 @@ function LogCard({
                     padding: "8px 10px",
                     borderRadius: 7,
                     border: "1px solid #FDE68A",
-                    fontSize: 13,
+                    fontSize: 14,
                     outline: "none",
                     resize: "vertical",
                     fontFamily: "inherit",
@@ -3982,7 +3982,7 @@ function LogCard({
                       color: "#fff",
                       border: "none",
                       borderRadius: 7,
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: 600,
                       cursor: "pointer",
                     }}
@@ -4000,7 +4000,7 @@ function LogCard({
                       color: "var(--text-secondary, #64748b)",
                       border: "none",
                       borderRadius: 7,
-                      fontSize: 12,
+                      fontSize: 13,
                       cursor: "pointer",
                     }}
                   >
@@ -4009,11 +4009,11 @@ function LogCard({
                 </div>
               </div>
             ) : rec.managerComment ? (
-              <div style={{ fontSize: 13, color: "#92400E", lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: "#92400E", lineHeight: 1.7 }}>
                 {rec.managerComment}
               </div>
             ) : (
-              <div style={{ fontSize: 12, color: "#D97706", opacity: 0.5 }}>
+              <div style={{ fontSize: 13, color: "#D97706", opacity: 0.5 }}>
                 {isAdmin
                   ? "（コメントを追加できます）"
                   : "（上司からのコメントはまだありません）"}
@@ -4034,7 +4034,7 @@ function LogCard({
                     display: "flex",
                     alignItems: "center",
                     gap: 5,
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--accent, #3B82F6)",
                     background: "var(--accent-light, #EFF6FF)",
                     border: "1px solid var(--accent-border, #BFDBFE)",
@@ -4055,7 +4055,7 @@ function LogCard({
                   display: "flex",
                   alignItems: "center",
                   gap: 5,
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--accent, #3B82F6)",
                   background: "var(--accent-light, #EFF6FF)",
                   border: "1px solid var(--accent-border, #BFDBFE)",
@@ -4076,7 +4076,7 @@ function LogCard({
                   display: "flex",
                   alignItems: "center",
                   gap: 5,
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--danger, #DC2626)",
                   background: "var(--card-bg, #fff)",
                   border: "1px solid var(--danger-border, #FECACA)",
@@ -4108,7 +4108,7 @@ function LogCard({
               <div
                 style={{
                   background: "var(--card-bg, #fff)",
-                  borderRadius: 18,
+                  borderRadius: 12,
                   padding: 28,
                   width: 520,
                   maxWidth: "95vw",
@@ -4197,10 +4197,10 @@ function DateGroup({
           marginBottom: 8,
         }}
       >
-        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
           {date}
         </span>
-        <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+        <span style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
           {recs.length}件 / {totMins}分
         </span>
         {onDuplicate && recs.some((r) => r.user === currentUser.name) && (
@@ -4210,7 +4210,7 @@ function DateGroup({
               display: "flex",
               alignItems: "center",
               gap: 4,
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--accent, #3B82F6)",
               background: "var(--accent-light, #EFF6FF)",
               border: "1px solid var(--accent-border, #BFDBFE)",
@@ -4227,10 +4227,10 @@ function DateGroup({
       <div
         style={{
           background: "var(--card-bg, #fff)",
-          borderRadius: 12,
+          borderRadius: 10,
           border: "1px solid var(--card-border, #e2e8f0)",
           overflow: "hidden",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
           marginBottom: 8,
         }}
       >
@@ -4251,15 +4251,15 @@ function DateGroup({
       <div
         style={{
           background: "var(--card-bg, #fff)",
-          borderRadius: 12,
+          borderRadius: 10,
           border: "1px solid var(--card-border, #e2e8f0)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+          boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
           padding: "14px 16px",
         }}
       >
         <div
           style={{
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 700,
             color: "var(--text-secondary, #64748b)",
             display: "flex",
@@ -4281,7 +4281,7 @@ function DateGroup({
           >
             <div
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: "var(--text-muted, #94a3b8)",
                 fontWeight: 600,
               }}
@@ -4296,7 +4296,7 @@ function DateGroup({
                     setEditMemberComment(true);
                   }}
                   style={{
-                    fontSize: 11, color: "var(--accent, #3B82F6)", background: "none",
+                    fontSize: 12, color: "var(--accent, #3B82F6)", background: "none",
                     border: "none", cursor: "pointer", fontFamily: "inherit",
                     padding: "2px 4px",
                   }}
@@ -4310,7 +4310,7 @@ function DateGroup({
                     }
                   }}
                   style={{
-                    fontSize: 11, color: "var(--danger, #DC2626)", background: "none",
+                    fontSize: 12, color: "var(--danger, #DC2626)", background: "none",
                     border: "none", cursor: "pointer", fontFamily: "inherit",
                     padding: "2px 4px",
                   }}
@@ -4326,7 +4326,7 @@ function DateGroup({
                 value={memberCommentDraft}
                 onChange={(e) => setMemberCommentDraft(e.target.value)}
                 style={{
-                  width: "100%", minHeight: 80, fontSize: 13, padding: "10px 12px",
+                  width: "100%", minHeight: 80, fontSize: 14, padding: "10px 12px",
                   borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontFamily: "inherit",
                   resize: "vertical", boxSizing: "border-box",
                 }}
@@ -4338,7 +4338,7 @@ function DateGroup({
                     setEditMemberComment(false);
                   }}
                   style={{
-                    fontSize: 12, padding: "5px 14px", borderRadius: 6,
+                    fontSize: 13, padding: "5px 14px", borderRadius: 6,
                     border: "none", background: "var(--accent, #3B82F6)", color: "#fff",
                     cursor: "pointer", fontFamily: "inherit",
                   }}
@@ -4348,7 +4348,7 @@ function DateGroup({
                 <button
                   onClick={() => setEditMemberComment(false)}
                   style={{
-                    fontSize: 12, padding: "5px 14px", borderRadius: 6,
+                    fontSize: 13, padding: "5px 14px", borderRadius: 6,
                     border: "1px solid var(--card-border, #e2e8f0)", background: "var(--card-bg, #fff)", color: "var(--text-secondary, #64748b)",
                     cursor: "pointer", fontFamily: "inherit",
                   }}
@@ -4360,7 +4360,7 @@ function DateGroup({
           ) : memberDayComment ? (
             <div
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: "var(--text-body, #475569)",
                 lineHeight: 1.7,
                 background: "var(--surface-2, #f8fafc)",
@@ -4374,7 +4374,7 @@ function DateGroup({
           ) : (
             <div
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-muted, #94a3b8)",
                 background: "var(--surface-2, #f8fafc)",
                 padding: "8px 12px",
@@ -4389,7 +4389,7 @@ function DateGroup({
           style={{
             background: "#FFFBEB",
             border: "1px solid #FDE68A",
-            borderRadius: 10,
+            borderRadius: 8,
             padding: "10px 14px",
           }}
         >
@@ -4401,14 +4401,14 @@ function DateGroup({
               marginBottom: 6,
             }}
           >
-            <span style={{ fontSize: 12, fontWeight: 700, color: "#D97706" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#D97706" }}>
               上司からの総括コメント
             </span>
             {isAdmin && !editDay && (
               <button
                 onClick={() => setEditDay(true)}
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: "#D97706",
                   background: "#FEF3C7",
                   border: "1px solid #FDE68A",
@@ -4434,7 +4434,7 @@ function DateGroup({
                   padding: "8px 10px",
                   borderRadius: 7,
                   border: "1px solid #FDE68A",
-                  fontSize: 13,
+                  fontSize: 14,
                   outline: "none",
                   resize: "vertical",
                   fontFamily: "inherit",
@@ -4455,7 +4455,7 @@ function DateGroup({
                     color: "#fff",
                     border: "none",
                     borderRadius: 7,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 600,
                     cursor: "pointer",
                   }}
@@ -4473,7 +4473,7 @@ function DateGroup({
                     color: "var(--text-secondary, #64748b)",
                     border: "none",
                     borderRadius: 7,
-                    fontSize: 12,
+                    fontSize: 13,
                     cursor: "pointer",
                   }}
                 >
@@ -4482,11 +4482,11 @@ function DateGroup({
               </div>
             </div>
           ) : managerDayComment ? (
-            <div style={{ fontSize: 13, color: "#92400E", lineHeight: 1.7 }}>
+            <div style={{ fontSize: 14, color: "#92400E", lineHeight: 1.7 }}>
               {managerDayComment}
             </div>
           ) : (
-            <div style={{ fontSize: 12, color: "#D97706", opacity: 0.5 }}>
+            <div style={{ fontSize: 13, color: "#D97706", opacity: 0.5 }}>
               {isAdmin
                 ? "（総括コメントを追加できます）"
                 : "（上司からの総括コメントはまだありません）"}
@@ -4518,7 +4518,7 @@ function MonthHeader({ y, m, recs, isExpanded, onClick, compact }) {
         padding: compact ? "8px 12px" : "11px 16px",
         background: "var(--card-bg, #fff)",
         border: "1px solid var(--card-border, #e2e8f0)",
-        borderRadius: 10,
+        borderRadius: 8,
         cursor: "pointer",
         fontFamily: "inherit",
         textAlign: "left",
@@ -4527,7 +4527,7 @@ function MonthHeader({ y, m, recs, isExpanded, onClick, compact }) {
     >
       <span
         style={{
-          fontSize: 11,
+          fontSize: 12,
           color: "var(--text-muted, #94a3b8)",
           transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
           transition: "transform 0.15s",
@@ -4539,12 +4539,12 @@ function MonthHeader({ y, m, recs, isExpanded, onClick, compact }) {
       <span style={{ fontSize: compact ? 13 : 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
         {y}年{Number(m)}月
       </span>
-      <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", whiteSpace: "nowrap" }}>
-        <b style={{ color: "var(--text-primary, #1e293b)", fontSize: 14 }}>{recs.length}</b>件
+      <span style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", whiteSpace: "nowrap" }}>
+        <b style={{ color: "var(--text-primary, #1e293b)", fontSize: 15 }}>{recs.length}</b>件
       </span>
       {!compact && (
-        <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", whiteSpace: "nowrap" }}>
-          <b style={{ color: "var(--text-primary, #1e293b)", fontSize: 14 }}>{hours}</b>時間
+        <span style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", whiteSpace: "nowrap" }}>
+          <b style={{ color: "var(--text-primary, #1e293b)", fontSize: 15 }}>{hours}</b>時間
         </span>
       )}
       {!compact && totalMins > 0 && (
@@ -4704,7 +4704,7 @@ function DayCard({ date, recs, selected, compact, onClick }) {
       style={{
         background: "var(--card-bg, #fff)",
         border: `1px solid ${selected ? "var(--accent, #3B82F6)" : "#e2e8f0"}`,
-        borderRadius: 14,
+        borderRadius: 10,
         padding: compact ? "10px 12px" : "13px 16px",
         marginBottom: 8,
         cursor: "pointer",
@@ -4741,14 +4741,14 @@ function DayCard({ date, recs, selected, compact, onClick }) {
           </span>
           {!compact && (
             <span
-              style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", whiteSpace: "nowrap" }}
+              style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", whiteSpace: "nowrap" }}
             >
               {recs.length}件 / {Math.floor(totMins / 60)}h
               {totMins % 60 > 0 ? `${totMins % 60}m` : ""}
             </span>
           )}
         </div>
-        <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", flexShrink: 0 }}>▶</span>
+        <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", flexShrink: 0 }}>▶</span>
       </div>
       {!compact && (
         <>
@@ -4782,7 +4782,7 @@ function DayCard({ date, recs, selected, compact, onClick }) {
             {Object.entries(CATEGORIES)
               .filter(([k]) => catMins[k] > 0)
               .map(([k, v]) => (
-                <span key={k} style={{ fontSize: 10, color: v.color }}>
+                <span key={k} style={{ fontSize: 11, color: v.color }}>
                   {k}: {Math.floor(catMins[k] / 60)}h
                   {catMins[k] % 60 > 0 ? `${catMins[k] % 60}m` : ""}
                 </span>
@@ -4922,10 +4922,10 @@ function LogListPage({
           style={{
             background: "#FEF3C7",
             border: "1px solid #FDE68A",
-            borderRadius: 10,
+            borderRadius: 8,
             padding: "10px 16px",
             marginBottom: 16,
-            fontSize: 13,
+            fontSize: 14,
             color: "#92400E",
             display: "flex",
             alignItems: "center",
@@ -4954,7 +4954,7 @@ function LogListPage({
             padding: "8px 12px",
             borderRadius: 8,
             border: "1px solid var(--card-border, #e2e8f0)",
-            fontSize: 13,
+            fontSize: 14,
             outline: "none",
             minWidth: 200,
           }}
@@ -4967,7 +4967,7 @@ function LogListPage({
             padding: "8px 12px",
             borderRadius: 8,
             border: "1px solid var(--card-border, #e2e8f0)",
-            fontSize: 13,
+            fontSize: 14,
             outline: "none",
           }}
         />
@@ -4978,7 +4978,7 @@ function LogListPage({
             padding: "8px 12px",
             borderRadius: 8,
             border: "1px solid var(--card-border, #e2e8f0)",
-            fontSize: 13,
+            fontSize: 14,
             outline: "none",
           }}
         >
@@ -5002,7 +5002,7 @@ function LogListPage({
               borderRadius: 8,
               border: "1px solid var(--card-border, #e2e8f0)",
               background: "var(--card-bg, #fff)",
-              fontSize: 13,
+              fontSize: 14,
               cursor: "pointer",
               color: "var(--text-secondary, #64748b)",
             }}
@@ -5013,7 +5013,7 @@ function LogListPage({
         <div
           style={{
             marginLeft: "auto",
-            fontSize: 13,
+            fontSize: 14,
             display: "flex",
             alignItems: "center",
             gap: 12,
@@ -5041,7 +5041,7 @@ function LogListPage({
                   borderRadius: 6,
                   border: "none",
                   cursor: "pointer",
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: viewMode === id ? 600 : 400,
                   fontFamily: "inherit",
                   background: viewMode === id ? "var(--card-bg, #fff)" : "transparent",
@@ -5066,10 +5066,10 @@ function LogListPage({
               marginBottom: 8,
             }}
           >
-            <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", fontWeight: 600 }}>
+            <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", fontWeight: 600 }}>
               タグ
             </span>
-            <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
+            <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
               タグをクリックで絞り込み・右クリックでピン留め
             </span>
           </div>
@@ -5095,7 +5095,7 @@ function LogListPage({
                       padding: "4px 10px",
                       borderRadius: 20,
                       border: "1px solid",
-                      fontSize: 12,
+                      fontSize: 13,
                       cursor: "pointer",
                       fontFamily: "inherit",
                       display: "flex",
@@ -5132,7 +5132,7 @@ function LogListPage({
                       padding: "4px 10px",
                       borderRadius: 20,
                       border: "1px solid",
-                      fontSize: 12,
+                      fontSize: 13,
                       cursor: "pointer",
                       fontFamily: "inherit",
                       borderColor: isActive ? "var(--accent, #3B82F6)" : "#e2e8f0",
@@ -5150,7 +5150,7 @@ function LogListPage({
             <div
               style={{
                 marginTop: 8,
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-secondary, #64748b)",
                 display: "flex",
                 alignItems: "center",
@@ -5165,7 +5165,7 @@ function LogListPage({
                     background: "#F5F3FF",
                     color: "#6D28D9",
                     padding: "2px 8px",
-                    borderRadius: 10,
+                    borderRadius: 8,
                     fontWeight: 600,
                   }}
                 >
@@ -5185,7 +5185,7 @@ function LogListPage({
             ...C,
             textAlign: "center",
             color: "var(--text-muted, #94a3b8)",
-            fontSize: 14,
+            fontSize: 15,
             padding: 48,
           }}
         >
@@ -5277,10 +5277,10 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
             onClick={() => onSelectMember(member)}
             style={{
               background: "var(--card-bg, #fff)",
-              borderRadius: 16,
+              borderRadius: 12,
               padding: 24,
               border: "1px solid var(--card-border, #e2e8f0)",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
               cursor: "pointer",
               transition: "all 0.2s",
             }}
@@ -5306,7 +5306,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                 style={{
                   width: 44,
                   height: 44,
-                  borderRadius: 12,
+                  borderRadius: 10,
                   flexShrink: 0,
                   background: "var(--accent, #3B82F6)",
                   display: "flex",
@@ -5325,7 +5325,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                 >
                   {member.name}
                 </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+                <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
                   {g ? g.name : ""}
                 </div>
               </div>
@@ -5352,7 +5352,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                   key={i}
                   style={{
                     background: "var(--surface-2, #f8fafc)",
-                    borderRadius: 10,
+                    borderRadius: 8,
                     padding: "10px 8px",
                     textAlign: "center",
                   }}
@@ -5360,7 +5360,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                   <div style={{ fontSize: 16, fontWeight: 700, color: s[2] }}>
                     {s[1]}
                   </div>
-                  <div style={{ fontSize: 10, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
                     {s[0]}
                   </div>
                 </div>
@@ -5391,7 +5391,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
               })}
             </div>
             {topCat && topCat[1] > 0 && (
-              <div style={{ fontSize: 11, color: "var(--text-secondary, #64748b)" }}>
+              <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
                 最多:{" "}
                 <span
                   style={{
@@ -5443,8 +5443,8 @@ function MemberDetailPage({
             padding: "8px 14px",
             background: "var(--surface-2, #f8fafc)",
             border: "1px solid var(--card-border, #e2e8f0)",
-            borderRadius: 10,
-            fontSize: 13,
+            borderRadius: 8,
+            fontSize: 14,
             color: "var(--text-secondary, #64748b)",
             cursor: "pointer",
             fontFamily: "inherit",
@@ -5466,7 +5466,7 @@ function MemberDetailPage({
           style={{
             width: 40,
             height: 40,
-            borderRadius: 10,
+            borderRadius: 8,
             background: "var(--accent, #3B82F6)",
             display: "flex",
             alignItems: "center",
@@ -5483,7 +5483,7 @@ function MemberDetailPage({
           <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             {member.name} の記録
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
             総 {memberLogs.length}件
           </div>
         </div>
@@ -5494,7 +5494,7 @@ function MemberDetailPage({
           gap: 4,
           marginBottom: 20,
           background: "var(--card-bg, #fff)",
-          borderRadius: 12,
+          borderRadius: 10,
           padding: 6,
           border: "1px solid var(--card-border, #e2e8f0)",
           width: "fit-content",
@@ -5512,7 +5512,7 @@ function MemberDetailPage({
               borderRadius: 8,
               border: "none",
               cursor: "pointer",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: tab === id ? 600 : 400,
               background: tab === id ? "var(--accent, #3B82F6)" : "transparent",
               color: tab === id ? "#fff" : "var(--text-secondary, #64748b)",
@@ -5599,7 +5599,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
       <div
         style={{
           background: "var(--card-bg, #fff)",
-          borderRadius: 18,
+          borderRadius: 12,
           padding: 28,
           width: 520,
           maxWidth: "95vw",
@@ -5645,7 +5645,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
             <div style={{ marginBottom: 14 }}>
               <label
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
@@ -5664,7 +5664,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
             <div style={{ marginBottom: 14 }}>
               <label
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
@@ -5696,7 +5696,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               <div>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
@@ -5717,7 +5717,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               <div>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
@@ -5738,7 +5738,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
           <div
             style={{
               background: "var(--surface-2, #f8fafc)",
-              borderRadius: 12,
+              borderRadius: 10,
               padding: 16,
               marginBottom: 20,
             }}
@@ -5757,7 +5757,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               <p
                 style={{
                   margin: "0 0 10px",
-                  fontSize: 13,
+                  fontSize: 14,
                   color: "var(--text-secondary, #64748b)",
                   lineHeight: 1.6,
                 }}
@@ -5768,7 +5768,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <span
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   padding: "3px 10px",
                   borderRadius: 20,
                   background: pm[card?.prio || "mid"].bg,
@@ -5781,7 +5781,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               {card?.due && (
                 <span
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     padding: "3px 10px",
                     borderRadius: 20,
                     background: "var(--accent-light, #EFF6FF)",
@@ -5798,7 +5798,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
         <div style={{ borderTop: "1px solid var(--line-soft, #f1f5f9)", paddingTop: 16 }}>
           <div
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               fontWeight: 600,
               marginBottom: 10,
@@ -5821,7 +5821,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                   style={{
                     background:
                       c.author === currentUser.name ? "var(--accent-light, #EFF6FF)" : "#f8fafc",
-                    borderRadius: 10,
+                    borderRadius: 8,
                     padding: "10px 12px",
                     border: `1px solid ${c.author === currentUser.name ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
                   }}
@@ -5835,21 +5835,21 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                   >
                     <span
                       style={{
-                        fontSize: 12,
+                        fontSize: 13,
                         fontWeight: 600,
                         color: "var(--text-primary, #1e293b)",
                       }}
                     >
                       {c.author}
                     </span>
-                    <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
+                    <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                       {c.at}
                     </span>
                   </div>
                   <p
                     style={{
                       margin: 0,
-                      fontSize: 13,
+                      fontSize: 14,
                       color: "#374151",
                       lineHeight: 1.6,
                     }}
@@ -5967,7 +5967,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       style={{
         background:
           dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#fff",
-        borderRadius: 12,
+        borderRadius: 10,
         border: `1px solid ${dc === "over" ? "#FECACA" : dc === "near" ? "#FDE68A" : "var(--card-border, #e2e8f0)"}`,
         padding: "12px 14px",
         cursor: isOwner ? "grab" : "pointer",
@@ -6003,7 +6003,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
         />
         <span
           style={{
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 600,
             color: "var(--text-primary, #1e293b)",
             lineHeight: 1.4,
@@ -6017,7 +6017,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
         <p
           style={{
             margin: "0 0 8px 14px",
-            fontSize: 12,
+            fontSize: 13,
             color: "var(--text-secondary, #64748b)",
             lineHeight: 1.5,
             display: "-webkit-box",
@@ -6040,7 +6040,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       >
         <span
           style={{
-            fontSize: 11,
+            fontSize: 12,
             padding: "2px 7px",
             borderRadius: 8,
             background: pc[card.prio] + "18",
@@ -6053,7 +6053,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
         {card.due && (
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               padding: "2px 7px",
               borderRadius: 8,
               fontWeight: 500,
@@ -6075,7 +6075,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
           </span>
         )}
         {card.comments?.length > 0 && (
-          <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginLeft: "auto" }}>
+          <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginLeft: "auto" }}>
             コメント {card.comments.length}
           </span>
         )}
@@ -6104,7 +6104,7 @@ function KanbanColumn({
         width: 280,
         flexShrink: 0,
         background: "var(--surface-2, #f8fafc)",
-        borderRadius: 14,
+        borderRadius: 10,
         border: "1px solid var(--card-border, #e2e8f0)",
         display: "flex",
         flexDirection: "column",
@@ -6150,7 +6150,7 @@ function KanbanColumn({
           }}
         />
         <span
-          style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)", flex: 1 }}
+          style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)", flex: 1 }}
         >
           {col.name}
         </span>
@@ -6159,7 +6159,7 @@ function KanbanColumn({
           onChange={(e) => onSortChange(col.id, e.target.value)}
           onClick={(e) => e.stopPropagation()}
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--text-secondary, #64748b)",
             border: "1px solid var(--card-border, #e2e8f0)",
             borderRadius: 6,
@@ -6176,7 +6176,7 @@ function KanbanColumn({
         </select>
         <span
           style={{
-            fontSize: 12,
+            fontSize: 13,
             color: "var(--text-muted, #94a3b8)",
             background: "var(--card-bg, #fff)",
             border: "1px solid var(--card-border, #e2e8f0)",
@@ -6231,7 +6231,7 @@ function KanbanColumn({
           <div
             style={{
               height: 56,
-              borderRadius: 10,
+              borderRadius: 8,
               border: "2px dashed #93C5FD",
               background: "#DBEAFE",
               flexShrink: 0,
@@ -6246,10 +6246,10 @@ function KanbanColumn({
             margin: "8px 10px 10px",
             padding: "8px",
             border: "1px dashed var(--line-strong, #cbd5e1)",
-            borderRadius: 10,
+            borderRadius: 8,
             background: "transparent",
             color: "var(--text-muted, #94a3b8)",
-            fontSize: 13,
+            fontSize: 14,
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -6492,7 +6492,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
         <div style={{ flex: 1 }}>
           <div
             style={{
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 700,
               color: "var(--text-primary, #1e293b)",
               marginBottom: 2,
@@ -6500,7 +6500,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           >
             {myGroup?.name || "全社"} — タスクサマリー
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
             グループ全体の進捗
           </div>
         </div>
@@ -6516,12 +6516,12 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               textAlign: "center",
               padding: "10px 18px",
               background: "var(--surface-2, #f8fafc)",
-              borderRadius: 10,
+              borderRadius: 8,
               border: "1px solid var(--card-border, #e2e8f0)",
             }}
           >
             <div style={{ fontSize: 22, fontWeight: 700, color: c }}>{v}</div>
-            <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
               {l}
             </div>
           </div>
@@ -6536,7 +6536,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", fontWeight: 500 }}>
+        <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", fontWeight: 500 }}>
           ToDoリストを選択：
         </span>
         <button
@@ -6546,7 +6546,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             background: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#fff",
             color: viewId === currentUser.id ? "#fff" : "var(--text-secondary, #64748b)",
             borderColor: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#e2e8f0",
-            fontSize: 12,
+            fontSize: 13,
             padding: "6px 14px",
             gap: 6,
           }}
@@ -6561,7 +6561,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               alignItems: "center",
               justifyContent: "center",
               color: "#fff",
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: 700,
               flexShrink: 0,
             }}
@@ -6579,7 +6579,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               background: viewId === m.id ? "var(--accent-light, #EFF6FF)" : "#fff",
               color: viewId === m.id ? "var(--accent-ink, #1D4ED8)" : "#64748b",
               borderColor: viewId === m.id ? "var(--accent-border, #BFDBFE)" : "#e2e8f0",
-              fontSize: 12,
+              fontSize: 13,
               padding: "6px 14px",
               gap: 6,
             }}
@@ -6594,7 +6594,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#fff",
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
                 flexShrink: 0,
               }}
@@ -6629,7 +6629,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             {!isOwner && (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   padding: "3px 10px",
                   borderRadius: 20,
                   background: "#FEF3C7",
@@ -6642,7 +6642,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               </span>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
             {isOwner
               ? "ドラッグでカードを移動 / クリックで編集"
               : "クリックしてコメントを追加できます"}
@@ -6703,7 +6703,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 width: 280,
                 flexShrink: 0,
                 background: "var(--surface-2, #f8fafc)",
-                borderRadius: 14,
+                borderRadius: 10,
                 border: "1px solid var(--card-border, #e2e8f0)",
                 padding: 14,
                 alignSelf: "flex-start",
@@ -6738,10 +6738,10 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 flexShrink: 0,
                 padding: 14,
                 border: "1.5px dashed var(--line-strong, #cbd5e1)",
-                borderRadius: 14,
+                borderRadius: 10,
                 background: "transparent",
                 color: "var(--text-muted, #94a3b8)",
-                fontSize: 13,
+                fontSize: 14,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -7034,10 +7034,10 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
       }}
     >
       <Icon name={icon} size={15} />
-      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
+      <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
         {label}{count !== undefined ? `（${count}件）` : ""}
       </span>
-      <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted, #94a3b8)", transform: openSection === id ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+      <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text-muted, #94a3b8)", transform: openSection === id ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
         ▼
       </span>
     </button>
@@ -7048,7 +7048,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
       <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
         部下のAIレポート参考資料 設定
       </h3>
-      <p style={{ margin: "0 0 14px", fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+      <p style={{ margin: "0 0 14px", fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
         部下を選んで、レポート生成に使う参考情報を一括管理します
       </p>
 
@@ -7065,13 +7065,13 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
 
       {member && (
         <>
-          <div style={{ background: "var(--surface-2, #f8fafc)", borderRadius: 10, padding: 14, marginBottom: 4 }}>
+          <div style={{ background: "var(--surface-2, #f8fafc)", borderRadius: 8, padding: 14, marginBottom: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>この部下に参考情報を使用する</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>この部下に参考情報を使用する</span>
               <button
                 onClick={() => setSettings((p) => ({ ...p, ai_reference_enabled: !p.ai_reference_enabled }))}
                 style={{
-                  width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
+                  width: 40, height: 22, borderRadius: 8, border: "none", cursor: "pointer",
                   background: settings.ai_reference_enabled ? "var(--accent, #3B82F6)" : "#cbd5e1",
                   position: "relative", transition: "background 0.2s", marginLeft: "auto",
                 }}
@@ -7087,7 +7087,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
             {settings.ai_reference_enabled && (
               <>
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", marginBottom: 6 }}>プロンプトの重さ</div>
+                  <div style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", marginBottom: 6 }}>プロンプトの重さ</div>
                   <div style={{ display: "flex", gap: 6 }}>
                     {[
                       ["light", "軽め"],
@@ -7102,7 +7102,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                           borderColor: settings.ai_reference_level === v ? "var(--accent, #3B82F6)" : "#e2e8f0",
                           background: settings.ai_reference_level === v ? "var(--accent-light, #EFF6FF)" : "#fff",
                           color: settings.ai_reference_level === v ? "var(--accent-ink, #1D4ED8)" : "#64748b",
-                          fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                          fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         }}
                       >
                         {label}
@@ -7111,7 +7111,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 16 }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-body, #475569)", cursor: "pointer" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-body, #475569)", cursor: "pointer" }}>
                     <input
                       type="checkbox"
                       checked={settings.use_action_plan}
@@ -7119,7 +7119,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                     />
                     実行計画書を使う
                   </label>
-                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-body, #475569)", cursor: "pointer" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-body, #475569)", cursor: "pointer" }}>
                     <input
                       type="checkbox"
                       checked={settings.use_challenge_sheet}
@@ -7132,39 +7132,39 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
             )}
 
             <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
-              <button onClick={handleSaveSettings} disabled={savingSettings} style={{ ...BP, fontSize: 12, padding: "6px 14px", opacity: savingSettings ? 0.6 : 1 }}>
+              <button onClick={handleSaveSettings} disabled={savingSettings} style={{ ...BP, fontSize: 13, padding: "6px 14px", opacity: savingSettings ? 0.6 : 1 }}>
                 {savingSettings ? "保存中..." : "設定を保存"}
               </button>
-              {settingsMsg && <span style={{ fontSize: 12, color: "#15803D" }}>{settingsMsg}</span>}
+              {settingsMsg && <span style={{ fontSize: 13, color: "#15803D" }}>{settingsMsg}</span>}
             </div>
           </div>
 
           <SectionHeader id="docs" icon="list" label="資料アップロード" />
           {openSection === "docs" && (
             <div style={{ padding: "10px 4px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
                 <span style={{ width: 110, color: "var(--text-secondary, #64748b)", flexShrink: 0 }}>実行計画書</span>
                 <span style={{ flex: 1, color: actionPlanInfo.filename ? "#15803D" : "var(--text-muted, #94a3b8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {actionPlanInfo.filename || "未アップロード"}
                 </span>
-                <label style={{ ...BB, padding: "4px 10px", fontSize: 11, cursor: "pointer", flexShrink: 0 }}>
+                <label style={{ ...BB, padding: "4px 10px", fontSize: 12, cursor: "pointer", flexShrink: 0 }}>
                   {uploadingActionPlan ? "..." : actionPlanInfo.filename ? "差替" : "選択"}
                   <input type="file" accept=".xlsx,.xls" onChange={handleUploadActionPlan} disabled={uploadingActionPlan} style={{ display: "none" }} />
                 </label>
               </div>
-              {actionPlanMsg && <div style={{ fontSize: 11, color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{actionPlanMsg}</div>}
+              {actionPlanMsg && <div style={{ fontSize: 12, color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{actionPlanMsg}</div>}
 
-              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13 }}>
                 <span style={{ width: 110, color: "var(--text-secondary, #64748b)", flexShrink: 0 }}>チャレンジシート</span>
                 <span style={{ flex: 1, color: challengeSheetInfo.filename ? "#15803D" : "var(--text-muted, #94a3b8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {challengeSheetInfo.filename || "未アップロード"}
                 </span>
-                <label style={{ ...BB, padding: "4px 10px", fontSize: 11, cursor: "pointer", flexShrink: 0 }}>
+                <label style={{ ...BB, padding: "4px 10px", fontSize: 12, cursor: "pointer", flexShrink: 0 }}>
                   {uploadingChallengeSheet ? "..." : challengeSheetInfo.filename ? "差替" : "選択"}
                   <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
                 </label>
               </div>
-              {challengeSheetMsg && <div style={{ fontSize: 11, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{challengeSheetMsg}</div>}
+              {challengeSheetMsg && <div style={{ fontSize: 12, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{challengeSheetMsg}</div>}
             </div>
           )}
 
@@ -7179,19 +7179,19 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                   style={{ ...I, flex: 1 }}
                   onKeyDown={(e) => e.key === "Enter" && handlePostDirection()}
                 />
-                <button onClick={handlePostDirection} disabled={postingDirection || !newDirection.trim()} style={{ ...BP, fontSize: 12, padding: "8px 16px", opacity: newDirection.trim() ? 1 : 0.4 }}>
+                <button onClick={handlePostDirection} disabled={postingDirection || !newDirection.trim()} style={{ ...BP, fontSize: 13, padding: "8px 16px", opacity: newDirection.trim() ? 1 : 0.4 }}>
                   追加
                 </button>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 200, overflowY: "auto" }}>
                 {directions.length === 0 && (
-                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>まだ記録がありません</div>
+                  <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>まだ記録がありません</div>
                 )}
                 {directions.map((d) => (
                   <div key={d.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "var(--surface-2, #f8fafc)", borderRadius: 8, padding: "8px 12px" }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 12, color: "var(--text-body, #475569)" }}>{d.content}</div>
-                      <div style={{ fontSize: 10, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
+                      <div style={{ fontSize: 13, color: "var(--text-body, #475569)" }}>{d.content}</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
                         {new Date(d.created_at).toLocaleDateString("ja-JP")}
                       </div>
                     </div>
@@ -7212,7 +7212,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                   type="file"
                   accept=".xlsx,.xls"
                   onChange={(e) => setRefFile(e.target.files?.[0] || null)}
-                  style={{ fontSize: 12 }}
+                  style={{ fontSize: 13 }}
                 />
                 <input
                   value={refReason}
@@ -7223,32 +7223,32 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                 <button
                   onClick={handleUploadRef}
                   disabled={!refFile || uploadingRef}
-                  style={{ ...BP, fontSize: 12, padding: "7px 14px", opacity: refFile ? 1 : 0.4, alignSelf: "flex-start" }}
+                  style={{ ...BP, fontSize: 13, padding: "7px 14px", opacity: refFile ? 1 : 0.4, alignSelf: "flex-start" }}
                 >
                   {uploadingRef ? "アップロード中..." : "アップロード"}
                 </button>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {refDocs.length === 0 && (
-                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>まだ資料がありません</div>
+                  <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>まだ資料がありません</div>
                 )}
                 {refDocs.map((doc) => (
                   <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--surface-2, #f8fafc)", borderRadius: 8, padding: "8px 12px" }}>
                     <button
                       onClick={() => toggleRefDocActive(doc)}
                       style={{
-                        width: 32, height: 18, borderRadius: 9, border: "none", cursor: "pointer", flexShrink: 0,
+                        width: 32, height: 18, borderRadius: 7, border: "none", cursor: "pointer", flexShrink: 0,
                         background: doc.is_active ? "var(--accent, #3B82F6)" : "#cbd5e1", position: "relative",
                       }}
                     >
                       <div style={{ width: 14, height: 14, borderRadius: "50%", background: "var(--card-bg, #fff)", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
                     </button>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary, #1e293b)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {doc.filename}
                       </div>
                       {doc.reason && (
-                        <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>{doc.reason}</div>
+                        <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>{doc.reason}</div>
                       )}
                     </div>
                     <button onClick={() => deleteRefDoc(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger, #DC2626)", flexShrink: 0 }}>
@@ -7504,11 +7504,11 @@ function MyPage({
               alignItems: "center",
               gap: 8,
               padding: "10px 14px",
-              borderRadius: 10,
+              borderRadius: 8,
               border: "none",
               cursor: "pointer",
               textAlign: "left",
-              fontSize: 13,
+              fontSize: 14,
               fontFamily: "inherit",
               background: myPageTab === id ? "var(--accent-light, #EFF6FF)" : "transparent",
               color: myPageTab === id ? "var(--accent, #3B82F6)" : "#64748b",
@@ -7529,31 +7529,31 @@ function MyPage({
             プロフィール設定
           </h3>
           {ok && (
-            <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
               <Icon name="check" size={14} />
               {ok}
             </div>
           )}
           {err && (
-            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#991B1B", fontSize: 13 }}>
+            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#991B1B", fontSize: 14 }}>
               {err}
             </div>
           )}
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>氏名</label>
+            <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>氏名</label>
             <input value={name} onChange={(e) => setName(e.target.value)} style={I} />
           </div>
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>メールアドレス</label>
+            <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>メールアドレス</label>
             <div style={{ ...I, background: "var(--surface-3, #f1f5f9)", color: "var(--text-muted, #94a3b8)" }}>{currentUser.email}</div>
           </div>
 
           {!isSA && (
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 14, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
+              <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
+              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 15, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
                 <option value="member">部下（member）</option>
                 <option value="admin">上司（admin）</option>
               </select>
@@ -7561,8 +7561,8 @@ function MyPage({
           )}
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>所属グループ</label>
-            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 14, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
+            <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>所属グループ</label>
+            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 15, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
               <option value="">未所属</option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>{g.name}</option>
@@ -7572,8 +7572,8 @@ function MyPage({
 
           {role === "member" && (
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>上司</label>
-              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 14, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
+              <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>上司</label>
+              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 15, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
                 <option value="">未設定</option>
                 {managers.map((m) => (
                   <option key={m.id} value={m.id}>{m.name}</option>
@@ -7583,15 +7583,15 @@ function MyPage({
           )}
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>
-              パスワード変更 <span style={{ fontWeight: 400, fontSize: 11 }}>（変更しない場合は空欄）</span>
+            <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>
+              パスワード変更 <span style={{ fontWeight: 400, fontSize: 12 }}>（変更しない場合は空欄）</span>
             </label>
             <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="新しいパスワード" style={I} />
           </div>
 
           {isSA && (
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
+              <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
               <select value={role} onChange={(e) => setRole(e.target.value)} style={I}>
                 <option value="member">部下</option>
                 <option value="admin">上司</option>
@@ -7613,32 +7613,32 @@ function MyPage({
             <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
               チャレンジシート
             </h3>
-            <p style={{ margin: "0 0 14px", fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+            <p style={{ margin: "0 0 14px", fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
               アップロードすると、上司がONに設定した場合にレポート生成の参考情報として活用されます
             </p>
             {challengeSheetMsg && (
-              <div style={{ background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 13 }}>
+              <div style={{ background: challengeSheetMsg.includes("失敗") ? "#FEF2F2" : "#DCFCE7", border: `1px solid ${challengeSheetMsg.includes("失敗") ? "#FECACA" : "#BBF7D0"}`, borderRadius: 8, padding: "8px 14px", marginBottom: 12, color: challengeSheetMsg.includes("失敗") ? "#991B1B" : "#15803D", fontSize: 14 }}>
                 {challengeSheetMsg}
               </div>
             )}
             {challengeSheetInfo.filename ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed var(--line-strong, #cbd5e1)", borderRadius: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed var(--line-strong, #cbd5e1)", borderRadius: 8 }}>
                 <Icon name="list" size={18} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {challengeSheetInfo.filename}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
+                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                     {challengeSheetInfo.updatedAt ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
                   </div>
                 </div>
-                <label style={{ ...BB, padding: "5px 12px", fontSize: 12, cursor: "pointer" }}>
+                <label style={{ ...BB, padding: "5px 12px", fontSize: 13, cursor: "pointer" }}>
                   {uploadingChallengeSheet ? "アップロード中..." : "差し替え"}
                   <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
                 </label>
               </div>
             ) : (
-              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed var(--line-strong, #cbd5e1)", borderRadius: 10, color: "var(--text-muted, #94a3b8)", cursor: "pointer", fontSize: 13 }}>
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed var(--line-strong, #cbd5e1)", borderRadius: 8, color: "var(--text-muted, #94a3b8)", cursor: "pointer", fontSize: 14 }}>
                 <Icon name="plus" size={16} />
                 {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
                 <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
@@ -7651,13 +7651,13 @@ function MyPage({
               レポート自動生成設定
             </h3>
             {scheduleOk && (
-              <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 13 }}>
+              <div style={{ background: "#DCFCE7", border: "1px solid #BBF7D0", borderRadius: 8, padding: "10px 14px", marginBottom: 14, color: "#15803D", fontSize: 14 }}>
                 {scheduleOk}
               </div>
             )}
 
             <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid var(--line-soft, #f1f5f9)" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>週次レポート</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>週次レポート</div>
               <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 {[
                   ["scheduled", "自動生成"],
@@ -7671,7 +7671,7 @@ function MyPage({
                       borderColor: weeklySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
                       background: weeklySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
                       color: weeklySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "#64748b",
-                      fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                      fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
                     {label}
@@ -7697,13 +7697,13 @@ function MyPage({
                   />
                 </div>
               )}
-              <button onClick={() => handleSaveSchedule("weekly")} style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}>
+              <button onClick={() => handleSaveSchedule("weekly")} style={{ ...BP, marginTop: 12, fontSize: 13, padding: "6px 14px" }}>
                 週次設定を保存
               </button>
             </div>
 
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>月次レポート</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>月次レポート</div>
               <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 {[
                   ["scheduled", "自動生成"],
@@ -7717,7 +7717,7 @@ function MyPage({
                       borderColor: monthlySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
                       background: monthlySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
                       color: monthlySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "#64748b",
-                      fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+                      fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
                     {label}
@@ -7743,7 +7743,7 @@ function MyPage({
                   />
                 </div>
               )}
-              <button onClick={() => handleSaveSchedule("monthly")} style={{ ...BP, marginTop: 12, fontSize: 12, padding: "6px 14px" }}>
+              <button onClick={() => handleSaveSchedule("monthly")} style={{ ...BP, marginTop: 12, fontSize: 13, padding: "6px 14px" }}>
                 月次設定を保存
               </button>
             </div>
@@ -7821,7 +7821,7 @@ function GroupForm({ groups, setGroups }) {
             padding: "10px 14px",
             marginBottom: 14,
             color: "#15803D",
-            fontSize: 13,
+            fontSize: 14,
             display: "flex",
             alignItems: "center",
             gap: 6,
@@ -7842,7 +7842,7 @@ function GroupForm({ groups, setGroups }) {
         <div style={{ flex: 1 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -7862,7 +7862,7 @@ function GroupForm({ groups, setGroups }) {
         <div>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -7918,7 +7918,7 @@ function GroupForm({ groups, setGroups }) {
               gap: 10,
               padding: "10px 14px",
               background: "var(--surface-2, #f8fafc)",
-              borderRadius: 10,
+              borderRadius: 8,
               border: "1px solid var(--card-border, #e2e8f0)",
             }}
           >
@@ -7933,7 +7933,7 @@ function GroupForm({ groups, setGroups }) {
             />
             <span
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 600,
                 color: "var(--text-primary, #1e293b)",
                 flex: 1,
@@ -7947,7 +7947,7 @@ function GroupForm({ groups, setGroups }) {
                 setName(g.name);
                 setColor(g.color);
               }}
-              style={{ ...BB, padding: "5px 10px", fontSize: 12, gap: 4 }}
+              style={{ ...BB, padding: "5px 10px", fontSize: 13, gap: 4 }}
             >
               <Icon name="edit" size={13} />
               編集
@@ -7957,7 +7957,7 @@ function GroupForm({ groups, setGroups }) {
               style={{
                 ...BB,
                 padding: "5px 10px",
-                fontSize: 12,
+                fontSize: 13,
                 gap: 4,
                 color: "var(--danger, #DC2626)",
                 borderColor: "var(--danger-border, #FECACA)",
@@ -8048,7 +8048,7 @@ function InviteModal({ onClose, currentUserRole }) {
       <div
         style={{
           background: "var(--card-bg, #fff)",
-          borderRadius: 18,
+          borderRadius: 12,
           padding: 28,
           width: 440,
           maxWidth: "95vw",
@@ -8091,7 +8091,7 @@ function InviteModal({ onClose, currentUserRole }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8110,7 +8110,7 @@ function InviteModal({ onClose, currentUserRole }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8130,7 +8130,7 @@ function InviteModal({ onClose, currentUserRole }) {
         <div style={{ marginBottom: 20 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8157,7 +8157,7 @@ function InviteModal({ onClose, currentUserRole }) {
               padding: "10px 14px",
               borderRadius: 8,
               marginBottom: 16,
-              fontSize: 13,
+              fontSize: 14,
               background: message.type === "success" ? "#DCFCE7" : "#FEF2F2",
               color: message.type === "success" ? "#15803D" : "#991B1B",
               border: `1px solid ${message.type === "success" ? "#BBF7D0" : "#FECACA"}`,
@@ -8243,7 +8243,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
       <div
         style={{
           background: "var(--card-bg, #fff)",
-          borderRadius: 18,
+          borderRadius: 12,
           padding: 28,
           width: 480,
           maxWidth: "95vw",
@@ -8289,7 +8289,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8308,7 +8308,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8317,7 +8317,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
             メールアドレス
             <span
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: "var(--text-muted, #94a3b8)",
                 fontWeight: 400,
                 marginLeft: 6,
@@ -8335,7 +8335,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8358,7 +8358,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -8387,7 +8387,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
           <div style={{ marginBottom: 20 }}>
             <label
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 5,
@@ -8418,7 +8418,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
               padding: "10px 14px",
               borderRadius: 8,
               marginBottom: 16,
-              fontSize: 13,
+              fontSize: 14,
               background: message.type === "success" ? "#DCFCE7" : "#FEF2F2",
               color: message.type === "success" ? "#15803D" : "#991B1B",
               border: `1px solid ${message.type === "success" ? "#BBF7D0" : "#FECACA"}`,
@@ -8597,7 +8597,7 @@ function SuperAdminPage({
           gap: 4,
           marginBottom: 20,
           background: "var(--card-bg, #fff)",
-          borderRadius: 12,
+          borderRadius: 10,
           padding: 6,
           border: "1px solid var(--card-border, #e2e8f0)",
           width: "fit-content",
@@ -8617,7 +8617,7 @@ function SuperAdminPage({
               borderRadius: 8,
               border: "none",
               cursor: "pointer",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: tab === id ? 600 : 400,
               background: tab === id ? "var(--accent, #3B82F6)" : "transparent",
               color: tab === id ? "#fff" : "var(--text-secondary, #64748b)",
@@ -8632,10 +8632,10 @@ function SuperAdminPage({
 
       <div style={{ ...C, marginBottom: 20, display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             AIレポート参考資料 機能
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
             実行計画書・チャレンジシート等を週報・月報生成の参考情報として使う機能の全体スイッチです
           </div>
         </div>
@@ -8643,7 +8643,7 @@ function SuperAdminPage({
           onClick={toggleAiRefEnabled}
           disabled={aiRefSaving}
           style={{
-            width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", flexShrink: 0,
+            width: 48, height: 26, borderRadius: 10, border: "none", cursor: "pointer", flexShrink: 0,
             background: aiRefEnabled ? "var(--accent, #3B82F6)" : "#cbd5e1", position: "relative", opacity: aiRefSaving ? 0.6 : 1,
           }}
         >
@@ -8652,7 +8652,7 @@ function SuperAdminPage({
             position: "absolute", top: 3, left: aiRefEnabled ? 25 : 3, transition: "left 0.2s",
           }} />
         </button>
-        <span style={{ fontSize: 12, fontWeight: 600, color: aiRefEnabled ? "#1D4ED8" : "var(--text-muted, #94a3b8)", width: 36 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: aiRefEnabled ? "#1D4ED8" : "var(--text-muted, #94a3b8)", width: 36 }}>
           {aiRefEnabled ? "ON" : "OFF"}
         </span>
       </div>
@@ -8686,7 +8686,7 @@ function SuperAdminPage({
                   padding: "10px 14px",
                   marginBottom: 14,
                   color: "#15803D",
-                  fontSize: 13,
+                  fontSize: 14,
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
@@ -8704,7 +8704,7 @@ function SuperAdminPage({
               <div key={f} style={{ marginBottom: 12 }}>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
@@ -8735,7 +8735,7 @@ function SuperAdminPage({
               <div>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
@@ -8758,7 +8758,7 @@ function SuperAdminPage({
               <div>
                 <label
                   style={{
-                    fontSize: 12,
+                    fontSize: 13,
                     color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
@@ -8830,7 +8830,7 @@ function SuperAdminPage({
                       gap: 12,
                       padding: "12px 14px",
                       background: "var(--surface-2, #f8fafc)",
-                      borderRadius: 10,
+                      borderRadius: 8,
                       border: "1px solid var(--card-border, #e2e8f0)",
                     }}
                   >
@@ -8838,7 +8838,7 @@ function SuperAdminPage({
                       style={{
                         width: 36,
                         height: 36,
-                        borderRadius: 10,
+                        borderRadius: 8,
                         flexShrink: 0,
                         background:
                           u.role === "superadmin"
@@ -8850,7 +8850,7 @@ function SuperAdminPage({
                         alignItems: "center",
                         justifyContent: "center",
                         color: "#fff",
-                        fontSize: 14,
+                        fontSize: 15,
                         fontWeight: 700,
                       }}
                     >
@@ -8859,21 +8859,21 @@ function SuperAdminPage({
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: 600,
                           color: "var(--text-primary, #1e293b)",
                         }}
                       >
                         {u.name}
                       </div>
-                      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+                      <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
                         {u.email}
                         {g ? ` · ${g.name}` : ""}
                       </div>
                     </div>
                     <span
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: 700,
                         padding: "3px 10px",
                         borderRadius: 20,
@@ -8891,7 +8891,7 @@ function SuperAdminPage({
                         style={{
                           ...BB,
                           padding: "5px 10px",
-                          fontSize: 12,
+                          fontSize: 13,
                           gap: 4,
                         }}
                       >
@@ -8903,7 +8903,7 @@ function SuperAdminPage({
                         style={{
                           ...BB,
                           padding: "5px 10px",
-                          fontSize: 12,
+                          fontSize: 13,
                           gap: 4,
                           color: "var(--danger, #DC2626)",
                           borderColor: "var(--danger-border, #FECACA)",
@@ -8988,7 +8988,7 @@ function SuperAdminPage({
                     <span
                       style={{
                         marginLeft: "auto",
-                        fontSize: 12,
+                        fontSize: 13,
                         color: "var(--text-muted, #94a3b8)",
                       }}
                     >
@@ -8999,7 +8999,7 @@ function SuperAdminPage({
                     <div style={{ marginBottom: 10 }}>
                       <div
                         style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           color: "var(--text-muted, #94a3b8)",
                           fontWeight: 600,
                           marginBottom: 6,
@@ -9032,7 +9032,7 @@ function SuperAdminPage({
                               alignItems: "center",
                               justifyContent: "center",
                               color: "#fff",
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: 700,
                             }}
                           >
@@ -9040,7 +9040,7 @@ function SuperAdminPage({
                           </div>
                           <span
                             style={{
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: 600,
                               color: "#92400E",
                             }}
@@ -9055,7 +9055,7 @@ function SuperAdminPage({
                     <div>
                       <div
                         style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           color: "var(--text-muted, #94a3b8)",
                           fontWeight: 600,
                           marginBottom: 6,
@@ -9088,13 +9088,13 @@ function SuperAdminPage({
                               alignItems: "center",
                               justifyContent: "center",
                               color: "#fff",
-                              fontSize: 11,
+                              fontSize: 12,
                               fontWeight: 700,
                             }}
                           >
                             {u.name[0]}
                           </div>
-                          <span style={{ fontSize: 13, color: "#1D4ED8" }}>
+                          <span style={{ fontSize: 14, color: "#1D4ED8" }}>
                             {u.name}
                           </span>
                         </div>
@@ -9106,7 +9106,7 @@ function SuperAdminPage({
                       style={{
                         textAlign: "center",
                         color: "var(--text-muted, #94a3b8)",
-                        fontSize: 13,
+                        fontSize: 14,
                         padding: "16px 0",
                       }}
                     >
@@ -9133,7 +9133,7 @@ function SuperAdminPage({
           </h3>
           <p
             style={{
-              fontSize: 13,
+              fontSize: 14,
               color: "var(--text-secondary, #64748b)",
               margin: "0 0 20px",
               lineHeight: 1.6,
@@ -9146,7 +9146,7 @@ function SuperAdminPage({
           <div
             style={{
               background: "var(--surface-2, #f8fafc)",
-              borderRadius: 10,
+              borderRadius: 8,
               padding: 16,
               border: "1px solid var(--card-border, #e2e8f0)",
               marginBottom: 20,
@@ -9154,7 +9154,7 @@ function SuperAdminPage({
           >
             <div
               style={{
-                fontSize: 13,
+                fontSize: 14,
                 color: "var(--text-primary, #1e293b)",
                 fontWeight: 600,
                 marginBottom: 4,
@@ -9166,7 +9166,7 @@ function SuperAdminPage({
               {logs.length}
               <span
                 style={{
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 400,
                   color: "var(--text-secondary, #64748b)",
                   marginLeft: 6,
@@ -9175,14 +9175,14 @@ function SuperAdminPage({
                 件
               </span>
             </div>
-            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 4 }}>
+            <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", marginTop: 4 }}>
               {INIT_USERS.filter((u) => u.role !== "superadmin").length}
               名分の記録
             </div>
           </div>
           <button
             onClick={exportCSV}
-            style={{ ...BP, padding: "12px 24px", fontSize: 14 }}
+            style={{ ...BP, padding: "12px 24px", fontSize: 15 }}
           >
             <Icon name="download" size={16} />
             CSVをダウンロード
@@ -9264,7 +9264,7 @@ function RankingPage({ logs, users, currentUser }) {
           gap: 4,
           marginBottom: 20,
           background: "var(--card-bg, #fff)",
-          borderRadius: 12,
+          borderRadius: 10,
           padding: 6,
           border: "1px solid var(--card-border, #e2e8f0)",
           width: "fit-content",
@@ -9283,7 +9283,7 @@ function RankingPage({ logs, users, currentUser }) {
               borderRadius: 8,
               border: "none",
               cursor: "pointer",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: period === id ? 600 : 400,
               fontFamily: "inherit",
               background: period === id ? "var(--accent, #3B82F6)" : "transparent",
@@ -9312,7 +9312,7 @@ function RankingPage({ logs, users, currentUser }) {
               key={u.id}
               style={{
                 background: isMe ? "var(--accent-light, #EFF6FF)" : "#fff",
-                borderRadius: 14,
+                borderRadius: 10,
                 border: `1px solid ${isMe ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
                 padding: "14px 18px",
                 display: "flex",
@@ -9334,7 +9334,7 @@ function RankingPage({ logs, users, currentUser }) {
                       borderRadius: "50%",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: 700,
                       background: medal.bg,
                       color: medal.c,
@@ -9354,7 +9354,7 @@ function RankingPage({ logs, users, currentUser }) {
                 style={{
                   width: 38,
                   height: 38,
-                  borderRadius: 10,
+                  borderRadius: 8,
                   flexShrink: 0,
                   background: avatarBg,
                   display: "flex",
@@ -9378,7 +9378,7 @@ function RankingPage({ logs, users, currentUser }) {
                 >
                   <span
                     style={{
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: isMe ? 700 : 600,
                       color: "var(--text-primary, #1e293b)",
                     }}
@@ -9388,11 +9388,11 @@ function RankingPage({ logs, users, currentUser }) {
                   {isMe && (
                     <span
                       style={{
-                        fontSize: 10,
+                        fontSize: 11,
                         background: "var(--accent, #3B82F6)",
                         color: "#fff",
                         padding: "1px 7px",
-                        borderRadius: 10,
+                        borderRadius: 8,
                         fontWeight: 600,
                       }}
                     >
@@ -9438,7 +9438,7 @@ function RankingPage({ logs, users, currentUser }) {
                 >
                   {u.count}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>件</div>
+                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>件</div>
               </div>
             </div>
           );
@@ -9637,7 +9637,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                 padding: "10px 14px",
                 marginBottom: 14,
                 color: "#15803D",
-                fontSize: 13,
+                fontSize: 14,
               }}
             >
               {ok}
@@ -9646,7 +9646,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
           <div style={{ marginBottom: 12 }}>
             <label
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 5,
@@ -9666,7 +9666,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
           <div style={{ marginBottom: 12 }}>
             <label
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 5,
@@ -9700,7 +9700,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
             <div>
               <label
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
@@ -9723,7 +9723,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
             <div>
               <label
                 style={{
-                  fontSize: 12,
+                  fontSize: 13,
                   color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
@@ -9788,7 +9788,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
           gap: 12,
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
           お知らせ一覧
         </div>
         {unreadCount > 0 && (
@@ -9796,7 +9796,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
             style={{
               background: "#EF4444",
               color: "#fff",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 700,
               padding: "2px 10px",
               borderRadius: 20,
@@ -9815,7 +9815,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
         </div>
       ) : loadError ? (
         <div style={{ ...C, textAlign: "center", padding: 48 }}>
-          <p style={{ color: "var(--text-muted, #94a3b8)", marginBottom: 14, fontSize: 13 }}>
+          <p style={{ color: "var(--text-muted, #94a3b8)", marginBottom: 14, fontSize: 14 }}>
             読み込みに時間がかかっています。通信状況をご確認の上、再試行してください。
           </p>
           <button onClick={fetchAll} style={BP}>
@@ -9865,7 +9865,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                     >
                       <span
                         style={{
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: 700,
                           padding: "2px 9px",
                           borderRadius: 20,
@@ -9879,7 +9879,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                       {targetGroup && (
                         <span
                           style={{
-                            fontSize: 11,
+                            fontSize: 12,
                             padding: "2px 9px",
                             borderRadius: 20,
                             background: "var(--surface-3, #f1f5f9)",
@@ -9893,7 +9893,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                       {!targetGroup && (
                         <span
                           style={{
-                            fontSize: 11,
+                            fontSize: 12,
                             padding: "2px 9px",
                             borderRadius: 20,
                             background: "var(--surface-3, #f1f5f9)",
@@ -9907,11 +9907,11 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                       {!isRead && (
                         <span
                           style={{
-                            fontSize: 10,
+                            fontSize: 11,
                             background: "#EF4444",
                             color: "#fff",
                             padding: "1px 7px",
-                            borderRadius: 10,
+                            borderRadius: 8,
                             fontWeight: 700,
                           }}
                         >
@@ -9931,7 +9931,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                     </div>
                     <div
                       style={{
-                        fontSize: 13,
+                        fontSize: 14,
                         color: "var(--text-body, #475569)",
                         lineHeight: 1.7,
                         whiteSpace: "pre-wrap",
@@ -9958,7 +9958,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                         style={{
                           ...BB,
                           padding: "4px 10px",
-                          fontSize: 12,
+                          fontSize: 13,
                           gap: 4,
                         }}
                       >
@@ -9973,7 +9973,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                         style={{
                           ...BB,
                           padding: "4px 10px",
-                          fontSize: 12,
+                          fontSize: 13,
                           gap: 4,
                           color: "var(--danger, #DC2626)",
                           borderColor: "var(--danger-border, #FECACA)",
@@ -9992,7 +9992,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                   )}
                 </div>
                 <div
-                  style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", textAlign: "right" }}
+                  style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", textAlign: "right" }}
                 >
                   {new Date(a.created_at).toLocaleString("ja-JP")}
                   {isRead && <span style={{ marginLeft: 8 }}>✓ 既読</span>}
@@ -10052,7 +10052,7 @@ function FeedbackPage({ currentUser }) {
               padding: "10px 14px",
               marginBottom: 14,
               color: "#15803D",
-              fontSize: 13,
+              fontSize: 14,
             }}
           >
             {ok}
@@ -10061,7 +10061,7 @@ function FeedbackPage({ currentUser }) {
         <div style={{ marginBottom: 14 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -10079,7 +10079,7 @@ function FeedbackPage({ currentUser }) {
         <div style={{ marginBottom: 20 }}>
           <label
             style={{
-              fontSize: 12,
+              fontSize: 13,
               color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
@@ -10150,10 +10150,10 @@ function FeedbackAdminPage() {
         }}
       >
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             意見・要望一覧
           </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
             全{feedbacks.length}件
           </div>
         </div>
@@ -10162,7 +10162,7 @@ function FeedbackAdminPage() {
             style={{
               background: "#EF4444",
               color: "#fff",
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 700,
               padding: "2px 10px",
               borderRadius: 20,
@@ -10212,7 +10212,7 @@ function FeedbackAdminPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     color: "#fff",
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: 700,
                     flexShrink: 0,
                   }}
@@ -10221,29 +10221,29 @@ function FeedbackAdminPage() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div
-                    style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}
+                    style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}
                   >
                     {f.user_name}
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
+                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                     {new Date(f.created_at).toLocaleString("ja-JP")}
                   </div>
                 </div>
                 {!f.is_read && (
                   <button
                     onClick={() => markAsRead(f.id)}
-                    style={{ ...BB, fontSize: 12, padding: "4px 12px" }}
+                    style={{ ...BB, fontSize: 13, padding: "4px 12px" }}
                   >
                     既読にする
                   </button>
                 )}
                 {f.is_read && (
-                  <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>既読</span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>既読</span>
                 )}
               </div>
               <div
                 style={{
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 700,
                   color: "var(--text-primary, #1e293b)",
                   marginBottom: 8,
@@ -10253,7 +10253,7 @@ function FeedbackAdminPage() {
               </div>
               <div
                 style={{
-                  fontSize: 13,
+                  fontSize: 14,
                   color: "var(--text-body, #475569)",
                   lineHeight: 1.7,
                   whiteSpace: "pre-wrap",
@@ -10334,9 +10334,9 @@ function TaskCarousel({ items, today }) {
                 if (!c) return <div key={ci} style={{ height: 17 }} />;
                 const isOver = c.due < today;
                 return (
-                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#78350F", height: 17 }}>
+                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#78350F", height: 17 }}>
                     <span style={{
-                      fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
+                      fontSize: 11, fontWeight: 700, padding: "1px 7px", borderRadius: 8,
                       background: isOver ? "#FEE2E2" : "#FEF3C7",
                       color: isOver ? "#991B1B" : "#92400E",
                       flexShrink: 0,
@@ -10360,8 +10360,8 @@ function TaskCarousel({ items, today }) {
             style={{
               position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)",
               width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
-              background: "var(--card-bg, #fff)", color: "#92400E", fontSize: 11, cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+              background: "var(--card-bg, #fff)", color: "#92400E", fontSize: 12, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
             }}
           >‹</button>
           <button
@@ -10369,8 +10369,8 @@ function TaskCarousel({ items, today }) {
             style={{
               position: "absolute", right: -8, top: "50%", transform: "translateY(-50%)",
               width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
-              background: "var(--card-bg, #fff)", color: "#92400E", fontSize: 11, cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+              background: "var(--card-bg, #fff)", color: "#92400E", fontSize: 12, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 2px rgba(19,32,58,0.06)",
             }}
           >›</button>
           <div style={{ display: "flex", justifyContent: "center", gap: 4, marginTop: 8 }}>
@@ -10425,14 +10425,14 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
     <div
       onClick={() => onNavigate?.("board")}
       style={{
-        background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 12,
+        background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10,
         padding: "12px 16px", cursor: "pointer", flex: hasTasks && hasAnnouncements ? 1 : "0 1 360px",
         minWidth: 260,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#92400E" }}>期日が近いタスク</span>
-        <span style={{ fontSize: 11, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 10, fontWeight: 700 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "#92400E" }}>期日が近いタスク</span>
+        <span style={{ fontSize: 12, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 8, fontWeight: 700 }}>
           {urgentCards.length}件
         </span>
       </div>
@@ -10444,14 +10444,14 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
     <div
       onClick={() => onNavigate?.("announcement")}
       style={{
-        background: "var(--accent-light, #EFF6FF)", border: "1px solid var(--accent-border, #BFDBFE)", borderRadius: 12,
+        background: "var(--accent-light, #EFF6FF)", border: "1px solid var(--accent-border, #BFDBFE)", borderRadius: 10,
         padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
         cursor: "pointer", flex: hasTasks && hasAnnouncements ? 1 : "0 1 360px",
         minWidth: 260,
       }}
     >
       <span style={{ display: "inline-flex", color: "var(--accent-ink, #1D4ED8)" }}><Icon name="megaphone" size={17} /></span>
-      <span style={{ fontSize: 13, color: "#1D4ED8", fontWeight: 600 }}>
+      <span style={{ fontSize: 14, color: "#1D4ED8", fontWeight: 600 }}>
         未読のお知らせが {unreadCount}件 あります
       </span>
     </div>
@@ -10660,7 +10660,7 @@ const deleteReport = async (r) => {
                 borderRadius: 8,
                 border: "none",
                 cursor: "pointer",
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: reportType === id ? 600 : 400,
                 fontFamily: "inherit",
                 background: reportType === id ? "var(--accent, #3B82F6)" : "transparent",
@@ -10688,7 +10688,7 @@ const deleteReport = async (r) => {
           }}
           onClick={(e) => e.target === e.currentTarget && setShowGenModal(false)}
         >
-          <div style={{ background: "var(--card-bg, #fff)", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+          <div style={{ background: "var(--card-bg, #fff)", borderRadius: 12, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
                 {reportType === "weekly" ? "期間を設定して生成" : "月を指定して生成"}
@@ -10700,7 +10700,7 @@ const deleteReport = async (r) => {
             {reportType === "weekly" ? (
               <>
                 <div style={{ marginBottom: 8 }}>
-                  <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>
+                  <label style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>
                     開始日（1週間分が対象になります）
                   </label>
                   <input
@@ -10710,7 +10710,7 @@ const deleteReport = async (r) => {
                     style={I}
                   />
                 </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginBottom: 20 }}>
+                <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)", marginBottom: 20 }}>
                   対象期間：{genStartDate} 〜 {(() => {
                     const d = new Date(genStartDate);
                     d.setDate(d.getDate() + 6);
@@ -10741,7 +10741,7 @@ const deleteReport = async (r) => {
               </div>
             )}
             {genMsg && (
-              <div style={{ fontSize: 12, color: genMsg.includes("失敗") ? "#EF4444" : "#15803D", marginBottom: 14 }}>
+              <div style={{ fontSize: 13, color: genMsg.includes("失敗") ? "#EF4444" : "#15803D", marginBottom: 14 }}>
                 {genMsg}
               </div>
             )}
@@ -10775,15 +10775,15 @@ const deleteReport = async (r) => {
                 style={{
                   background: selectedPeriod === key ? "var(--accent-light, #EFF6FF)" : "#fff",
                   border: `1px solid ${selectedPeriod === key ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
-                  borderRadius: 10,
+                  borderRadius: 8,
                   padding: "10px 12px",
                   cursor: "pointer",
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                   {periodLabel(recs[0])}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
+                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                   {scope === "all" ? `${recs.length}名分` : "生成済み"}
                 </div>
               </div>
@@ -10818,33 +10818,33 @@ const deleteReport = async (r) => {
                             alignItems: "center",
                             justifyContent: "center",
                             color: "#fff",
-                            fontSize: 13,
+                            fontSize: 14,
                             fontWeight: 700,
                           }}
                         >
                           {nameOf(r.user_id)[0]}
                         </div>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
+                        <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                           {nameOf(r.user_id)}
                         </span>
                       </div>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button
                           onClick={() => downloadReport(r)}
-                          style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4 }}
+                          style={{ ...BB, padding: "5px 12px", fontSize: 13, gap: 4 }}
                         >
                           <Icon name="download" size={13} />
                           DL
                         </button>
                         <button
                           onClick={() => deleteReport(r)}
-                          style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
+                          style={{ ...BB, padding: "5px 12px", fontSize: 13, gap: 4, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
                         >
                           <Icon name="trash" size={13} />
                         </button>
                       </div>
                     </div>
-                    <div style={{ fontSize: 13, color: "var(--text-body, #475569)", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                    <div style={{ fontSize: 14, color: "var(--text-body, #475569)", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
                       {r.content}
                     </div>
                   </div>
@@ -10865,7 +10865,7 @@ const deleteReport = async (r) => {
                       <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                         {periodLabel(r)}
                       </div>
-                      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+                      <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
                         {nameOf(r.user_id)}・{new Date(r.generated_at).toLocaleString("ja-JP")} 生成
                       </div>
                     </div>
@@ -10901,7 +10901,7 @@ const deleteReport = async (r) => {
                     style={{
                       borderTop: r.category_summary ? "none" : "1px solid var(--line-soft, #f1f5f9)",
                       paddingTop: r.category_summary ? 0 : 12,
-                      fontSize: 13,
+                      fontSize: 14,
                       color: "var(--text-body, #475569)",
                       lineHeight: 1.8,
                       whiteSpace: "pre-wrap",
@@ -11405,7 +11405,7 @@ export default function App() {
             <p
               style={{
                 color: "rgba(255,255,255,0.45)",
-                fontSize: 13,
+                fontSize: 14,
                 margin: "6px 0 0",
               }}
             >
@@ -11417,10 +11417,10 @@ export default function App() {
               style={{
                 background: "rgba(34,197,94,0.12)",
                 border: "1px solid rgba(34,197,94,0.3)",
-                borderRadius: 10,
+                borderRadius: 8,
                 padding: "10px 14px",
                 color: "#86efac",
-                fontSize: 13,
+                fontSize: 14,
                 textAlign: "center",
               }}
             >
@@ -11438,7 +11438,7 @@ export default function App() {
                   border: "none",
                   background: "var(--accent, #3B82F6)",
                   color: "#fff",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: 600,
                   cursor: "pointer",
                 }}
@@ -11452,7 +11452,7 @@ export default function App() {
                 <label
                   style={{
                     color: "rgba(255,255,255,0.6)",
-                    fontSize: 12,
+                    fontSize: 13,
                     display: "block",
                     marginBottom: 6,
                   }}
@@ -11469,9 +11469,9 @@ export default function App() {
                     padding: "12px 14px",
                     background: "rgba(255,255,255,0.07)",
                     border: "1px solid rgba(255,255,255,0.12)",
-                    borderRadius: 10,
+                    borderRadius: 8,
                     color: "#fff",
-                    fontSize: 14,
+                    fontSize: 15,
                     outline: "none",
                     boxSizing: "border-box",
                     fontFamily: "inherit",
@@ -11490,7 +11490,7 @@ export default function App() {
                 style={{
                   width: "100%",
                   padding: 13,
-                  borderRadius: 10,
+                  borderRadius: 8,
                   border: "none",
                   background: "var(--accent, #3B82F6)",
                   color: "#fff",
@@ -11533,7 +11533,7 @@ export default function App() {
             animation: "spin 0.8s linear infinite",
           }}
         />
-        <div style={{ color: "var(--text-secondary, #64748b)", fontSize: 14 }}>読み込み中...</div>
+        <div style={{ color: "var(--text-secondary, #64748b)", fontSize: 15 }}>読み込み中...</div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -11734,7 +11734,7 @@ export default function App() {
           <div style={{ color: "#fff", fontWeight: 700, fontSize: 17, lineHeight: 1.3 }}>
             Sales TM
           </div>
-          <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginTop: 2 }}>
+          <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, marginTop: 2 }}>
             営業生産性向上システム
           </div>
           {myGroup && (
@@ -11754,7 +11754,7 @@ export default function App() {
                   background: myGroup.color,
                 }}
               />
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.64)" }}>
+              <span style={{ fontSize: 13, color: "rgba(255,255,255,0.64)" }}>
                 {myGroup.name}
               </span>
             </div>
@@ -11834,7 +11834,7 @@ export default function App() {
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#fff",
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 700,
               }}
             >
@@ -11844,7 +11844,7 @@ export default function App() {
               <div
                 style={{
                   color: "#fff",
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 700,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
@@ -11853,7 +11853,7 @@ export default function App() {
               >
                 {currentUser.name}
               </div>
-              <div style={{ color: "rgba(255,255,255,0.64)", fontSize: 12 }}>
+              <div style={{ color: "rgba(255,255,255,0.64)", fontSize: 13 }}>
                 {roleLabel}
               </div>
             </div>
@@ -11869,7 +11869,7 @@ export default function App() {
                 display: "flex",
                 alignItems: "center",
                 gap: 5,
-                fontSize: 12,
+                fontSize: 13,
                 whiteSpace: "nowrap",
                 fontFamily: "inherit",
               }}
@@ -11995,7 +11995,7 @@ export default function App() {
               <div style={{ fontSize: 17, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
                 {titles[page] || ""}
               </div>
-              <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
+              <div style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>
                 {subs[page] || ""}
               </div>
             </div>
@@ -12014,7 +12014,7 @@ export default function App() {
             >
               {titles[page] || ""}
             </h1>
-            <div style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", marginTop: 4 }}>
+            <div style={{ fontSize: 15, color: "var(--text-secondary, #64748b)", marginTop: 4 }}>
               {subs[page] || ""}
             </div>
             {page === "dashboard" && (
@@ -12076,7 +12076,7 @@ export default function App() {
                       marginBottom: 20,
                       flexWrap: "wrap",
                       background: "var(--card-bg, #fff)",
-                      borderRadius: 12,
+                      borderRadius: 10,
                       padding: 6,
                       border: "1px solid var(--card-border, #e2e8f0)",
                       width: "fit-content",
@@ -12091,7 +12091,7 @@ export default function App() {
                           borderRadius: 8,
                           border: "none",
                           cursor: "pointer",
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: dashFilter === t.id ? 600 : 400,
                           fontFamily: "inherit",
                           background:
