@@ -4220,11 +4220,18 @@ function DateGroup({
           marginBottom: 8,
         }}
       >
-        <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-          {date}
+        <span style={{ fontSize: 17, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+          {(() => {
+            // 表示用：2026-11-02 → 11月2日（月）
+            const d = new Date(`${date}T00:00:00`);
+            return isNaN(d)
+              ? date
+              : `${d.getMonth() + 1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
+          })()}
         </span>
-        <span style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>
-          {recs.length}件 / {totMins}分
+        <span style={{ fontSize: 13.5, color: "var(--text-secondary, #64748b)", fontVariantNumeric: "tabular-nums" }}>
+          {recs.length}件{"  "}{Math.floor(totMins / 60) > 0 ? `${Math.floor(totMins / 60)}時間` : ""}
+          {totMins % 60 > 0 || totMins === 0 ? `${totMins % 60}分` : ""}
         </span>
         {onDuplicate && recs.some((r) => r.user === currentUser.name) && (
           <button
