@@ -1647,6 +1647,8 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   const [date, setDate] = useState(draft?.date ?? today);
   const [dayComment, setDayComment] = useState(draft?.dayComment ?? "");
   const [saved, setSaved] = useState(false);
+  // 下書きを自動保存した時刻（表示用）
+  const [draftSavedAt, setDraftSavedAt] = useState(null);
   const [rows, setRows] = useState(
     () => draft?.rows ?? [newRow(), newRow(), newRow()],
   );
@@ -1792,6 +1794,7 @@ function DailyReportPage({ currentUser, onSave, draft, onDraftChange, logs }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onDraftChange?.({ date, dayComment, rows });
+      setDraftSavedAt(new Date());
     }, 1000);
     return () => clearTimeout(timer);
   }, [date, dayComment, rows]);
@@ -2115,17 +2118,38 @@ const upd = useCallback(
             </div>
           )}
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          {draftSavedAt && (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                fontSize: 12.5,
+                color: "var(--text-secondary, #64748b)",
+                marginRight: 4,
+              }}
+            >
+              <span style={{ color: "#16A34A", display: "inline-flex" }}>
+                <Icon name="check" size={14} />
+              </span>
+              下書きを自動保存しました（
+              {String(draftSavedAt.getHours()).padStart(2, "0")}:
+              {String(draftSavedAt.getMinutes()).padStart(2, "0")}）
+            </span>
+          )}
           <button onClick={() => setShowTemplateModal(true)} style={{ ...BB }}>
-            📋 テンプレート
+            <Icon name="list" size={15} />
+            テンプレート
           </button>
           <button onClick={() => setShowSaveTemplate(true)} style={{ ...BB }}>
-            💾 テンプレート保存
+            <Icon name="save" size={15} />
+            テンプレート保存
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            style={{ ...BP, boxShadow: "0 2px 8px rgba(59,130,246,0.3)", opacity: saving ? 0.6 : 1 }}
+            style={{ ...BP, opacity: saving ? 0.6 : 1 }}
           >
             {saved ? (
               <>
@@ -2577,7 +2601,9 @@ const upd = useCallback(
           const mins = getMins(row.start, row.end);
           const valid = row.task && row.start && row.end && row.cat && mins > 0;
           const cc = row.cat ? CATEGORIES[row.cat].color : "#cbd5e1";
-          const cb = row.cat ? CATEGORIES[row.cat].bg : "#fff";
+          const cb = row.cat
+            ? `color-mix(in srgb, ${CATEGORIES[row.cat].color} 9%, var(--card-bg, #fff))`
+            : "var(--card-bg, #fff)";
           return (
             <div
               key={row.id}
@@ -2631,10 +2657,10 @@ const upd = useCallback(
                     value={row.start}
                     onChange={(e) => upd(row.id, "start", e.target.value)}
                     style={{
-                      padding: "6px 10px",
+                      padding: "7px 10px",
                       borderRadius: 7,
                       border: "1px solid var(--card-border, #e2e8f0)",
-                      fontSize: 13,
+                      fontSize: 14,
                       outline: "none",
                     }}
                   />
@@ -2644,10 +2670,10 @@ const upd = useCallback(
                     value={row.end}
                     onChange={(e) => upd(row.id, "end", e.target.value)}
                     style={{
-                      padding: "6px 10px",
+                      padding: "7px 10px",
                       borderRadius: 7,
                       border: "1px solid var(--card-border, #e2e8f0)",
-                      fontSize: 13,
+                      fontSize: 14,
                       outline: "none",
                     }}
                   />
@@ -2678,7 +2704,7 @@ const upd = useCallback(
                       fontSize: 13,
                       color: row.cat ? CATEGORIES[row.cat].color : "var(--text-muted, #94a3b8)",
                       fontWeight: row.cat ? 700 : 400,
-                      background: row.cat ? CATEGORIES[row.cat].bg : "var(--card-bg, #fff)",
+                      background: cb,
                       cursor: "pointer",
                       fontFamily: "inherit",
                       minWidth: 140,
@@ -2846,8 +2872,8 @@ const upd = useCallback(
                 <div>
                   <label
                     style={{
-                      fontSize: 11,
-                      color: "var(--text-muted, #94a3b8)",
+                      fontSize: 12.5,
+                      color: "var(--text-secondary, #64748b)",
                       fontWeight: 600,
                       display: "block",
                       marginBottom: 4,
@@ -2864,11 +2890,12 @@ const upd = useCallback(
                       placeholder="業務タイトル（#タグで分類できます）"
                       style={{
                         width: "100%",
-                        padding: "8px 10px",
+                        padding: "10px 12px",
                         borderRadius: 7,
                         border: "1px solid var(--card-border, #e2e8f0)",
-                        fontSize: 13,
+                        fontSize: 15,
                         color: "var(--text-primary, #1e293b)",
+                        background: "var(--card-bg, #fff)",
                         outline: "none",
                         boxSizing: "border-box",
                         fontWeight: 500,
@@ -2970,15 +2997,15 @@ const upd = useCallback(
                 <div>
                   <label
                     style={{
-                      fontSize: 11,
-                      color: "var(--text-muted, #94a3b8)",
+                      fontSize: 12.5,
+                      color: "var(--text-secondary, #64748b)",
                       fontWeight: 600,
                       display: "block",
                       marginBottom: 4,
                     }}
                   >
                     詳細{" "}
-                    <span style={{ fontWeight: 400, fontSize: 10 }}>
+                    <span style={{ fontWeight: 400, fontSize: 11.5, color: "var(--text-muted, #94a3b8)" }}>
                       （右下をドラッグして高さを調整できます）
                     </span>
                   </label>
@@ -2991,15 +3018,16 @@ const upd = useCallback(
                       placeholder="場所・相手・内容・目的など詳細を入力...(#タグで分類できます)"
                       style={{
                         width: "100%",
-                        padding: "8px 10px",
+                        padding: "10px 12px",
                         borderRadius: 7,
                         border: "1px solid var(--card-border, #e2e8f0)",
-                        fontSize: 13,
+                        fontSize: 15,
                         color: "var(--text-primary, #1e293b)",
+                        background: "var(--card-bg, #fff)",
                         outline: "none",
                         resize: "vertical",
-                        minHeight: 60,
-                        maxHeight: 320,
+                        minHeight: 104,
+                        maxHeight: 480,
                         boxSizing: "border-box",
                         fontFamily: "inherit",
                         lineHeight: 1.7,
@@ -3188,7 +3216,7 @@ const upd = useCallback(
           本日の振り返り・総括コメント
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--text-muted, #94a3b8)",
               fontWeight: 400,
               marginLeft: 4,
@@ -3207,11 +3235,12 @@ const upd = useCallback(
             padding: "10px 12px",
             borderRadius: 8,
             border: "1px solid var(--card-border, #e2e8f0)",
-            fontSize: 13,
+            fontSize: 15,
             color: "var(--text-primary, #1e293b)",
+            background: "var(--card-bg, #fff)",
             outline: "none",
             resize: "vertical",
-            minHeight: 80,
+            minHeight: 110,
             fontFamily: "inherit",
             boxSizing: "border-box",
             lineHeight: 1.6,
@@ -3240,7 +3269,7 @@ const upd = useCallback(
                 alignItems: "center",
                 gap: 6,
                 padding: "4px 10px",
-                background: v.bg,
+                background: `color-mix(in srgb, ${v.color} 9%, var(--card-bg, #fff))`,
                 borderRadius: 6,
                 border: `1px solid ${v.color}33`,
               }}
