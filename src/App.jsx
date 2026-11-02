@@ -487,20 +487,20 @@ const Icon = ({ name, size = 16 }) => (
 );
 
 const C = {
-  background: "#fff",
+  background: "var(--card-bg, #fff)",
   borderRadius: 14,
-  border: "1px solid #e2e8f0",
+  border: "1px solid var(--card-border, #e2e8f0)",
   boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
   padding: "16px 20px",
 };
 const I = {
   padding: "9px 12px",
   borderRadius: 8,
-  border: "1px solid #e2e8f0",
+  border: "1px solid var(--input-border, #e2e8f0)",
   fontSize: 13,
-  color: "#1e293b",
+  color: "var(--text-primary, #1e293b)",
   outline: "none",
-  background: "#fafafa",
+  background: "var(--input-bg, #fafafa)",
   fontFamily: "inherit",
   width: "100%",
   boxSizing: "border-box",
@@ -511,9 +511,9 @@ const BB = {
   gap: 6,
   padding: "9px 18px",
   borderRadius: 10,
-  border: "1px solid #e2e8f0",
-  background: "#fff",
-  color: "#1e293b",
+  border: "1px solid var(--card-border, #e2e8f0)",
+  background: "var(--card-bg, #fff)",
+  color: "var(--text-primary, #1e293b)",
   fontSize: 13,
   fontWeight: 600,
   cursor: "pointer",
@@ -843,7 +843,7 @@ function PieChart({ data }) {
       <div
         style={{
           textAlign: "center",
-          color: "#94a3b8",
+          color: "var(--text-muted, #94a3b8)",
           padding: "40px 0",
           fontSize: 13,
         }}
@@ -901,11 +901,11 @@ function PieChart({ data }) {
                 flexShrink: 0,
               }}
             />
-            <span style={{ color: "#64748b" }}>{d.label}</span>
+            <span style={{ color: "var(--text-secondary, #64748b)" }}>{d.label}</span>
             <span
               style={{
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
                 marginLeft: "auto",
                 paddingLeft: 8,
               }}
@@ -936,7 +936,7 @@ function BarChart({ data }) {
             style={{
               width: 32,
               textAlign: "right",
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               flexShrink: 0,
               fontWeight: 600,
             }}
@@ -946,7 +946,7 @@ function BarChart({ data }) {
           <div
             style={{
               flex: 1,
-              background: "#f1f5f9",
+              background: "var(--surface-3, #f1f5f9)",
               borderRadius: 4,
               height: 22,
               overflow: "hidden",
@@ -1035,7 +1035,7 @@ function MonthBar({ monthlyData }) {
                 ) : null;
               })}
             </div>
-            <div style={{ fontSize: 10, color: "#94a3b8" }}>{mi + 1}月</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted, #94a3b8)" }}>{mi + 1}月</div>
           </div>
         ))}
       </div>
@@ -1172,20 +1172,20 @@ function WeatherWidget() {
   if (error) {
     return (
       <div style={{ ...C, flex: 1, minWidth: 220 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary, #64748b)", marginBottom: 10 }}>
           今日の天気
         </div>
-        <div style={{ fontSize: 13, color: "#94a3b8" }}>{error}</div>
+        <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>{error}</div>
       </div>
     );
   }
   if (!data) {
     return (
       <div style={{ ...C, flex: 1, minWidth: 220 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#64748b", marginBottom: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary, #64748b)", marginBottom: 10 }}>
           今日の天気
         </div>
-        <div style={{ fontSize: 13, color: "#94a3b8" }}>取得中...</div>
+        <div style={{ fontSize: 13, color: "var(--text-muted, #94a3b8)" }}>取得中...</div>
       </div>
     );
   }
@@ -1235,7 +1235,7 @@ function WeatherWidget() {
           href="https://www.msn.com/ja-jp/weather/forecast"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ fontSize: 13, color: "#64748b", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
+          style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
         >
           詳細 ↗
         </a>
@@ -1247,20 +1247,20 @@ function WeatherWidget() {
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <WeatherIcon type={current.type} size={40} color="#3B82F6" />
               <div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#1e293b", lineHeight: 1 }}>
+                <div style={{ fontSize: 32, fontWeight: 700, color: "var(--text-primary, #1e293b)", lineHeight: 1 }}>
                   {Math.round(data.current.temperature_2m)}°
                 </div>
-                <div style={{ fontSize: 14, color: "#64748b", marginTop: 2 }}>{current.label}</div>
+                <div style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", marginTop: 2 }}>{current.label}</div>
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 14, color: "#64748b" }}>
-                最高 <b style={{ color: "#1e293b" }}>{todayMax}°</b> / 最低 <b style={{ color: "#1e293b" }}>{todayMin}°</b>
+              <div style={{ fontSize: 14, color: "var(--text-secondary, #64748b)" }}>
+                最高 <b style={{ color: "var(--text-primary, #1e293b)" }}>{todayMax}°</b> / 最低 <b style={{ color: "var(--text-primary, #1e293b)" }}>{todayMin}°</b>
               </div>
               <div style={{ fontSize: 13, color: "#3B82F6", marginTop: 4 }}>降水確率 {todayPop}%</div>
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${hourlyIdx.length}, 1fr)`, gap: 4, paddingTop: 14, borderTop: "1px solid #f1f5f9" }}>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${hourlyIdx.length}, 1fr)`, gap: 4, paddingTop: 14, borderTop: "1px solid var(--line-soft, #f1f5f9)" }}>
             {hourlyIdx.map((h) => {
               const todayStr = new Date().toISOString().slice(0, 10);
               const hourIdx = data.hourly.time.findIndex((t) => t === `${todayStr}T${String(h).padStart(2, "0")}:00`);
@@ -1271,13 +1271,13 @@ function WeatherWidget() {
               const info = code !== null ? wmoInfo(code) : null;
               return (
                 <div key={h} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6 }}>{h}時</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginBottom: 6 }}>{h}時</div>
                   {info ? (
                     <WeatherIcon type={info.type} size={22} color={info.type === "rain" || info.type === "storm" ? "#3B82F6" : "#64748b"} night={isNight} />
                   ) : (
-                    <span style={{ fontSize: 12, color: "#cbd5e1" }}>—</span>
+                    <span style={{ fontSize: 12, color: "var(--text-muted, #cbd5e1)" }}>—</span>
                   )}
-                  <div style={{ fontSize: 13, color: "#1e293b", marginTop: 6 }}>{temp !== null ? `${temp}°` : ""}</div>
+                  <div style={{ fontSize: 13, color: "var(--text-primary, #1e293b)", marginTop: 6 }}>{temp !== null ? `${temp}°` : ""}</div>
                   <div style={{ fontSize: 11, color: "#3B82F6", marginTop: 2 }}>{pop !== null ? `${pop}%` : ""}</div>
                 </div>
               );
@@ -1293,9 +1293,9 @@ function WeatherWidget() {
             return (
               <div key={dateStr} style={{
                 display: "flex", alignItems: "center", gap: 14, fontSize: 14,
-                padding: "10px 0", borderBottom: i < data.daily.time.length - 1 ? "1px solid #f1f5f9" : "none",
+                padding: "10px 0", borderBottom: i < data.daily.time.length - 1 ? "1px solid var(--line-soft, #f1f5f9)" : "none",
               }}>
-                <span style={{ width: 64, color: "#64748b" }}>{label}</span>
+                <span style={{ width: 64, color: "var(--text-secondary, #64748b)" }}>{label}</span>
                 <span style={{ width: 26, display: "flex" }}>
                   <WeatherIcon type={info.type} size={22} color="#3B82F6" />
                 </span>
@@ -1303,8 +1303,8 @@ function WeatherWidget() {
                   {data.daily.precipitation_probability_max[i]}%
                 </span>
                 <span style={{ marginLeft: "auto", fontSize: 15 }}>
-                  <b style={{ color: "#1e293b" }}>{Math.round(data.daily.temperature_2m_max[i])}°</b>
-                  <span style={{ color: "#94a3b8" }}> / {Math.round(data.daily.temperature_2m_min[i])}°</span>
+                  <b style={{ color: "var(--text-primary, #1e293b)" }}>{Math.round(data.daily.temperature_2m_max[i])}°</b>
+                  <span style={{ color: "var(--text-muted, #94a3b8)" }}> / {Math.round(data.daily.temperature_2m_min[i])}°</span>
                 </span>
               </div>
             );
@@ -1359,7 +1359,7 @@ function QuoteWidget() {
         style={{
           fontSize: 12,
           fontWeight: 700,
-          color: "#64748b",
+          color: "var(--text-secondary, #64748b)",
           marginBottom: 10,
         }}
       >
@@ -1368,7 +1368,7 @@ function QuoteWidget() {
       <div
         style={{
           fontSize: 14,
-          color: "#1e293b",
+          color: "var(--text-primary, #1e293b)",
           lineHeight: 1.7,
           fontStyle: "italic",
           marginBottom: 8,
@@ -1376,7 +1376,7 @@ function QuoteWidget() {
       >
         「{quote.text}」
       </div>
-      <div style={{ fontSize: 12, color: "#94a3b8", textAlign: "right" }}>
+      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", textAlign: "right" }}>
         — {quote.author}
       </div>
     </div>
@@ -1447,14 +1447,14 @@ function SummaryPanel({ logs, subtitle }) {
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
               marginRight: 4,
             }}
           >
             {subtitle}
           </span>
         )}
-        <span style={{ fontSize: 13, color: "#64748b" }}>集計期間</span>
+        <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>集計期間</span>
         <input
           type="date"
           value={df}
@@ -1462,12 +1462,12 @@ function SummaryPanel({ logs, subtitle }) {
           style={{
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--card-border, #e2e8f0)",
             fontSize: 13,
             outline: "none",
           }}
         />
-        <span style={{ color: "#94a3b8" }}>〜</span>
+        <span style={{ color: "var(--text-muted, #94a3b8)" }}>〜</span>
         <input
           type="date"
           value={dt}
@@ -1475,15 +1475,15 @@ function SummaryPanel({ logs, subtitle }) {
           style={{
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--card-border, #e2e8f0)",
             fontSize: 13,
             outline: "none",
           }}
         />
         <div style={{ marginLeft: "auto", fontSize: 13 }}>
-          <b style={{ color: "#1e293b" }}>{totC}件</b>
-          <span style={{ color: "#94a3b8", margin: "0 6px" }}>/</span>
-          <b style={{ color: "#1e293b" }}>
+          <b style={{ color: "var(--text-primary, #1e293b)" }}>{totC}件</b>
+          <span style={{ color: "var(--text-muted, #94a3b8)", margin: "0 6px" }}>/</span>
+          <b style={{ color: "var(--text-primary, #1e293b)" }}>
             {Math.round((totM / 60) * 10) / 10}h
           </b>
         </div>
@@ -1500,7 +1500,7 @@ function SummaryPanel({ logs, subtitle }) {
           <div
             key={k}
             style={{
-              background: "#fff",
+              background: "var(--card-bg, #fff)",
               borderRadius: 14,
               padding: 16,
               border: `1px solid ${v.color}22`,
@@ -1518,17 +1518,17 @@ function SummaryPanel({ logs, subtitle }) {
               <span style={{ fontSize: 12, fontWeight: 700, color: v.color }}>
                 {k}
               </span>
-              <span style={{ fontSize: 11, color: "#94a3b8" }}>
+              <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
                 {cs[k].count}件
               </span>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "#1e293b" }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
               {Math.round((cs[k].minutes / 60) * 10) / 10}
-              <span style={{ fontSize: 12, fontWeight: 400, color: "#64748b" }}>
+              <span style={{ fontSize: 12, fontWeight: 400, color: "var(--text-secondary, #64748b)" }}>
                 h
               </span>
             </div>
-            <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
               {v.label}
             </div>
             {totM > 0 && (
@@ -1536,7 +1536,7 @@ function SummaryPanel({ logs, subtitle }) {
                 style={{
                   marginTop: 8,
                   height: 3,
-                  background: "#f1f5f9",
+                  background: "var(--surface-3, #f1f5f9)",
                   borderRadius: 2,
                 }}
               >
@@ -1568,7 +1568,7 @@ function SummaryPanel({ logs, subtitle }) {
               margin: "0 0 16px",
               fontSize: 14,
               fontWeight: 600,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             区分別 時間構成比
@@ -1581,7 +1581,7 @@ function SummaryPanel({ logs, subtitle }) {
               margin: "0 0 16px",
               fontSize: 14,
               fontWeight: 600,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             区分別 合計時間
@@ -1605,7 +1605,7 @@ function SummaryPanel({ logs, subtitle }) {
               margin: 0,
               fontSize: 14,
               fontWeight: 600,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             月別 業務区分別 合計時間
@@ -1629,7 +1629,7 @@ function SummaryPanel({ logs, subtitle }) {
                     background: v.color,
                   }}
                 />
-                <span style={{ color: "#64748b" }}>
+                <span style={{ color: "var(--text-secondary, #64748b)" }}>
                   {k}: {v.label}
                 </span>
               </div>
@@ -2060,7 +2060,7 @@ const upd = useCallback(
             <label
               style={{
                 fontSize: 12,
-                color: "#64748b",
+                color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 4,
               }}
@@ -2074,25 +2074,25 @@ const upd = useCallback(
               style={{
                 padding: "8px 12px",
                 borderRadius: 8,
-                border: "1px solid #e2e8f0",
+                border: "1px solid var(--card-border, #e2e8f0)",
                 fontSize: 14,
                 outline: "none",
               }}
             />
           </div>
           <div>
-            <div style={{ fontSize: 12, color: "#64748b", marginBottom: 4 }}>
+            <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", marginBottom: 4 }}>
               氏名
             </div>
             <div
               style={{
                 fontSize: 14,
                 fontWeight: 600,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
                 padding: "8px 12px",
-                background: "#f8fafc",
+                background: "var(--surface-2, #f8fafc)",
                 borderRadius: 8,
-                border: "1px solid #e2e8f0",
+                border: "1px solid var(--card-border, #e2e8f0)",
               }}
             >
               {currentUser.name}
@@ -2107,7 +2107,7 @@ const upd = useCallback(
                 border: "1px solid var(--accent-border, #BFDBFE)",
               }}
             >
-              <span style={{ fontSize: 12, color: "#64748b" }}>本日合計 </span>
+              <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>本日合計 </span>
               <span style={{ fontSize: 16, fontWeight: 700, color: "var(--accent, #3B82F6)" }}>
                 {Math.floor(totalMins / 60)}h
                 {totalMins % 60 > 0 ? `${totalMins % 60}m` : ""}
@@ -2186,7 +2186,7 @@ const upd = useCallback(
           >
             <div
               style={{
-                background: "#fff",
+                background: "var(--card-bg, #fff)",
                 borderRadius: 18,
                 padding: 28,
                 width: 500,
@@ -2209,7 +2209,7 @@ const upd = useCallback(
                     margin: 0,
                     fontSize: 16,
                     fontWeight: 700,
-                    color: "#1e293b",
+                    color: "var(--text-primary, #1e293b)",
                   }}
                 >
                   📋 テンプレートを選択
@@ -2220,7 +2220,7 @@ const upd = useCallback(
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: "#94a3b8",
+                    color: "var(--text-muted, #94a3b8)",
                   }}
                 >
                   <Icon name="x" size={18} />
@@ -2232,7 +2232,7 @@ const upd = useCallback(
                   display: "flex",
                   gap: 4,
                   marginBottom: 16,
-                  background: "#f1f5f9",
+                  background: "var(--surface-3, #f1f5f9)",
                   borderRadius: 10,
                   padding: 4,
                 }}
@@ -2253,8 +2253,8 @@ const upd = useCallback(
                       fontSize: 13,
                       fontWeight: templateTab === tab ? 600 : 400,
                       fontFamily: "inherit",
-                      background: templateTab === tab ? "#fff" : "transparent",
-                      color: templateTab === tab ? "#1e293b" : "#64748b",
+                      background: templateTab === tab ? "var(--card-bg, #fff)" : "transparent",
+                      color: templateTab === tab ? "var(--text-primary, #1e293b)" : "var(--text-secondary, #64748b)",
                       boxShadow:
                         templateTab === tab
                           ? "0 1px 3px rgba(0,0,0,0.1)"
@@ -2274,7 +2274,7 @@ const upd = useCallback(
                     <div
                       style={{
                         textAlign: "center",
-                        color: "#94a3b8",
+                        color: "var(--text-muted, #94a3b8)",
                         padding: "32px 0",
                         fontSize: 13,
                       }}
@@ -2294,10 +2294,10 @@ const upd = useCallback(
                       <div
                         key={t.id}
                         style={{
-                          background: "#f8fafc",
+                          background: "var(--surface-2, #f8fafc)",
                           borderRadius: 10,
                           padding: "12px 14px",
-                          border: "1px solid #e2e8f0",
+                          border: "1px solid var(--card-border, #e2e8f0)",
                         }}
                       >
                         <div
@@ -2312,7 +2312,7 @@ const upd = useCallback(
                             style={{
                               fontSize: 14,
                               fontWeight: 700,
-                              color: "#1e293b",
+                              color: "var(--text-primary, #1e293b)",
                               flex: 1,
                             }}
                           >
@@ -2330,14 +2330,14 @@ const upd = useCallback(
                               ...BB,
                               padding: "5px 10px",
                               fontSize: 12,
-                              color: "#EF4444",
-                              borderColor: "#FECACA",
+                              color: "var(--danger, #DC2626)",
+                              borderColor: "var(--danger-border, #FECACA)",
                             }}
                             onMouseEnter={(e) =>
-                              (e.currentTarget.style.background = "#FEF2F2")
+                              (e.currentTarget.style.background = "var(--danger-soft, #FEF2F2)")
                             }
                             onMouseLeave={(e) =>
-                              (e.currentTarget.style.background = "#fff")
+                              (e.currentTarget.style.background = "var(--card-bg, #fff)")
                             }
                           >
                             <Icon name="trash" size={13} />
@@ -2355,7 +2355,7 @@ const upd = useCallback(
                               key={i}
                               style={{
                                 fontSize: 12,
-                                color: "#64748b",
+                                color: "var(--text-secondary, #64748b)",
                                 display: "flex",
                                 gap: 8,
                               }}
@@ -2372,7 +2372,7 @@ const upd = useCallback(
                               </span>
                               <span>{r.task}</span>
                               {r.start && r.end && (
-                                <span style={{ color: "#94a3b8" }}>
+                                <span style={{ color: "var(--text-muted, #94a3b8)" }}>
                                   {r.start}〜{r.end}
                                 </span>
                               )}
@@ -2406,7 +2406,7 @@ const upd = useCallback(
           >
             <div
               style={{
-                background: "#fff",
+                background: "var(--card-bg, #fff)",
                 borderRadius: 18,
                 padding: 28,
                 width: 420,
@@ -2427,7 +2427,7 @@ const upd = useCallback(
                     margin: 0,
                     fontSize: 16,
                     fontWeight: 700,
-                    color: "#1e293b",
+                    color: "var(--text-primary, #1e293b)",
                   }}
                 >
                   💾 テンプレートとして保存
@@ -2438,7 +2438,7 @@ const upd = useCallback(
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    color: "#94a3b8",
+                    color: "var(--text-muted, #94a3b8)",
                   }}
                 >
                   <Icon name="x" size={18} />
@@ -2449,7 +2449,7 @@ const upd = useCallback(
                   display: "flex",
                   gap: 4,
                   marginBottom: 16,
-                  background: "#f1f5f9",
+                  background: "var(--surface-3, #f1f5f9)",
                   borderRadius: 10,
                   padding: 4,
                 }}
@@ -2482,8 +2482,8 @@ const upd = useCallback(
                         fontSize: 13,
                         fontWeight: isActive ? 600 : 400,
                         fontFamily: "inherit",
-                        background: isActive ? "#fff" : "transparent",
-                        color: isActive ? "#1e293b" : "#64748b",
+                        background: isActive ? "var(--card-bg, #fff)" : "transparent",
+                        color: isActive ? "var(--text-primary, #1e293b)" : "var(--text-secondary, #64748b)",
                         boxShadow: isActive
                           ? "0 1px 3px rgba(0,0,0,0.1)"
                           : "none",
@@ -2499,7 +2499,7 @@ const upd = useCallback(
                   <label
                     style={{
                       fontSize: 12,
-                      color: "#64748b",
+                      color: "var(--text-secondary, #64748b)",
                       display: "block",
                       marginBottom: 5,
                     }}
@@ -2530,7 +2530,7 @@ const upd = useCallback(
                 <label
                   style={{
                     fontSize: 12,
-                    color: "#64748b",
+                    color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
                   }}
@@ -2582,10 +2582,10 @@ const upd = useCallback(
             <div
               key={row.id}
               style={{
-                background: "#fff",
+                background: "var(--card-bg, #fff)",
                 borderRadius: 14,
-                border: "1px solid #e2e8f0",
-                borderLeft: `4px solid ${valid ? cc : "#e2e8f0"}`,
+                border: "1px solid var(--card-border, #e2e8f0)",
+                borderLeft: `4px solid ${valid ? cc : "var(--card-border, #e2e8f0)"}`,
                 boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
                 overflow: "hidden",
               }}
@@ -2596,8 +2596,8 @@ const upd = useCallback(
                   alignItems: "center",
                   gap: 10,
                   padding: "10px 14px",
-                  background: valid ? cb : "#fafafa",
-                  borderBottom: "1px solid #f1f5f9",
+                  background: valid ? cb : "var(--surface-2, #fafafa)",
+                  borderBottom: "1px solid var(--line-soft, #f1f5f9)",
                   flexWrap: "wrap",
                 }}
               >
@@ -2606,7 +2606,7 @@ const upd = useCallback(
                     width: 24,
                     height: 24,
                     borderRadius: 6,
-                    background: valid ? cc : "#e2e8f0",
+                    background: valid ? cc : "var(--card-border, #e2e8f0)",
                     color: "#fff",
                     fontSize: 12,
                     fontWeight: 700,
@@ -2633,12 +2633,12 @@ const upd = useCallback(
                     style={{
                       padding: "6px 10px",
                       borderRadius: 7,
-                      border: "1px solid #e2e8f0",
+                      border: "1px solid var(--card-border, #e2e8f0)",
                       fontSize: 13,
                       outline: "none",
                     }}
                   />
-                  <span style={{ color: "#94a3b8", fontSize: 13 }}>〜</span>
+                  <span style={{ color: "var(--text-muted, #94a3b8)", fontSize: 13 }}>〜</span>
                   <input
                     type="time"
                     value={row.end}
@@ -2646,7 +2646,7 @@ const upd = useCallback(
                     style={{
                       padding: "6px 10px",
                       borderRadius: 7,
-                      border: "1px solid #e2e8f0",
+                      border: "1px solid var(--card-border, #e2e8f0)",
                       fontSize: 13,
                       outline: "none",
                     }}
@@ -2674,11 +2674,11 @@ const upd = useCallback(
                     style={{
                       padding: "6px 10px",
                       borderRadius: 7,
-                      border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "#e2e8f0"}`,
+                      border: `1px solid ${row.cat ? CATEGORIES[row.cat].color : "var(--card-border, #e2e8f0)"}`,
                       fontSize: 13,
-                      color: row.cat ? CATEGORIES[row.cat].color : "#94a3b8",
+                      color: row.cat ? CATEGORIES[row.cat].color : "var(--text-muted, #94a3b8)",
                       fontWeight: row.cat ? 700 : 400,
-                      background: row.cat ? CATEGORIES[row.cat].bg : "#fff",
+                      background: row.cat ? CATEGORIES[row.cat].bg : "var(--card-bg, #fff)",
                       cursor: "pointer",
                       fontFamily: "inherit",
                       minWidth: 140,
@@ -2696,8 +2696,8 @@ const upd = useCallback(
                         top: "100%",
                         left: 0,
                         zIndex: 50,
-                        background: "#fff",
-                        border: "1px solid #e2e8f0",
+                        background: "var(--card-bg, #fff)",
+                        border: "1px solid var(--card-border, #e2e8f0)",
                         borderRadius: 10,
                         boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                         overflow: "hidden",
@@ -2717,7 +2717,7 @@ const upd = useCallback(
                             display: "flex",
                             alignItems: "center",
                             gap: 10,
-                            background: row.cat === k ? v.bg : "#fff",
+                            background: row.cat === k ? v.bg : "var(--card-bg, #fff)",
                             borderLeft: `3px solid ${row.cat === k ? v.color : "transparent"}`,
                           }}
                           onMouseEnter={(e) =>
@@ -2746,7 +2746,7 @@ const upd = useCallback(
                           >
                             {k}
                           </span>
-                          <span style={{ fontSize: 12, color: "#64748b" }}>
+                          <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
                             {v.label}
                           </span>
                         </div>
@@ -2847,7 +2847,7 @@ const upd = useCallback(
                   <label
                     style={{
                       fontSize: 11,
-                      color: "#94a3b8",
+                      color: "var(--text-muted, #94a3b8)",
                       fontWeight: 600,
                       display: "block",
                       marginBottom: 4,
@@ -2866,16 +2866,16 @@ const upd = useCallback(
                         width: "100%",
                         padding: "8px 10px",
                         borderRadius: 7,
-                        border: "1px solid #e2e8f0",
+                        border: "1px solid var(--card-border, #e2e8f0)",
                         fontSize: 13,
-                        color: "#1e293b",
+                        color: "var(--text-primary, #1e293b)",
                         outline: "none",
                         boxSizing: "border-box",
                         fontWeight: 500,
                       }}
                       onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
                       onBlur={(e) => {
-                        e.target.style.borderColor = "#e2e8f0";
+                        e.target.style.borderColor = "var(--card-border, #e2e8f0)";
                         setTimeout(
                           () =>
                             setTagSuggest({
@@ -2897,8 +2897,8 @@ const upd = useCallback(
                             top: "100%",
                             left: 0,
                             zIndex: 50,
-                            background: "#fff",
-                            border: "1px solid #e2e8f0",
+                            background: "var(--card-bg, #fff)",
+                            border: "1px solid var(--card-border, #e2e8f0)",
                             borderRadius: 10,
                             boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                             overflow: "hidden",
@@ -2925,7 +2925,7 @@ const upd = useCallback(
                                 (e.currentTarget.style.background = "#F5F3FF")
                               }
                               onMouseLeave={(e) =>
-                                (e.currentTarget.style.background = "#fff")
+                                (e.currentTarget.style.background = "var(--card-bg, #fff)")
                               }
                             >
                               <span
@@ -2971,7 +2971,7 @@ const upd = useCallback(
                   <label
                     style={{
                       fontSize: 11,
-                      color: "#94a3b8",
+                      color: "var(--text-muted, #94a3b8)",
                       fontWeight: 600,
                       display: "block",
                       marginBottom: 4,
@@ -2993,9 +2993,9 @@ const upd = useCallback(
                         width: "100%",
                         padding: "8px 10px",
                         borderRadius: 7,
-                        border: "1px solid #e2e8f0",
+                        border: "1px solid var(--card-border, #e2e8f0)",
                         fontSize: 13,
-                        color: "#1e293b",
+                        color: "var(--text-primary, #1e293b)",
                         outline: "none",
                         resize: "vertical",
                         minHeight: 60,
@@ -3006,7 +3006,7 @@ const upd = useCallback(
                       }}
                       onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
                       onBlur={(e) => {
-                        e.target.style.borderColor = "#e2e8f0";
+                        e.target.style.borderColor = "var(--card-border, #e2e8f0)";
                         setTimeout(
                           () =>
                             setTagSuggest({
@@ -3028,8 +3028,8 @@ const upd = useCallback(
                             bottom: "100%",
                             left: 0,
                             zIndex: 50,
-                            background: "#fff",
-                            border: "1px solid #e2e8f0",
+                            background: "var(--card-bg, #fff)",
+                            border: "1px solid var(--card-border, #e2e8f0)",
                             borderRadius: 10,
                             boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                             overflow: "hidden",
@@ -3056,7 +3056,7 @@ const upd = useCallback(
                                 (e.currentTarget.style.background = "#F5F3FF")
                               }
                               onMouseLeave={(e) =>
-                                (e.currentTarget.style.background = "#fff")
+                                (e.currentTarget.style.background = "var(--card-bg, #fff)")
                               }
                             >
                               <span
@@ -3144,9 +3144,9 @@ const upd = useCallback(
           width: "100%",
           padding: "11px",
           borderRadius: 12,
-          border: "2px dashed #cbd5e1",
+          border: "2px dashed var(--line-strong, #cbd5e1)",
           background: "transparent",
-          color: "#64748b",
+          color: "var(--text-secondary, #64748b)",
           fontSize: 13,
           fontWeight: 600,
           cursor: "pointer",
@@ -3164,8 +3164,8 @@ const upd = useCallback(
           e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = "#cbd5e1";
-          e.currentTarget.style.color = "#64748b";
+          e.currentTarget.style.borderColor = "var(--line-strong, #cbd5e1)";
+          e.currentTarget.style.color = "var(--text-secondary, #64748b)";
           e.currentTarget.style.background = "transparent";
         }}
       >
@@ -3177,7 +3177,7 @@ const upd = useCallback(
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: "#1e293b",
+            color: "var(--text-primary, #1e293b)",
             display: "flex",
             alignItems: "center",
             gap: 7,
@@ -3189,7 +3189,7 @@ const upd = useCallback(
           <span
             style={{
               fontSize: 11,
-              color: "#94a3b8",
+              color: "var(--text-muted, #94a3b8)",
               fontWeight: 400,
               marginLeft: 4,
             }}
@@ -3206,9 +3206,9 @@ const upd = useCallback(
             width: "100%",
             padding: "10px 12px",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--card-border, #e2e8f0)",
             fontSize: 13,
-            color: "#1e293b",
+            color: "var(--text-primary, #1e293b)",
             outline: "none",
             resize: "vertical",
             minHeight: 80,
@@ -3217,7 +3217,7 @@ const upd = useCallback(
             lineHeight: 1.6,
           }}
           onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
-          onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--card-border, #e2e8f0)")}
         />
       </div>
       <div style={C}>
@@ -3226,7 +3226,7 @@ const upd = useCallback(
             margin: "0 0 8px",
             fontSize: 12,
             fontWeight: 600,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
           }}
         >
           業務区分
@@ -3248,7 +3248,7 @@ const upd = useCallback(
               <span style={{ fontWeight: 700, color: v.color, fontSize: 13 }}>
                 {k}
               </span>
-              <span style={{ fontSize: 12, color: "#64748b" }}>{v.desc}</span>
+              <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>{v.desc}</span>
             </div>
           ))}
         </div>
@@ -3292,7 +3292,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
         <label
           style={{
             fontSize: 12,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
             display: "block",
             marginBottom: 5,
           }}
@@ -3309,7 +3309,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
         <label
           style={{
             fontSize: 12,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
             display: "block",
             marginBottom: 5,
           }}
@@ -3330,7 +3330,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -3348,7 +3348,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -3368,7 +3368,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
               alignSelf: "flex-end",
               paddingBottom: 9,
               fontSize: 13,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
             }}
           >
             {getMins(start, end)}分
@@ -3379,7 +3379,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
         <label
           style={{
             fontSize: 12,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
             display: "block",
             marginBottom: 5,
           }}
@@ -3393,11 +3393,11 @@ function EditLogForm({ rec, onSave, onCancel }) {
             style={{
               padding: "9px 12px",
               borderRadius: 8,
-              border: `1px solid ${cat ? CATEGORIES[cat].color : "#e2e8f0"}`,
+              border: `1px solid ${cat ? CATEGORIES[cat].color : "var(--card-border, #e2e8f0)"}`,
               fontSize: 13,
-              color: cat ? CATEGORIES[cat].color : "#94a3b8",
+              color: cat ? CATEGORIES[cat].color : "var(--text-muted, #94a3b8)",
               fontWeight: cat ? 700 : 400,
-              background: cat ? CATEGORIES[cat].bg : "#fff",
+              background: cat ? CATEGORIES[cat].bg : "var(--card-bg, #fff)",
               cursor: "pointer",
               fontFamily: "inherit",
               minWidth: 160,
@@ -3413,8 +3413,8 @@ function EditLogForm({ rec, onSave, onCancel }) {
                 top: "100%",
                 left: 0,
                 zIndex: 50,
-                background: "#fff",
-                border: "1px solid #e2e8f0",
+                background: "var(--card-bg, #fff)",
+                border: "1px solid var(--card-border, #e2e8f0)",
                 borderRadius: 10,
                 boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                 overflow: "hidden",
@@ -3434,7 +3434,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 10,
-                    background: cat === k ? v.bg : "#fff",
+                    background: cat === k ? v.bg : "var(--card-bg, #fff)",
                     borderLeft: `3px solid ${cat === k ? v.color : "transparent"}`,
                   }}
                   onMouseEnter={(e) =>
@@ -3450,7 +3450,7 @@ function EditLogForm({ rec, onSave, onCancel }) {
                   >
                     {k}
                   </span>
-                  <span style={{ fontSize: 12, color: "#64748b" }}>
+                  <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
                     {v.label}
                   </span>
                 </div>
@@ -3487,18 +3487,18 @@ function LogCard({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(rec.managerComment || "");
   const cat = CATEGORIES[rec.cat] || {
-    color: "#94a3b8",
+    color: "var(--text-muted, #94a3b8)",
     bg: "#f8fafc",
     label: "その他",
   };
   return (
     <div
       style={{
-        borderBottom: "1px solid #f1f5f9",
+        borderBottom: "1px solid var(--line-soft, #f1f5f9)",
         transition: "background 0.15s",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+      onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface-2, #fafafa)")}
+      onMouseLeave={(e) => (e.currentTarget.style.background = "var(--card-bg, #fff)")}
     >
       <div
         style={{
@@ -3523,7 +3523,7 @@ function LogCard({
           <div
             style={{
               fontSize: 14,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
               fontWeight: 600,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -3555,7 +3555,7 @@ function LogCard({
             <div
               style={{
                 fontSize: 12,
-                color: "#94a3b8",
+                color: "var(--text-muted, #94a3b8)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -3589,7 +3589,7 @@ function LogCard({
               👑コメントあり
             </span>
           )}
-          <span style={{ fontSize: 12, color: "#64748b" }}>
+          <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
             {rec.start}〜{rec.end}
           </span>
           <span
@@ -3607,7 +3607,7 @@ function LogCard({
           <span
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               width: 36,
               textAlign: "right",
             }}
@@ -3617,7 +3617,7 @@ function LogCard({
           <span
             style={{
               fontSize: 10,
-              color: "#94a3b8",
+              color: "var(--text-muted, #94a3b8)",
               transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
               transition: "transform 0.2s",
               display: "inline-block",
@@ -3639,7 +3639,7 @@ function LogCard({
               <div
                 style={{
                   fontSize: 11,
-                  color: "#94a3b8",
+                  color: "var(--text-muted, #94a3b8)",
                   fontWeight: 600,
                   marginBottom: 4,
                 }}
@@ -3649,9 +3649,9 @@ function LogCard({
               <div
                 style={{
                   fontSize: 13,
-                  color: "#475569",
+                  color: "var(--text-body, #475569)",
                   lineHeight: 1.7,
-                  background: "#f8fafc",
+                  background: "var(--surface-2, #f8fafc)",
                   padding: "10px 12px",
                   borderRadius: 8,
                   whiteSpace: "pre-wrap",
@@ -3718,7 +3718,7 @@ function LogCard({
                     outline: "none",
                     resize: "vertical",
                     fontFamily: "inherit",
-                    background: "#fff",
+                    background: "var(--card-bg, #fff)",
                     boxSizing: "border-box",
                     lineHeight: 1.6,
                   }}
@@ -3749,8 +3749,8 @@ function LogCard({
                     }}
                     style={{
                       padding: "6px 14px",
-                      background: "#f1f5f9",
-                      color: "#64748b",
+                      background: "var(--surface-3, #f1f5f9)",
+                      color: "var(--text-secondary, #64748b)",
                       border: "none",
                       borderRadius: 7,
                       fontSize: 12,
@@ -3830,9 +3830,9 @@ function LogCard({
                   alignItems: "center",
                   gap: 5,
                   fontSize: 12,
-                  color: "#ef4444",
-                  background: "#FEF2F2",
-                  border: "1px solid #FECACA",
+                  color: "var(--danger, #DC2626)",
+                  background: "var(--card-bg, #fff)",
+                  border: "1px solid var(--danger-border, #FECACA)",
                   borderRadius: 7,
                   padding: "5px 10px",
                   cursor: "pointer",
@@ -3860,7 +3860,7 @@ function LogCard({
             >
               <div
                 style={{
-                  background: "#fff",
+                  background: "var(--card-bg, #fff)",
                   borderRadius: 18,
                   padding: 28,
                   width: 520,
@@ -3883,7 +3883,7 @@ function LogCard({
                       margin: 0,
                       fontSize: 16,
                       fontWeight: 700,
-                      color: "#1e293b",
+                      color: "var(--text-primary, #1e293b)",
                     }}
                   >
                     業務を編集
@@ -3894,7 +3894,7 @@ function LogCard({
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      color: "#94a3b8",
+                      color: "var(--text-muted, #94a3b8)",
                     }}
                   >
                     <Icon name="x" size={18} />
@@ -3950,10 +3950,10 @@ function DateGroup({
           marginBottom: 8,
         }}
       >
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
           {date}
         </span>
-        <span style={{ fontSize: 12, color: "#94a3b8" }}>
+        <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
           {recs.length}件 / {totMins}分
         </span>
         {onDuplicate && recs.some((r) => r.user === currentUser.name) && (
@@ -3979,9 +3979,9 @@ function DateGroup({
       </div>
       <div
         style={{
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 12,
-          border: "1px solid #e2e8f0",
+          border: "1px solid var(--card-border, #e2e8f0)",
           overflow: "hidden",
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
           marginBottom: 8,
@@ -4003,9 +4003,9 @@ function DateGroup({
       </div>
       <div
         style={{
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 12,
-          border: "1px solid #e2e8f0",
+          border: "1px solid var(--card-border, #e2e8f0)",
           boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
           padding: "14px 16px",
         }}
@@ -4014,7 +4014,7 @@ function DateGroup({
           style={{
             fontSize: 12,
             fontWeight: 700,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
             display: "flex",
             alignItems: "center",
             gap: 5,
@@ -4035,7 +4035,7 @@ function DateGroup({
             <div
               style={{
                 fontSize: 11,
-                color: "#94a3b8",
+                color: "var(--text-muted, #94a3b8)",
                 fontWeight: 600,
               }}
             >
@@ -4063,7 +4063,7 @@ function DateGroup({
                     }
                   }}
                   style={{
-                    fontSize: 11, color: "#EF4444", background: "none",
+                    fontSize: 11, color: "var(--danger, #DC2626)", background: "none",
                     border: "none", cursor: "pointer", fontFamily: "inherit",
                     padding: "2px 4px",
                   }}
@@ -4080,7 +4080,7 @@ function DateGroup({
                 onChange={(e) => setMemberCommentDraft(e.target.value)}
                 style={{
                   width: "100%", minHeight: 80, fontSize: 13, padding: "10px 12px",
-                  borderRadius: 8, border: "1px solid #e2e8f0", fontFamily: "inherit",
+                  borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontFamily: "inherit",
                   resize: "vertical", boxSizing: "border-box",
                 }}
               />
@@ -4102,7 +4102,7 @@ function DateGroup({
                   onClick={() => setEditMemberComment(false)}
                   style={{
                     fontSize: 12, padding: "5px 14px", borderRadius: 6,
-                    border: "1px solid #e2e8f0", background: "#fff", color: "#64748b",
+                    border: "1px solid var(--card-border, #e2e8f0)", background: "var(--card-bg, #fff)", color: "var(--text-secondary, #64748b)",
                     cursor: "pointer", fontFamily: "inherit",
                   }}
                 >
@@ -4114,9 +4114,9 @@ function DateGroup({
             <div
               style={{
                 fontSize: 13,
-                color: "#475569",
+                color: "var(--text-body, #475569)",
                 lineHeight: 1.7,
-                background: "#f8fafc",
+                background: "var(--surface-2, #f8fafc)",
                 padding: "10px 12px",
                 borderRadius: 8,
                 whiteSpace: "pre-wrap",
@@ -4128,8 +4128,8 @@ function DateGroup({
             <div
               style={{
                 fontSize: 12,
-                color: "#94a3b8",
-                background: "#f8fafc",
+                color: "var(--text-muted, #94a3b8)",
+                background: "var(--surface-2, #f8fafc)",
                 padding: "8px 12px",
                 borderRadius: 8,
               }}
@@ -4191,7 +4191,7 @@ function DateGroup({
                   outline: "none",
                   resize: "vertical",
                   fontFamily: "inherit",
-                  background: "#fff",
+                  background: "var(--card-bg, #fff)",
                   boxSizing: "border-box",
                   lineHeight: 1.6,
                 }}
@@ -4222,8 +4222,8 @@ function DateGroup({
                   }}
                   style={{
                     padding: "6px 14px",
-                    background: "#f1f5f9",
-                    color: "#64748b",
+                    background: "var(--surface-3, #f1f5f9)",
+                    color: "var(--text-secondary, #64748b)",
                     border: "none",
                     borderRadius: 7,
                     fontSize: 12,
@@ -4324,18 +4324,18 @@ function CardLogView({
                 onClick={() => toggleMonth(month)}
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 8,
-                  padding: "8px 12px", background: "#f8fafc", border: "1px solid #e2e8f0",
+                  padding: "8px 12px", background: "var(--surface-2, #f8fafc)", border: "1px solid var(--card-border, #e2e8f0)",
                   borderRadius: 10, cursor: "pointer", fontFamily: "inherit",
                   marginBottom: isExpanded ? 8 : 0,
                 }}
               >
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#1e293b" }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
                   {y}年{m}月
                 </span>
                 {!isExpanded && (
-                  <span style={{ fontSize: 11, color: "#94a3b8" }}>{totalCount}件</span>
+                  <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>{totalCount}件</span>
                 )}
-                <span style={{ marginLeft: "auto", fontSize: 10, color: "#94a3b8", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--text-muted, #94a3b8)", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
                   ▼
                 </span>
               </button>
@@ -4400,7 +4400,7 @@ function DayCard({ date, recs, selected, compact, onClick }) {
     <div
       onClick={onClick}
       style={{
-        background: "#fff",
+        background: "var(--card-bg, #fff)",
         border: `1px solid ${selected ? "var(--accent, #3B82F6)" : "#e2e8f0"}`,
         borderRadius: 14,
         padding: compact ? "10px 12px" : "13px 16px",
@@ -4410,10 +4410,10 @@ function DayCard({ date, recs, selected, compact, onClick }) {
         boxShadow: selected ? "0 2px 8px rgba(59,130,246,0.12)" : "none",
       }}
       onMouseEnter={(e) => {
-        if (!selected) e.currentTarget.style.borderColor = "#cbd5e1";
+        if (!selected) e.currentTarget.style.borderColor = "var(--line-strong, #cbd5e1)";
       }}
       onMouseLeave={(e) => {
-        if (!selected) e.currentTarget.style.borderColor = "#e2e8f0";
+        if (!selected) e.currentTarget.style.borderColor = "var(--card-border, #e2e8f0)";
       }}
     >
       <div
@@ -4431,7 +4431,7 @@ function DayCard({ date, recs, selected, compact, onClick }) {
             style={{
               fontSize: compact ? 13 : 14,
               fontWeight: 600,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
               whiteSpace: "nowrap",
             }}
           >
@@ -4439,14 +4439,14 @@ function DayCard({ date, recs, selected, compact, onClick }) {
           </span>
           {!compact && (
             <span
-              style={{ fontSize: 11, color: "#94a3b8", whiteSpace: "nowrap" }}
+              style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", whiteSpace: "nowrap" }}
             >
               {recs.length}件 / {Math.floor(totMins / 60)}h
               {totMins % 60 > 0 ? `${totMins % 60}m` : ""}
             </span>
           )}
         </div>
-        <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0 }}>▶</span>
+        <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", flexShrink: 0 }}>▶</span>
       </div>
       {!compact && (
         <>
@@ -4651,7 +4651,7 @@ function LogListPage({
           style={{
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--card-border, #e2e8f0)",
             fontSize: 13,
             outline: "none",
             minWidth: 200,
@@ -4664,7 +4664,7 @@ function LogListPage({
           style={{
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--card-border, #e2e8f0)",
             fontSize: 13,
             outline: "none",
           }}
@@ -4675,7 +4675,7 @@ function LogListPage({
           style={{
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid #e2e8f0",
+            border: "1px solid var(--card-border, #e2e8f0)",
             fontSize: 13,
             outline: "none",
           }}
@@ -4698,11 +4698,11 @@ function LogListPage({
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #e2e8f0",
-              background: "#fff",
+              border: "1px solid var(--card-border, #e2e8f0)",
+              background: "var(--card-bg, #fff)",
               fontSize: 13,
               cursor: "pointer",
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
             }}
           >
             リセット
@@ -4717,12 +4717,12 @@ function LogListPage({
             gap: 12,
           }}
         >
-          <b style={{ color: "#1e293b" }}>{filtered.length}件</b>
+          <b style={{ color: "var(--text-primary, #1e293b)" }}>{filtered.length}件</b>
           <div
             style={{
               display: "flex",
               gap: 2,
-              background: "#f1f5f9",
+              background: "var(--surface-3, #f1f5f9)",
               borderRadius: 8,
               padding: 3,
             }}
@@ -4742,8 +4742,8 @@ function LogListPage({
                   fontSize: 12,
                   fontWeight: viewMode === id ? 600 : 400,
                   fontFamily: "inherit",
-                  background: viewMode === id ? "#fff" : "transparent",
-                  color: viewMode === id ? "#1e293b" : "#64748b",
+                  background: viewMode === id ? "var(--card-bg, #fff)" : "transparent",
+                  color: viewMode === id ? "var(--text-primary, #1e293b)" : "var(--text-secondary, #64748b)",
                   boxShadow:
                     viewMode === id ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                 }}
@@ -4764,10 +4764,10 @@ function LogListPage({
               marginBottom: 8,
             }}
           >
-            <span style={{ fontSize: 12, color: "#64748b", fontWeight: 600 }}>
+            <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", fontWeight: 600 }}>
               🏷 タグ
             </span>
-            <span style={{ fontSize: 11, color: "#94a3b8" }}>
+            <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
               タグをクリックで絞り込み・右クリックでピン留め
             </span>
           </div>
@@ -4835,7 +4835,7 @@ function LogListPage({
                       fontFamily: "inherit",
                       borderColor: isActive ? "var(--accent, #3B82F6)" : "#e2e8f0",
                       background: isActive ? "var(--accent, #3B82F6)" : "#f8fafc",
-                      color: isActive ? "#fff" : "#64748b",
+                      color: isActive ? "#fff" : "var(--text-secondary, #64748b)",
                       fontWeight: isActive ? 600 : 400,
                     }}
                   >
@@ -4849,7 +4849,7 @@ function LogListPage({
               style={{
                 marginTop: 8,
                 fontSize: 12,
-                color: "#64748b",
+                color: "var(--text-secondary, #64748b)",
                 display: "flex",
                 alignItems: "center",
                 gap: 4,
@@ -4882,7 +4882,7 @@ function LogListPage({
           style={{
             ...C,
             textAlign: "center",
-            color: "#94a3b8",
+            color: "var(--text-muted, #94a3b8)",
             fontSize: 14,
             padding: 48,
           }}
@@ -4914,18 +4914,18 @@ function LogListPage({
                 onClick={() => toggleMonth(month)}
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: 8,
-                  padding: "10px 14px", background: "#f8fafc", border: "1px solid #e2e8f0",
+                  padding: "10px 14px", background: "var(--surface-2, #f8fafc)", border: "1px solid var(--card-border, #e2e8f0)",
                   borderRadius: 10, cursor: "pointer", fontFamily: "inherit",
                   marginBottom: isExpanded ? 10 : 0,
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
                   {y}年{m}月
                 </span>
                 {!isExpanded && (
-                  <span style={{ fontSize: 12, color: "#94a3b8" }}>{totalCount}件</span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>{totalCount}件</span>
                 )}
-                <span style={{ marginLeft: "auto", fontSize: 11, color: "#94a3b8", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted, #94a3b8)", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
                   ▼
                 </span>
               </button>
@@ -4987,10 +4987,10 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
             key={member.id}
             onClick={() => onSelectMember(member)}
             style={{
-              background: "#fff",
+              background: "var(--card-bg, #fff)",
               borderRadius: 16,
               padding: 24,
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--card-border, #e2e8f0)",
               boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
               cursor: "pointer",
               transition: "all 0.2s",
@@ -5002,7 +5002,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
-              e.currentTarget.style.borderColor = "#e2e8f0";
+              e.currentTarget.style.borderColor = "var(--card-border, #e2e8f0)";
             }}
           >
             <div
@@ -5032,11 +5032,11 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
               </div>
               <div style={{ flex: 1 }}>
                 <div
-                  style={{ fontSize: 15, fontWeight: 700, color: "#1e293b" }}
+                  style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}
                 >
                   {member.name}
                 </div>
-                <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                   {g ? g.name : ""}
                 </div>
               </div>
@@ -5062,7 +5062,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                 <div
                   key={i}
                   style={{
-                    background: "#f8fafc",
+                    background: "var(--surface-2, #f8fafc)",
                     borderRadius: 10,
                     padding: "10px 8px",
                     textAlign: "center",
@@ -5071,7 +5071,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                   <div style={{ fontSize: 16, fontWeight: 700, color: s[2] }}>
                     {s[1]}
                   </div>
-                  <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                  <div style={{ fontSize: 10, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
                     {s[0]}
                   </div>
                 </div>
@@ -5102,7 +5102,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
               })}
             </div>
             {topCat && topCat[1] > 0 && (
-              <div style={{ fontSize: 11, color: "#64748b" }}>
+              <div style={{ fontSize: 11, color: "var(--text-secondary, #64748b)" }}>
                 最多:{" "}
                 <span
                   style={{
@@ -5112,7 +5112,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
                 >
                   {topCat[0]}: {CATEGORIES[topCat[0]].label}
                 </span>
-                <span style={{ color: "#94a3b8", marginLeft: 8 }}>
+                <span style={{ color: "var(--text-muted, #94a3b8)", marginLeft: 8 }}>
                   詳細を見る →
                 </span>
               </div>
@@ -5152,11 +5152,11 @@ function MemberDetailPage({
             alignItems: "center",
             gap: 6,
             padding: "8px 14px",
-            background: "#f8fafc",
-            border: "1px solid #e2e8f0",
+            background: "var(--surface-2, #f8fafc)",
+            border: "1px solid var(--card-border, #e2e8f0)",
             borderRadius: 10,
             fontSize: 13,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
             cursor: "pointer",
             fontFamily: "inherit",
           }}
@@ -5165,14 +5165,14 @@ function MemberDetailPage({
             e.currentTarget.style.color = "var(--accent, #3B82F6)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#f8fafc";
-            e.currentTarget.style.color = "#64748b";
+            e.currentTarget.style.background = "var(--surface-2, #f8fafc)";
+            e.currentTarget.style.color = "var(--text-secondary, #64748b)";
           }}
         >
           <Icon name="back" size={16} />
           メンバー一覧に戻る
         </button>
-        <div style={{ width: 1, height: 32, background: "#e2e8f0" }} />
+        <div style={{ width: 1, height: 32, background: "var(--card-border, #e2e8f0)" }} />
         <div
           style={{
             width: 40,
@@ -5191,10 +5191,10 @@ function MemberDetailPage({
           {member.name[0]}
         </div>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             {member.name} の記録
           </div>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
             総 {memberLogs.length}件
           </div>
         </div>
@@ -5204,10 +5204,10 @@ function MemberDetailPage({
           display: "flex",
           gap: 4,
           marginBottom: 20,
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 12,
           padding: 6,
-          border: "1px solid #e2e8f0",
+          border: "1px solid var(--card-border, #e2e8f0)",
           width: "fit-content",
         }}
       >
@@ -5226,7 +5226,7 @@ function MemberDetailPage({
               fontSize: 13,
               fontWeight: tab === id ? 600 : 400,
               background: tab === id ? "var(--accent, #3B82F6)" : "transparent",
-              color: tab === id ? "#fff" : "#64748b",
+              color: tab === id ? "#fff" : "var(--text-secondary, #64748b)",
               transition: "all 0.2s",
               fontFamily: "inherit",
             }}
@@ -5309,7 +5309,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
     >
       <div
         style={{
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 18,
           padding: 28,
           width: 520,
@@ -5332,7 +5332,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               margin: 0,
               fontSize: 16,
               fontWeight: 700,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             {isNew ? "タスクを追加" : isOwner ? "タスクを編集" : "タスクを閲覧"}
@@ -5343,7 +5343,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#94a3b8",
+              color: "var(--text-muted, #94a3b8)",
               display: "flex",
               padding: 4,
             }}
@@ -5357,7 +5357,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               <label
                 style={{
                   fontSize: 12,
-                  color: "#64748b",
+                  color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
                 }}
@@ -5376,7 +5376,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               <label
                 style={{
                   fontSize: 12,
-                  color: "#64748b",
+                  color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
                 }}
@@ -5408,7 +5408,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                 <label
                   style={{
                     fontSize: 12,
-                    color: "#64748b",
+                    color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
                   }}
@@ -5429,7 +5429,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                 <label
                   style={{
                     fontSize: 12,
-                    color: "#64748b",
+                    color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
                   }}
@@ -5448,7 +5448,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
         ) : (
           <div
             style={{
-              background: "#f8fafc",
+              background: "var(--surface-2, #f8fafc)",
               borderRadius: 12,
               padding: 16,
               marginBottom: 20,
@@ -5458,7 +5458,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               style={{
                 fontSize: 15,
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
                 marginBottom: 8,
               }}
             >
@@ -5469,7 +5469,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                 style={{
                   margin: "0 0 10px",
                   fontSize: 13,
-                  color: "#64748b",
+                  color: "var(--text-secondary, #64748b)",
                   lineHeight: 1.6,
                 }}
               >
@@ -5506,11 +5506,11 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
             </div>
           </div>
         )}
-        <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: 16 }}>
+        <div style={{ borderTop: "1px solid var(--line-soft, #f1f5f9)", paddingTop: 16 }}>
           <div
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               fontWeight: 600,
               marginBottom: 10,
             }}
@@ -5548,12 +5548,12 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                       style={{
                         fontSize: 12,
                         fontWeight: 600,
-                        color: "#1e293b",
+                        color: "var(--text-primary, #1e293b)",
                       }}
                     >
                       {c.author}
                     </span>
-                    <span style={{ fontSize: 11, color: "#94a3b8" }}>
+                    <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
                       {c.at}
                     </span>
                   </div>
@@ -5599,7 +5599,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
               justifyContent: "space-between",
               marginTop: 20,
               paddingTop: 16,
-              borderTop: "1px solid #f1f5f9",
+              borderTop: "1px solid var(--line-soft, #f1f5f9)",
             }}
           >
             <div>
@@ -5609,12 +5609,12 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                     onDelete(card.id);
                     onClose();
                   }}
-                  style={{ ...BB, color: "#EF4444", borderColor: "#FECACA" }}
+                  style={{ ...BB, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
                   onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#FEF2F2")
+                    (e.currentTarget.style.background = "var(--danger-soft, #FEF2F2)")
                   }
                   onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "#fff")
+                    (e.currentTarget.style.background = "var(--card-bg, #fff)")
                   }
                 >
                   <Icon name="trash" size={14} />
@@ -5679,7 +5679,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
         background:
           dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#fff",
         borderRadius: 12,
-        border: `1px solid ${dc === "over" ? "#FECACA" : dc === "near" ? "#FDE68A" : "#e2e8f0"}`,
+        border: `1px solid ${dc === "over" ? "#FECACA" : dc === "near" ? "#FDE68A" : "var(--card-border, #e2e8f0)"}`,
         padding: "12px 14px",
         cursor: isOwner ? "grab" : "pointer",
         transition: "all 0.15s",
@@ -5687,11 +5687,11 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
-        if (!isUrgent) e.currentTarget.style.borderColor = "#cbd5e1";
+        if (!isUrgent) e.currentTarget.style.borderColor = "var(--line-strong, #cbd5e1)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.boxShadow = "none";
-        if (!isUrgent) e.currentTarget.style.borderColor = "#e2e8f0";
+        if (!isUrgent) e.currentTarget.style.borderColor = "var(--card-border, #e2e8f0)";
       }}
     >
       <div
@@ -5716,7 +5716,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
           style={{
             fontSize: 13,
             fontWeight: 600,
-            color: "#1e293b",
+            color: "var(--text-primary, #1e293b)",
             lineHeight: 1.4,
             flex: 1,
           }}
@@ -5729,7 +5729,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
           style={{
             margin: "0 0 8px 14px",
             fontSize: 12,
-            color: "#64748b",
+            color: "var(--text-secondary, #64748b)",
             lineHeight: 1.5,
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -5786,7 +5786,7 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
           </span>
         )}
         {card.comments?.length > 0 && (
-          <span style={{ fontSize: 11, color: "#94a3b8", marginLeft: "auto" }}>
+          <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginLeft: "auto" }}>
             💬 {card.comments.length}
           </span>
         )}
@@ -5814,9 +5814,9 @@ function KanbanColumn({
       style={{
         width: 280,
         flexShrink: 0,
-        background: "#f8fafc",
+        background: "var(--surface-2, #f8fafc)",
         borderRadius: 14,
-        border: "1px solid #e2e8f0",
+        border: "1px solid var(--card-border, #e2e8f0)",
         display: "flex",
         flexDirection: "column",
         maxHeight: "calc(100vh - 280px)",
@@ -5846,7 +5846,7 @@ function KanbanColumn({
       <div
         style={{
           padding: "14px 16px 12px",
-          borderBottom: "1px solid #e2e8f0",
+          borderBottom: "1px solid var(--card-border, #e2e8f0)",
           display: "flex",
           alignItems: "center",
           gap: 8,
@@ -5861,7 +5861,7 @@ function KanbanColumn({
           }}
         />
         <span
-          style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", flex: 1 }}
+          style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)", flex: 1 }}
         >
           {col.name}
         </span>
@@ -5871,11 +5871,11 @@ function KanbanColumn({
           onClick={(e) => e.stopPropagation()}
           style={{
             fontSize: 11,
-            color: "#64748b",
-            border: "1px solid #e2e8f0",
+            color: "var(--text-secondary, #64748b)",
+            border: "1px solid var(--card-border, #e2e8f0)",
             borderRadius: 6,
             padding: "2px 4px",
-            background: "#fff",
+            background: "var(--card-bg, #fff)",
             outline: "none",
             cursor: "pointer",
             fontFamily: "inherit",
@@ -5888,9 +5888,9 @@ function KanbanColumn({
         <span
           style={{
             fontSize: 12,
-            color: "#94a3b8",
-            background: "#fff",
-            border: "1px solid #e2e8f0",
+            color: "var(--text-muted, #94a3b8)",
+            background: "var(--card-bg, #fff)",
+            border: "1px solid var(--card-border, #e2e8f0)",
             borderRadius: 20,
             padding: "1px 8px",
           }}
@@ -5956,10 +5956,10 @@ function KanbanColumn({
           style={{
             margin: "8px 10px 10px",
             padding: "8px",
-            border: "1px dashed #cbd5e1",
+            border: "1px dashed var(--line-strong, #cbd5e1)",
             borderRadius: 10,
             background: "transparent",
-            color: "#94a3b8",
+            color: "var(--text-muted, #94a3b8)",
             fontSize: 13,
             cursor: "pointer",
             display: "flex",
@@ -5974,8 +5974,8 @@ function KanbanColumn({
             e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#cbd5e1";
-            e.currentTarget.style.color = "#94a3b8";
+            e.currentTarget.style.borderColor = "var(--line-strong, #cbd5e1)";
+            e.currentTarget.style.color = "var(--text-muted, #94a3b8)";
             e.currentTarget.style.background = "transparent";
           }}
         >
@@ -6205,13 +6205,13 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
               marginBottom: 2,
             }}
           >
             {myGroup?.name || "全社"} — タスクサマリー
           </div>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
             グループ全体の進捗
           </div>
         </div>
@@ -6226,13 +6226,13 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             style={{
               textAlign: "center",
               padding: "10px 18px",
-              background: "#f8fafc",
+              background: "var(--surface-2, #f8fafc)",
               borderRadius: 10,
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--card-border, #e2e8f0)",
             }}
           >
             <div style={{ fontSize: 22, fontWeight: 700, color: c }}>{v}</div>
-            <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
               {l}
             </div>
           </div>
@@ -6247,7 +6247,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           alignItems: "center",
         }}
       >
-        <span style={{ fontSize: 12, color: "#64748b", fontWeight: 500 }}>
+        <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", fontWeight: 500 }}>
           ToDoリストを選択：
         </span>
         <button
@@ -6255,7 +6255,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           style={{
             ...BB,
             background: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#fff",
-            color: viewId === currentUser.id ? "#fff" : "#64748b",
+            color: viewId === currentUser.id ? "#fff" : "var(--text-secondary, #64748b)",
             borderColor: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#e2e8f0",
             fontSize: 12,
             padding: "6px 14px",
@@ -6332,7 +6332,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 margin: 0,
                 fontSize: 17,
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
               }}
             >
               {isOwner ? "マイToDo" : `${viewUser?.name} のToDoリスト`}
@@ -6353,7 +6353,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               </span>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
             {isOwner
               ? "ドラッグでカードを移動 / クリックで編集"
               : "クリックしてコメントを追加できます"}
@@ -6413,9 +6413,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
               style={{
                 width: 280,
                 flexShrink: 0,
-                background: "#f8fafc",
+                background: "var(--surface-2, #f8fafc)",
                 borderRadius: 14,
-                border: "1px solid #e2e8f0",
+                border: "1px solid var(--card-border, #e2e8f0)",
                 padding: 14,
                 alignSelf: "flex-start",
               }}
@@ -6448,10 +6448,10 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 width: 220,
                 flexShrink: 0,
                 padding: 14,
-                border: "1.5px dashed #cbd5e1",
+                border: "1.5px dashed var(--line-strong, #cbd5e1)",
                 borderRadius: 14,
                 background: "transparent",
-                color: "#94a3b8",
+                color: "var(--text-muted, #94a3b8)",
                 fontSize: 13,
                 cursor: "pointer",
                 display: "flex",
@@ -6467,8 +6467,8 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#cbd5e1";
-                e.currentTarget.style.color = "#94a3b8";
+                e.currentTarget.style.borderColor = "var(--line-strong, #cbd5e1)";
+                e.currentTarget.style.color = "var(--text-muted, #94a3b8)";
                 e.currentTarget.style.background = "transparent";
               }}
             >
@@ -6741,14 +6741,14 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
       style={{
         width: "100%", display: "flex", alignItems: "center", gap: 8,
         padding: "10px 4px", background: "none", border: "none", cursor: "pointer",
-        fontFamily: "inherit", textAlign: "left", borderTop: "1px solid #f1f5f9",
+        fontFamily: "inherit", textAlign: "left", borderTop: "1px solid var(--line-soft, #f1f5f9)",
       }}
     >
       <Icon name={icon} size={15} />
-      <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>
+      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
         {label}{count !== undefined ? `（${count}件）` : ""}
       </span>
-      <span style={{ marginLeft: "auto", fontSize: 11, color: "#94a3b8", transform: openSection === id ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+      <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted, #94a3b8)", transform: openSection === id ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
         ▼
       </span>
     </button>
@@ -6759,7 +6759,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
       <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
         部下のAIレポート参考資料 設定
       </h3>
-      <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+      <p style={{ margin: "0 0 14px", fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
         部下を選んで、レポート生成に使う参考情報を一括管理します
       </p>
 
@@ -6776,9 +6776,9 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
 
       {member && (
         <>
-          <div style={{ background: "#f8fafc", borderRadius: 10, padding: 14, marginBottom: 4 }}>
+          <div style={{ background: "var(--surface-2, #f8fafc)", borderRadius: 10, padding: 14, marginBottom: 4 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>この部下に参考情報を使用する</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>この部下に参考情報を使用する</span>
               <button
                 onClick={() => setSettings((p) => ({ ...p, ai_reference_enabled: !p.ai_reference_enabled }))}
                 style={{
@@ -6788,7 +6788,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                 }}
               >
                 <div style={{
-                  width: 18, height: 18, borderRadius: "50%", background: "#fff",
+                  width: 18, height: 18, borderRadius: "50%", background: "var(--card-bg, #fff)",
                   position: "absolute", top: 2, left: settings.ai_reference_enabled ? 20 : 2,
                   transition: "left 0.2s",
                 }} />
@@ -6798,7 +6798,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
             {settings.ai_reference_enabled && (
               <>
                 <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 12, color: "#64748b", marginBottom: 6 }}>プロンプトの重さ</div>
+                  <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", marginBottom: 6 }}>プロンプトの重さ</div>
                   <div style={{ display: "flex", gap: 6 }}>
                     {[
                       ["light", "軽め"],
@@ -6822,7 +6822,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 16 }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#475569", cursor: "pointer" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-body, #475569)", cursor: "pointer" }}>
                     <input
                       type="checkbox"
                       checked={settings.use_action_plan}
@@ -6830,7 +6830,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                     />
                     実行計画書を使う
                   </label>
-                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#475569", cursor: "pointer" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-body, #475569)", cursor: "pointer" }}>
                     <input
                       type="checkbox"
                       checked={settings.use_challenge_sheet}
@@ -6854,8 +6854,8 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
           {openSection === "docs" && (
             <div style={{ padding: "10px 4px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
-                <span style={{ width: 110, color: "#64748b", flexShrink: 0 }}>実行計画書</span>
-                <span style={{ flex: 1, color: actionPlanInfo.filename ? "#15803D" : "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span style={{ width: 110, color: "var(--text-secondary, #64748b)", flexShrink: 0 }}>実行計画書</span>
+                <span style={{ flex: 1, color: actionPlanInfo.filename ? "#15803D" : "var(--text-muted, #94a3b8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {actionPlanInfo.filename || "未アップロード"}
                 </span>
                 <label style={{ ...BB, padding: "4px 10px", fontSize: 11, cursor: "pointer", flexShrink: 0 }}>
@@ -6866,8 +6866,8 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
               {actionPlanMsg && <div style={{ fontSize: 11, color: actionPlanMsg.includes("失敗") ? "#991B1B" : "#15803D" }}>{actionPlanMsg}</div>}
 
               <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12 }}>
-                <span style={{ width: 110, color: "#64748b", flexShrink: 0 }}>チャレンジシート</span>
-                <span style={{ flex: 1, color: challengeSheetInfo.filename ? "#15803D" : "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <span style={{ width: 110, color: "var(--text-secondary, #64748b)", flexShrink: 0 }}>チャレンジシート</span>
+                <span style={{ flex: 1, color: challengeSheetInfo.filename ? "#15803D" : "var(--text-muted, #94a3b8)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {challengeSheetInfo.filename || "未アップロード"}
                 </span>
                 <label style={{ ...BB, padding: "4px 10px", fontSize: 11, cursor: "pointer", flexShrink: 0 }}>
@@ -6896,17 +6896,17 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 200, overflowY: "auto" }}>
                 {directions.length === 0 && (
-                  <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ記録がありません</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>まだ記録がありません</div>
                 )}
                 {directions.map((d) => (
-                  <div key={d.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
+                  <div key={d.id} style={{ display: "flex", alignItems: "flex-start", gap: 8, background: "var(--surface-2, #f8fafc)", borderRadius: 8, padding: "8px 12px" }}>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 12, color: "#475569" }}>{d.content}</div>
-                      <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2 }}>
+                      <div style={{ fontSize: 12, color: "var(--text-body, #475569)" }}>{d.content}</div>
+                      <div style={{ fontSize: 10, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
                         {new Date(d.created_at).toLocaleDateString("ja-JP")}
                       </div>
                     </div>
-                    <button onClick={() => handleDeleteDirection(d.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
+                    <button onClick={() => handleDeleteDirection(d.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger, #DC2626)", flexShrink: 0 }}>
                       <Icon name="trash" size={13} />
                     </button>
                   </div>
@@ -6941,10 +6941,10 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {refDocs.length === 0 && (
-                  <div style={{ fontSize: 12, color: "#94a3b8" }}>まだ資料がありません</div>
+                  <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>まだ資料がありません</div>
                 )}
                 {refDocs.map((doc) => (
-                  <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "#f8fafc", borderRadius: 8, padding: "8px 12px" }}>
+                  <div key={doc.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--surface-2, #f8fafc)", borderRadius: 8, padding: "8px 12px" }}>
                     <button
                       onClick={() => toggleRefDocActive(doc)}
                       style={{
@@ -6952,17 +6952,17 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                         background: doc.is_active ? "var(--accent, #3B82F6)" : "#cbd5e1", position: "relative",
                       }}
                     >
-                      <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
+                      <div style={{ width: 14, height: 14, borderRadius: "50%", background: "var(--card-bg, #fff)", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
                     </button>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary, #1e293b)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {doc.filename}
                       </div>
                       {doc.reason && (
-                        <div style={{ fontSize: 11, color: "#94a3b8" }}>{doc.reason}</div>
+                        <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>{doc.reason}</div>
                       )}
                     </div>
-                    <button onClick={() => deleteRefDoc(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#EF4444", flexShrink: 0 }}>
+                    <button onClick={() => deleteRefDoc(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--danger, #DC2626)", flexShrink: 0 }}>
                       <Icon name="trash" size={13} />
                     </button>
                   </div>
@@ -7236,7 +7236,7 @@ function MyPage({
 
       {myPageTab === "profile" && (
         <div style={{ ...C, marginBottom: 16 }}>
-          <h3 style={{ margin: "0 0 20px", fontSize: 15, fontWeight: 700, color: "#1e293b" }}>
+          <h3 style={{ margin: "0 0 20px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             プロフィール設定
           </h3>
           {ok && (
@@ -7252,19 +7252,19 @@ function MyPage({
           )}
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>氏名</label>
+            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>氏名</label>
             <input value={name} onChange={(e) => setName(e.target.value)} style={I} />
           </div>
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>メールアドレス</label>
-            <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>{currentUser.email}</div>
+            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>メールアドレス</label>
+            <div style={{ ...I, background: "var(--surface-3, #f1f5f9)", color: "var(--text-muted, #94a3b8)" }}>{currentUser.email}</div>
           </div>
 
           {!isSA && (
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>ロール</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, background: "#fff", color: "#1e293b" }}>
+              <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
+              <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 14, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
                 <option value="member">部下（member）</option>
                 <option value="admin">上司（admin）</option>
               </select>
@@ -7272,8 +7272,8 @@ function MyPage({
           )}
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>所属グループ</label>
-            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, background: "#fff", color: "#1e293b" }}>
+            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>所属グループ</label>
+            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 14, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
               <option value="">未所属</option>
               {groups.map((g) => (
                 <option key={g.id} value={g.id}>{g.name}</option>
@@ -7283,8 +7283,8 @@ function MyPage({
 
           {role === "member" && (
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>上司</label>
-              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14, background: "#fff", color: "#1e293b" }}>
+              <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>上司</label>
+              <select value={managerId} onChange={(e) => setManagerId(e.target.value)} style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--card-border, #e2e8f0)", fontSize: 14, background: "var(--card-bg, #fff)", color: "var(--text-primary, #1e293b)" }}>
                 <option value="">未設定</option>
                 {managers.map((m) => (
                   <option key={m.id} value={m.id}>{m.name}</option>
@@ -7294,7 +7294,7 @@ function MyPage({
           )}
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>
+            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>
               パスワード変更 <span style={{ fontWeight: 400, fontSize: 11 }}>（変更しない場合は空欄）</span>
             </label>
             <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="新しいパスワード" style={I} />
@@ -7302,7 +7302,7 @@ function MyPage({
 
           {isSA && (
             <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>ロール</label>
+              <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>ロール</label>
               <select value={role} onChange={(e) => setRole(e.target.value)} style={I}>
                 <option value="member">部下</option>
                 <option value="admin">上司</option>
@@ -7324,7 +7324,7 @@ function MyPage({
             <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
               チャレンジシート
             </h3>
-            <p style={{ margin: "0 0 14px", fontSize: 12, color: "#94a3b8" }}>
+            <p style={{ margin: "0 0 14px", fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
               アップロードすると、上司がONに設定した場合にレポート生成の参考情報として活用されます
             </p>
             {challengeSheetMsg && (
@@ -7333,13 +7333,13 @@ function MyPage({
               </div>
             )}
             {challengeSheetInfo.filename ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed #cbd5e1", borderRadius: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed var(--line-strong, #cbd5e1)", borderRadius: 10 }}>
                 <Icon name="list" size={18} />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {challengeSheetInfo.filename}
                   </div>
-                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                  <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
                     {challengeSheetInfo.updatedAt ? `${new Date(challengeSheetInfo.updatedAt).toLocaleString("ja-JP")} 更新` : ""}
                   </div>
                 </div>
@@ -7349,7 +7349,7 @@ function MyPage({
                 </label>
               </div>
             ) : (
-              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed #cbd5e1", borderRadius: 10, color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>
+              <label style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "20px 14px", border: "1px dashed var(--line-strong, #cbd5e1)", borderRadius: 10, color: "var(--text-muted, #94a3b8)", cursor: "pointer", fontSize: 13 }}>
                 <Icon name="plus" size={16} />
                 {uploadingChallengeSheet ? "アップロード中..." : "クリックしてExcelファイルを選択"}
                 <input type="file" accept=".xlsx,.xls" onChange={handleUploadChallengeSheet} disabled={uploadingChallengeSheet} style={{ display: "none" }} />
@@ -7367,8 +7367,8 @@ function MyPage({
               </div>
             )}
 
-            <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>週次レポート</div>
+            <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid var(--line-soft, #f1f5f9)" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>週次レポート</div>
               <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 {[
                   ["scheduled", "自動生成"],
@@ -7414,7 +7414,7 @@ function MyPage({
             </div>
 
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 10 }}>月次レポート</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)", marginBottom: 10 }}>月次レポート</div>
               <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
                 {[
                   ["scheduled", "自動生成"],
@@ -7554,7 +7554,7 @@ function GroupForm({ groups, setGroups }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -7567,14 +7567,14 @@ function GroupForm({ groups, setGroups }) {
             placeholder="例：営業第3グループ"
             style={I}
             onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
-            onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+            onBlur={(e) => (e.target.style.borderColor = "var(--card-border, #e2e8f0)")}
           />
         </div>
         <div>
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -7589,7 +7589,7 @@ function GroupForm({ groups, setGroups }) {
               width: 48,
               height: 38,
               borderRadius: 8,
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--card-border, #e2e8f0)",
               cursor: "pointer",
               padding: 2,
             }}
@@ -7628,9 +7628,9 @@ function GroupForm({ groups, setGroups }) {
               alignItems: "center",
               gap: 10,
               padding: "10px 14px",
-              background: "#f8fafc",
+              background: "var(--surface-2, #f8fafc)",
               borderRadius: 10,
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--card-border, #e2e8f0)",
             }}
           >
             <div
@@ -7646,7 +7646,7 @@ function GroupForm({ groups, setGroups }) {
               style={{
                 fontSize: 13,
                 fontWeight: 600,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
                 flex: 1,
               }}
             >
@@ -7670,13 +7670,13 @@ function GroupForm({ groups, setGroups }) {
                 padding: "5px 10px",
                 fontSize: 12,
                 gap: 4,
-                color: "#EF4444",
-                borderColor: "#FECACA",
+                color: "var(--danger, #DC2626)",
+                borderColor: "var(--danger-border, #FECACA)",
               }}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#FEF2F2")
+                (e.currentTarget.style.background = "var(--danger-soft, #FEF2F2)")
               }
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--card-bg, #fff)")}
             >
               <Icon name="trash" size={13} />
               削除
@@ -7758,7 +7758,7 @@ function InviteModal({ onClose, currentUserRole }) {
     >
       <div
         style={{
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 18,
           padding: 28,
           width: 440,
@@ -7779,7 +7779,7 @@ function InviteModal({ onClose, currentUserRole }) {
               margin: 0,
               fontSize: 16,
               fontWeight: 700,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             ユーザーを招待
@@ -7790,7 +7790,7 @@ function InviteModal({ onClose, currentUserRole }) {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#94a3b8",
+              color: "var(--text-muted, #94a3b8)",
               display: "flex",
               padding: 4,
             }}
@@ -7803,7 +7803,7 @@ function InviteModal({ onClose, currentUserRole }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -7822,7 +7822,7 @@ function InviteModal({ onClose, currentUserRole }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -7842,7 +7842,7 @@ function InviteModal({ onClose, currentUserRole }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -7953,7 +7953,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
     >
       <div
         style={{
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 18,
           padding: 28,
           width: 480,
@@ -7976,7 +7976,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
               margin: 0,
               fontSize: 16,
               fontWeight: 700,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             ユーザー編集
@@ -7987,7 +7987,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#94a3b8",
+              color: "var(--text-muted, #94a3b8)",
               display: "flex",
               padding: 4,
             }}
@@ -8001,7 +8001,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -8020,7 +8020,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -8029,7 +8029,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
             <span
               style={{
                 fontSize: 11,
-                color: "#94a3b8",
+                color: "var(--text-muted, #94a3b8)",
                 fontWeight: 400,
                 marginLeft: 6,
               }}
@@ -8037,7 +8037,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
               （変更不可）
             </span>
           </label>
-          <div style={{ ...I, background: "#f1f5f9", color: "#94a3b8" }}>
+          <div style={{ ...I, background: "var(--surface-3, #f1f5f9)", color: "var(--text-muted, #94a3b8)" }}>
             {user.email}
           </div>
         </div>
@@ -8047,7 +8047,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -8070,7 +8070,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -8099,7 +8099,7 @@ function EditUserModal({ user, groups, allUsers, onClose, onSave }) {
             <label
               style={{
                 fontSize: 12,
-                color: "#64748b",
+                color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 5,
               }}
@@ -8307,10 +8307,10 @@ function SuperAdminPage({
           display: "flex",
           gap: 4,
           marginBottom: 20,
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 12,
           padding: 6,
-          border: "1px solid #e2e8f0",
+          border: "1px solid var(--card-border, #e2e8f0)",
           width: "fit-content",
           flexWrap: "wrap",
         }}
@@ -8331,7 +8331,7 @@ function SuperAdminPage({
               fontSize: 13,
               fontWeight: tab === id ? 600 : 400,
               background: tab === id ? "var(--accent, #3B82F6)" : "transparent",
-              color: tab === id ? "#fff" : "#64748b",
+              color: tab === id ? "#fff" : "var(--text-secondary, #64748b)",
               transition: "all 0.2s",
               fontFamily: "inherit",
             }}
@@ -8343,10 +8343,10 @@ function SuperAdminPage({
 
       <div style={{ ...C, marginBottom: 20, display: "flex", alignItems: "center", gap: 14 }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#1e293b" }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             AIレポート参考資料 機能
           </div>
-          <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 2 }}>
             実行計画書・チャレンジシート等を週報・月報生成の参考情報として使う機能の全体スイッチです
           </div>
         </div>
@@ -8359,11 +8359,11 @@ function SuperAdminPage({
           }}
         >
           <div style={{
-            width: 20, height: 20, borderRadius: "50%", background: "#fff",
+            width: 20, height: 20, borderRadius: "50%", background: "var(--card-bg, #fff)",
             position: "absolute", top: 3, left: aiRefEnabled ? 25 : 3, transition: "left 0.2s",
           }} />
         </button>
-        <span style={{ fontSize: 12, fontWeight: 600, color: aiRefEnabled ? "#1D4ED8" : "#94a3b8", width: 36 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: aiRefEnabled ? "#1D4ED8" : "var(--text-muted, #94a3b8)", width: 36 }}>
           {aiRefEnabled ? "ON" : "OFF"}
         </span>
       </div>
@@ -8383,7 +8383,7 @@ function SuperAdminPage({
                 margin: "0 0 18px",
                 fontSize: 15,
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
               }}
             >
               {editId ? "ユーザーを編集" : "ユーザーを追加"}
@@ -8416,7 +8416,7 @@ function SuperAdminPage({
                 <label
                   style={{
                     fontSize: 12,
-                    color: "#64748b",
+                    color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
                   }}
@@ -8431,7 +8431,7 @@ function SuperAdminPage({
                   type={f === "password" ? "password" : "text"}
                   style={I}
                   onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
-                  onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+                  onBlur={(e) => (e.target.style.borderColor = "var(--card-border, #e2e8f0)")}
                 />
               </div>
             ))}
@@ -8447,7 +8447,7 @@ function SuperAdminPage({
                 <label
                   style={{
                     fontSize: 12,
-                    color: "#64748b",
+                    color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
                   }}
@@ -8470,7 +8470,7 @@ function SuperAdminPage({
                 <label
                   style={{
                     fontSize: 12,
-                    color: "#64748b",
+                    color: "var(--text-secondary, #64748b)",
                     display: "block",
                     marginBottom: 5,
                   }}
@@ -8523,7 +8523,7 @@ function SuperAdminPage({
                 margin: "0 0 16px",
                 fontSize: 15,
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
               }}
             >
               ユーザー一覧（{users.length}名）
@@ -8540,9 +8540,9 @@ function SuperAdminPage({
                       alignItems: "center",
                       gap: 12,
                       padding: "12px 14px",
-                      background: "#f8fafc",
+                      background: "var(--surface-2, #f8fafc)",
                       borderRadius: 10,
-                      border: "1px solid #e2e8f0",
+                      border: "1px solid var(--card-border, #e2e8f0)",
                     }}
                   >
                     <div
@@ -8572,12 +8572,12 @@ function SuperAdminPage({
                         style={{
                           fontSize: 14,
                           fontWeight: 600,
-                          color: "#1e293b",
+                          color: "var(--text-primary, #1e293b)",
                         }}
                       >
                         {u.name}
                       </div>
-                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                         {u.email}
                         {g ? ` · ${g.name}` : ""}
                       </div>
@@ -8616,14 +8616,14 @@ function SuperAdminPage({
                           padding: "5px 10px",
                           fontSize: 12,
                           gap: 4,
-                          color: "#EF4444",
-                          borderColor: "#FECACA",
+                          color: "var(--danger, #DC2626)",
+                          borderColor: "var(--danger-border, #FECACA)",
                         }}
                         onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "#FEF2F2")
+                          (e.currentTarget.style.background = "var(--danger-soft, #FEF2F2)")
                         }
                         onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "#fff")
+                          (e.currentTarget.style.background = "var(--card-bg, #fff)")
                         }
                       >
                         <Icon name="trash" size={13} />
@@ -8645,7 +8645,7 @@ function SuperAdminPage({
                 margin: "0 0 16px",
                 fontSize: 15,
                 fontWeight: 700,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
               }}
             >
               グループを追加
@@ -8691,7 +8691,7 @@ function SuperAdminPage({
                         margin: 0,
                         fontSize: 15,
                         fontWeight: 700,
-                        color: "#1e293b",
+                        color: "var(--text-primary, #1e293b)",
                       }}
                     >
                       {g.name}
@@ -8700,7 +8700,7 @@ function SuperAdminPage({
                       style={{
                         marginLeft: "auto",
                         fontSize: 12,
-                        color: "#94a3b8",
+                        color: "var(--text-muted, #94a3b8)",
                       }}
                     >
                       {members.length}名
@@ -8711,7 +8711,7 @@ function SuperAdminPage({
                       <div
                         style={{
                           fontSize: 11,
-                          color: "#94a3b8",
+                          color: "var(--text-muted, #94a3b8)",
                           fontWeight: 600,
                           marginBottom: 6,
                         }}
@@ -8767,7 +8767,7 @@ function SuperAdminPage({
                       <div
                         style={{
                           fontSize: 11,
-                          color: "#94a3b8",
+                          color: "var(--text-muted, #94a3b8)",
                           fontWeight: 600,
                           marginBottom: 6,
                         }}
@@ -8816,7 +8816,7 @@ function SuperAdminPage({
                     <div
                       style={{
                         textAlign: "center",
-                        color: "#94a3b8",
+                        color: "var(--text-muted, #94a3b8)",
                         fontSize: 13,
                         padding: "16px 0",
                       }}
@@ -8837,7 +8837,7 @@ function SuperAdminPage({
               margin: "0 0 12px",
               fontSize: 15,
               fontWeight: 700,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             📥 CSVエクスポート
@@ -8845,7 +8845,7 @@ function SuperAdminPage({
           <p
             style={{
               fontSize: 13,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               margin: "0 0 20px",
               lineHeight: 1.6,
             }}
@@ -8856,17 +8856,17 @@ function SuperAdminPage({
           </p>
           <div
             style={{
-              background: "#f8fafc",
+              background: "var(--surface-2, #f8fafc)",
               borderRadius: 10,
               padding: 16,
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--card-border, #e2e8f0)",
               marginBottom: 20,
             }}
           >
             <div
               style={{
                 fontSize: 13,
-                color: "#1e293b",
+                color: "var(--text-primary, #1e293b)",
                 fontWeight: 600,
                 marginBottom: 4,
               }}
@@ -8879,14 +8879,14 @@ function SuperAdminPage({
                 style={{
                   fontSize: 14,
                   fontWeight: 400,
-                  color: "#64748b",
+                  color: "var(--text-secondary, #64748b)",
                   marginLeft: 6,
                 }}
               >
                 件
               </span>
             </div>
-            <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginTop: 4 }}>
               {INIT_USERS.filter((u) => u.role !== "superadmin").length}
               名分の記録
             </div>
@@ -8969,10 +8969,10 @@ function RankingPage({ logs, users, currentUser }) {
           display: "flex",
           gap: 4,
           marginBottom: 20,
-          background: "#fff",
+          background: "var(--card-bg, #fff)",
           borderRadius: 12,
           padding: 6,
-          border: "1px solid #e2e8f0",
+          border: "1px solid var(--card-border, #e2e8f0)",
           width: "fit-content",
         }}
       >
@@ -8993,7 +8993,7 @@ function RankingPage({ logs, users, currentUser }) {
               fontWeight: period === id ? 600 : 400,
               fontFamily: "inherit",
               background: period === id ? "var(--accent, #3B82F6)" : "transparent",
-              color: period === id ? "#fff" : "#64748b",
+              color: period === id ? "#fff" : "var(--text-secondary, #64748b)",
               transition: "all 0.15s",
             }}
           >
@@ -9035,7 +9035,7 @@ function RankingPage({ logs, users, currentUser }) {
                   <span style={{ fontSize: 22 }}>{medal}</span>
                 ) : (
                   <span
-                    style={{ fontSize: 15, fontWeight: 700, color: "#94a3b8" }}
+                    style={{ fontSize: 15, fontWeight: 700, color: "var(--text-muted, #94a3b8)" }}
                   >
                     {rank}
                   </span>
@@ -9071,7 +9071,7 @@ function RankingPage({ logs, users, currentUser }) {
                     style={{
                       fontSize: 14,
                       fontWeight: isMe ? 700 : 600,
-                      color: "#1e293b",
+                      color: "var(--text-primary, #1e293b)",
                     }}
                   >
                     {u.name}
@@ -9094,7 +9094,7 @@ function RankingPage({ logs, users, currentUser }) {
                 <div
                   style={{
                     height: 6,
-                    background: "#f1f5f9",
+                    background: "var(--surface-3, #f1f5f9)",
                     borderRadius: 3,
                     overflow: "hidden",
                   }}
@@ -9124,19 +9124,19 @@ function RankingPage({ logs, users, currentUser }) {
                   style={{
                     fontSize: 22,
                     fontWeight: 700,
-                    color: rank === 1 && u.count > 0 ? "#F59E0B" : "#1e293b",
+                    color: rank === 1 && u.count > 0 ? "#F59E0B" : "var(--text-primary, #1e293b)",
                   }}
                 >
                   {u.count}
                 </div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>件</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>件</div>
               </div>
             </div>
           );
         })}
         {ranking.length === 0 && (
           <div
-            style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+            style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}
           >
             データがありません
           </div>
@@ -9314,7 +9314,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
               margin: "0 0 16px",
               fontSize: 15,
               fontWeight: 700,
-              color: "#1e293b",
+              color: "var(--text-primary, #1e293b)",
             }}
           >
             {editId ? "お知らせを編集" : "お知らせを投稿"}
@@ -9338,7 +9338,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
             <label
               style={{
                 fontSize: 12,
-                color: "#64748b",
+                color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 5,
               }}
@@ -9358,7 +9358,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
             <label
               style={{
                 fontSize: 12,
-                color: "#64748b",
+                color: "var(--text-secondary, #64748b)",
                 display: "block",
                 marginBottom: 5,
               }}
@@ -9392,7 +9392,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
               <label
                 style={{
                   fontSize: 12,
-                  color: "#64748b",
+                  color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
                 }}
@@ -9415,7 +9415,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
               <label
                 style={{
                   fontSize: 12,
-                  color: "#64748b",
+                  color: "var(--text-secondary, #64748b)",
                   display: "block",
                   marginBottom: 5,
                 }}
@@ -9479,7 +9479,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
           gap: 12,
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
           お知らせ一覧
         </div>
         {unreadCount > 0 && (
@@ -9500,13 +9500,13 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
 
       {loading ? (
         <div
-          style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+          style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}
         >
           読み込み中...（{loadSeconds}秒経過）
         </div>
       ) : loadError ? (
         <div style={{ ...C, textAlign: "center", padding: 48 }}>
-          <p style={{ color: "#94a3b8", marginBottom: 14, fontSize: 13 }}>
+          <p style={{ color: "var(--text-muted, #94a3b8)", marginBottom: 14, fontSize: 13 }}>
             読み込みに時間がかかっています。通信状況をご確認の上、再試行してください。
           </p>
           <button onClick={fetchAll} style={BP}>
@@ -9515,7 +9515,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
         </div>
       ) : visibleAnnouncements.length === 0 ? (
         <div
-          style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+          style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}
         >
           お知らせはありません
         </div>
@@ -9531,7 +9531,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                 onClick={() => markRead(a.id)}
                 style={{
                   ...C,
-                  borderLeft: `4px solid ${isRead ? "#e2e8f0" : ps.border}`,
+                  borderLeft: `4px solid ${isRead ? "var(--card-border, #e2e8f0)" : ps.border}`,
                   cursor: "pointer",
                   opacity: isRead ? 0.85 : 1,
                 }}
@@ -9573,9 +9573,9 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                             fontSize: 11,
                             padding: "2px 9px",
                             borderRadius: 20,
-                            background: "#f1f5f9",
-                            color: "#64748b",
-                            border: "1px solid #e2e8f0",
+                            background: "var(--surface-3, #f1f5f9)",
+                            color: "var(--text-secondary, #64748b)",
+                            border: "1px solid var(--card-border, #e2e8f0)",
                           }}
                         >
                           🏢 {targetGroup.name}
@@ -9587,9 +9587,9 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                             fontSize: 11,
                             padding: "2px 9px",
                             borderRadius: 20,
-                            background: "#f1f5f9",
-                            color: "#64748b",
-                            border: "1px solid #e2e8f0",
+                            background: "var(--surface-3, #f1f5f9)",
+                            color: "var(--text-secondary, #64748b)",
+                            border: "1px solid var(--card-border, #e2e8f0)",
                           }}
                         >
                           👥 全員
@@ -9614,7 +9614,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                       style={{
                         fontSize: 15,
                         fontWeight: 700,
-                        color: "#1e293b",
+                        color: "var(--text-primary, #1e293b)",
                         marginBottom: 8,
                       }}
                     >
@@ -9623,7 +9623,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                     <div
                       style={{
                         fontSize: 13,
-                        color: "#475569",
+                        color: "var(--text-body, #475569)",
                         lineHeight: 1.7,
                         whiteSpace: "pre-wrap",
                       }}
@@ -9666,14 +9666,14 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                           padding: "4px 10px",
                           fontSize: 12,
                           gap: 4,
-                          color: "#EF4444",
-                          borderColor: "#FECACA",
+                          color: "var(--danger, #DC2626)",
+                          borderColor: "var(--danger-border, #FECACA)",
                         }}
                         onMouseEnter={(e) =>
-                          (e.currentTarget.style.background = "#FEF2F2")
+                          (e.currentTarget.style.background = "var(--danger-soft, #FEF2F2)")
                         }
                         onMouseLeave={(e) =>
-                          (e.currentTarget.style.background = "#fff")
+                          (e.currentTarget.style.background = "var(--card-bg, #fff)")
                         }
                       >
                         <Icon name="trash" size={12} />
@@ -9683,7 +9683,7 @@ function AnnouncementPage({ currentUser, groups, isSA }) {
                   )}
                 </div>
                 <div
-                  style={{ fontSize: 11, color: "#94a3b8", textAlign: "right" }}
+                  style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)", textAlign: "right" }}
                 >
                   {new Date(a.created_at).toLocaleString("ja-JP")}
                   {isRead && <span style={{ marginLeft: 8 }}>✓ 既読</span>}
@@ -9729,7 +9729,7 @@ function FeedbackPage({ currentUser }) {
             margin: "0 0 20px",
             fontSize: 15,
             fontWeight: 700,
-            color: "#1e293b",
+            color: "var(--text-primary, #1e293b)",
           }}
         >
           管理者への意見・要望
@@ -9753,7 +9753,7 @@ function FeedbackPage({ currentUser }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -9771,7 +9771,7 @@ function FeedbackPage({ currentUser }) {
           <label
             style={{
               fontSize: 12,
-              color: "#64748b",
+              color: "var(--text-secondary, #64748b)",
               display: "block",
               marginBottom: 5,
             }}
@@ -9841,10 +9841,10 @@ function FeedbackAdminPage() {
         }}
       >
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
             意見・要望一覧
           </div>
-          <div style={{ fontSize: 12, color: "#94a3b8" }}>
+          <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
             全{feedbacks.length}件
           </div>
         </div>
@@ -9865,13 +9865,13 @@ function FeedbackAdminPage() {
       </div>
       {loading ? (
         <div
-          style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+          style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}
         >
           読み込み中...
         </div>
       ) : feedbacks.length === 0 ? (
         <div
-          style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}
+          style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}
         >
           意見・要望はまだありません
         </div>
@@ -9882,7 +9882,7 @@ function FeedbackAdminPage() {
               key={f.id}
               style={{
                 ...C,
-                borderLeft: `4px solid ${f.is_read ? "#e2e8f0" : "var(--accent, #3B82F6)"}`,
+                borderLeft: `4px solid ${f.is_read ? "var(--card-border, #e2e8f0)" : "var(--accent, #3B82F6)"}`,
               }}
             >
               <div
@@ -9912,11 +9912,11 @@ function FeedbackAdminPage() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div
-                    style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}
+                    style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}
                   >
                     {f.user_name}
                   </div>
-                  <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                  <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
                     {new Date(f.created_at).toLocaleString("ja-JP")}
                   </div>
                 </div>
@@ -9929,14 +9929,14 @@ function FeedbackAdminPage() {
                   </button>
                 )}
                 {f.is_read && (
-                  <span style={{ fontSize: 11, color: "#94a3b8" }}>既読</span>
+                  <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>既読</span>
                 )}
               </div>
               <div
                 style={{
                   fontSize: 14,
                   fontWeight: 700,
-                  color: "#1e293b",
+                  color: "var(--text-primary, #1e293b)",
                   marginBottom: 8,
                 }}
               >
@@ -9945,10 +9945,10 @@ function FeedbackAdminPage() {
               <div
                 style={{
                   fontSize: 13,
-                  color: "#475569",
+                  color: "var(--text-body, #475569)",
                   lineHeight: 1.7,
                   whiteSpace: "pre-wrap",
-                  background: "#f8fafc",
+                  background: "var(--surface-2, #f8fafc)",
                   padding: "10px 12px",
                   borderRadius: 8,
                 }}
@@ -10051,7 +10051,7 @@ function TaskCarousel({ items, today }) {
             style={{
               position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)",
               width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
-              background: "#fff", color: "#92400E", fontSize: 11, cursor: "pointer",
+              background: "var(--card-bg, #fff)", color: "#92400E", fontSize: 11, cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             }}
           >‹</button>
@@ -10060,7 +10060,7 @@ function TaskCarousel({ items, today }) {
             style={{
               position: "absolute", right: -8, top: "50%", transform: "translateY(-50%)",
               width: 22, height: 22, borderRadius: "50%", border: "1px solid #FDE68A",
-              background: "#fff", color: "#92400E", fontSize: 11, cursor: "pointer",
+              background: "var(--card-bg, #fff)", color: "#92400E", fontSize: 11, cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
             }}
           >›</button>
@@ -10355,7 +10355,7 @@ const deleteReport = async (r) => {
                 fontWeight: reportType === id ? 600 : 400,
                 fontFamily: "inherit",
                 background: reportType === id ? "var(--accent, #3B82F6)" : "transparent",
-                color: reportType === id ? "#fff" : "#64748b",
+                color: reportType === id ? "#fff" : "var(--text-secondary, #64748b)",
               }}
             >
               {label}
@@ -10379,19 +10379,19 @@ const deleteReport = async (r) => {
           }}
           onClick={(e) => e.target === e.currentTarget && setShowGenModal(false)}
         >
-          <div style={{ background: "#fff", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+          <div style={{ background: "var(--card-bg, #fff)", borderRadius: 18, padding: 28, width: 420, maxWidth: "95vw", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
                 {reportType === "weekly" ? "期間を設定して生成" : "月を指定して生成"}
               </h3>
-              <button onClick={() => setShowGenModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}>
+              <button onClick={() => setShowGenModal(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted, #94a3b8)" }}>
                 <Icon name="x" size={18} />
               </button>
             </div>
             {reportType === "weekly" ? (
               <>
                 <div style={{ marginBottom: 8 }}>
-                  <label style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 5 }}>
+                  <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 5 }}>
                     開始日（1週間分が対象になります）
                   </label>
                   <input
@@ -10401,7 +10401,7 @@ const deleteReport = async (r) => {
                     style={I}
                   />
                 </div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 20 }}>
+                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)", marginBottom: 20 }}>
                   対象期間：{genStartDate} 〜 {(() => {
                     const d = new Date(genStartDate);
                     d.setDate(d.getDate() + 6);
@@ -10449,11 +10449,11 @@ const deleteReport = async (r) => {
       )}
 
       {loading ? (
-        <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
+        <div style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}>
           読み込み中...
         </div>
       ) : periodGroups.length === 0 ? (
-        <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
+        <div style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}>
           レポートがまだありません
         </div>
       ) : (
@@ -10471,10 +10471,10 @@ const deleteReport = async (r) => {
                   cursor: "pointer",
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                   {periodLabel(recs[0])}
                 </div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>
+                <div style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
                   {scope === "all" ? `${recs.length}名分` : "生成済み"}
                 </div>
               </div>
@@ -10483,7 +10483,7 @@ const deleteReport = async (r) => {
 
           <div>
             {!selectedPeriod ? (
-              <div style={{ ...C, textAlign: "center", color: "#94a3b8", padding: 48 }}>
+              <div style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}>
                 左の一覧から期間を選んでください
               </div>
             ) : scope === "all" ? (
@@ -10515,7 +10515,7 @@ const deleteReport = async (r) => {
                         >
                           {nameOf(r.user_id)[0]}
                         </div>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: "#1e293b" }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                           {nameOf(r.user_id)}
                         </span>
                       </div>
@@ -10529,13 +10529,13 @@ const deleteReport = async (r) => {
                         </button>
                         <button
                           onClick={() => deleteReport(r)}
-                          style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4, color: "#EF4444", borderColor: "#FECACA" }}
+                          style={{ ...BB, padding: "5px 12px", fontSize: 12, gap: 4, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
                         >
                           <Icon name="trash" size={13} />
                         </button>
                       </div>
                     </div>
-                    <div style={{ fontSize: 13, color: "#475569", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
+                    <div style={{ fontSize: 13, color: "var(--text-body, #475569)", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
                       {r.content}
                     </div>
                   </div>
@@ -10553,10 +10553,10 @@ const deleteReport = async (r) => {
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 600, color: "#1e293b" }}>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
                         {periodLabel(r)}
                       </div>
-                      <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                      <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
                         {nameOf(r.user_id)}・{new Date(r.generated_at).toLocaleString("ja-JP")} 生成
                       </div>
                     </div>
@@ -10570,7 +10570,7 @@ const deleteReport = async (r) => {
                       </button>
                       <button
                         onClick={() => deleteReport(r)}
-                        style={{ ...BB, gap: 6, color: "#EF4444", borderColor: "#FECACA" }}
+                        style={{ ...BB, gap: 6, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
                       >
                         <Icon name="trash" size={14} />
                         削除
@@ -10578,7 +10578,7 @@ const deleteReport = async (r) => {
                     </div>
                   </div>
                   {r.category_summary && (
-                    <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: 12, marginBottom: 12 }}>
+                    <div style={{ borderTop: "1px solid var(--line-soft, #f1f5f9)", paddingTop: 12, marginBottom: 12 }}>
                       <PieChart
                         data={Object.entries(CATEGORIES).map(([k, v]) => ({
                           label: `${k}: ${v.label}`,
@@ -10590,10 +10590,10 @@ const deleteReport = async (r) => {
                   )}
                   <div
                     style={{
-                      borderTop: r.category_summary ? "none" : "1px solid #f1f5f9",
+                      borderTop: r.category_summary ? "none" : "1px solid var(--line-soft, #f1f5f9)",
                       paddingTop: r.category_summary ? 0 : 12,
                       fontSize: 13,
-                      color: "#475569",
+                      color: "var(--text-body, #475569)",
                       lineHeight: 1.8,
                       whiteSpace: "pre-wrap",
                     }}
@@ -11224,7 +11224,7 @@ export default function App() {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          background: "#f8fafc",
+          background: "var(--surface-2, #f8fafc)",
           flexDirection: "column",
           gap: 16,
         }}
@@ -11233,13 +11233,13 @@ export default function App() {
           style={{
             width: 40,
             height: 40,
-            border: "3px solid #e2e8f0",
+            border: "3px solid var(--card-border, #e2e8f0)",
             borderTop: "3px solid var(--accent, #3B82F6)",
             borderRadius: "50%",
             animation: "spin 0.8s linear infinite",
           }}
         />
-        <div style={{ color: "#64748b", fontSize: 14 }}>読み込み中...</div>
+        <div style={{ color: "var(--text-secondary, #64748b)", fontSize: 14 }}>読み込み中...</div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -11313,7 +11313,15 @@ export default function App() {
     "--card-border": darkMode ? "#334155" : "#e2e8f0",
     "--text-primary": darkMode ? "#f1f5f9" : "#1e293b",
     "--text-secondary": darkMode ? "#94a3b8" : "#64748b",
-    "--text-muted": darkMode ? "#475569" : "#94a3b8",
+    "--text-muted": darkMode ? "#7C8AA0" : "#94a3b8",
+    "--text-body": darkMode ? "#CBD5E1" : "#475569",
+    "--surface-2": darkMode ? "#1B2840" : "#f8fafc",
+    "--surface-3": darkMode ? "#22304A" : "#f1f5f9",
+    "--line-soft": darkMode ? "#26324A" : "#f1f5f9",
+    "--line-strong": darkMode ? "#3A4760" : "#cbd5e1",
+    "--danger": darkMode ? "#F87171" : "#DC2626",
+    "--danger-border": darkMode ? "#7F1D1D" : "#FECACA",
+    "--danger-soft": darkMode ? "#3A1818" : "#FEF2F2",
     "--input-bg": darkMode ? "#0f172a" : "#fafafa",
     "--input-border": darkMode ? "#334155" : "#e2e8f0",
   };
@@ -11390,6 +11398,7 @@ export default function App() {
         background: "var(--bg)",
         fontFamily: "'Noto Sans JP','Helvetica Neue',-apple-system,sans-serif",
         display: "flex",
+        colorScheme: darkMode ? "dark" : "light",
         ...themeVars,
       }}
     >
@@ -11678,7 +11687,7 @@ export default function App() {
                     style={{
                       width: 18,
                       height: 2,
-                      background: "#fff",
+                      background: "var(--card-bg, #fff)",
                       borderRadius: 2,
                     }}
                   />
@@ -11769,10 +11778,10 @@ export default function App() {
                       gap: 4,
                       marginBottom: 20,
                       flexWrap: "wrap",
-                      background: "#fff",
+                      background: "var(--card-bg, #fff)",
                       borderRadius: 12,
                       padding: 6,
-                      border: "1px solid #e2e8f0",
+                      border: "1px solid var(--card-border, #e2e8f0)",
                       width: "fit-content",
                     }}
                   >
@@ -11790,7 +11799,7 @@ export default function App() {
                           fontFamily: "inherit",
                           background:
                             dashFilter === t.id ? "var(--accent, #3B82F6)" : "transparent",
-                          color: dashFilter === t.id ? "#fff" : "#64748b",
+                          color: dashFilter === t.id ? "#fff" : "var(--text-secondary, #64748b)",
                           transition: "all 0.15s",
                         }}
                       >
