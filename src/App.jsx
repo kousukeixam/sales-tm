@@ -1205,7 +1205,7 @@ function WeatherWidget() {
             style={{
               fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
               borderColor: tab === "today" ? "#93c5fd" : "#e2e8f0",
-              background: tab === "today" ? "#eff6ff" : "transparent",
+              background: tab === "today" ? "var(--accent-light, #EFF6FF)" : "transparent",
               color: tab === "today" ? "#1d4ed8" : "#64748b",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
@@ -1217,7 +1217,7 @@ function WeatherWidget() {
             style={{
               fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
               borderColor: tab === "week" ? "#93c5fd" : "#e2e8f0",
-              background: tab === "week" ? "#eff6ff" : "transparent",
+              background: tab === "week" ? "var(--accent-light, #EFF6FF)" : "transparent",
               color: tab === "week" ? "#1d4ed8" : "#64748b",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
@@ -2096,13 +2096,13 @@ const upd = useCallback(
             <div
               style={{
                 padding: "8px 16px",
-                background: "#EFF6FF",
+                background: "var(--accent-light, #EFF6FF)",
                 borderRadius: 8,
-                border: "1px solid #BFDBFE",
+                border: "1px solid var(--accent-border, #BFDBFE)",
               }}
             >
               <span style={{ fontSize: 12, color: "#64748b" }}>本日合計 </span>
-              <span style={{ fontSize: 16, fontWeight: 700, color: "#3B82F6" }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "var(--accent, #3B82F6)" }}>
                 {Math.floor(totalMins / 60)}h
                 {totalMins % 60 > 0 ? `${totalMins % 60}m` : ""}
               </span>
@@ -2773,10 +2773,10 @@ const upd = useCallback(
                           ]);
                         }}
                         style={{
-                          background: "#EFF6FF",
-                          border: "1px solid #BFDBFE",
+                          background: "var(--accent-light, #EFF6FF)",
+                          border: "1px solid var(--accent-border, #BFDBFE)",
                           cursor: "pointer",
-                          color: "#3B82F6",
+                          color: "var(--accent, #3B82F6)",
                           padding: "4px 8px",
                           borderRadius: 6,
                           fontSize: 11,
@@ -2867,7 +2867,7 @@ const upd = useCallback(
                         boxSizing: "border-box",
                         fontWeight: 500,
                       }}
-                      onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+                      onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#e2e8f0";
                         setTimeout(
@@ -2998,7 +2998,7 @@ const upd = useCallback(
                         fontFamily: "inherit",
                         lineHeight: 1.7,
                       }}
-                      onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+                      onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#e2e8f0";
                         setTimeout(
@@ -3153,9 +3153,9 @@ const upd = useCallback(
           fontFamily: "inherit",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = "#3B82F6";
-          e.currentTarget.style.color = "#3B82F6";
-          e.currentTarget.style.background = "#EFF6FF";
+          e.currentTarget.style.borderColor = "var(--accent, #3B82F6)";
+          e.currentTarget.style.color = "var(--accent, #3B82F6)";
+          e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.borderColor = "#cbd5e1";
@@ -3210,7 +3210,7 @@ const upd = useCallback(
             boxSizing: "border-box",
             lineHeight: 1.6,
           }}
-          onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+          onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
           onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
         />
       </div>
@@ -3782,9 +3782,9 @@ function LogCard({
                     alignItems: "center",
                     gap: 5,
                     fontSize: 12,
-                    color: "#3B82F6",
-                    background: "#EFF6FF",
-                    border: "1px solid #BFDBFE",
+                    color: "var(--accent, #3B82F6)",
+                    background: "var(--accent-light, #EFF6FF)",
+                    border: "1px solid var(--accent-border, #BFDBFE)",
                     borderRadius: 7,
                     padding: "5px 10px",
                     cursor: "pointer",
@@ -3803,9 +3803,9 @@ function LogCard({
                   alignItems: "center",
                   gap: 5,
                   fontSize: 12,
-                  color: "#3B82F6",
-                  background: "#EFF6FF",
-                  border: "1px solid #BFDBFE",
+                  color: "var(--accent, #3B82F6)",
+                  background: "var(--accent-light, #EFF6FF)",
+                  border: "1px solid var(--accent-border, #BFDBFE)",
                   borderRadius: 7,
                   padding: "5px 10px",
                   cursor: "pointer",
@@ -3958,9 +3958,9 @@ function DateGroup({
               alignItems: "center",
               gap: 4,
               fontSize: 11,
-              color: "#3B82F6",
-              background: "#EFF6FF",
-              border: "1px solid #BFDBFE",
+              color: "var(--accent, #3B82F6)",
+              background: "var(--accent-light, #EFF6FF)",
+              border: "1px solid var(--accent-border, #BFDBFE)",
               borderRadius: 6,
               padding: "3px 10px",
               cursor: "pointer",
@@ -4043,7 +4043,7 @@ function DateGroup({
                     setEditMemberComment(true);
                   }}
                   style={{
-                    fontSize: 11, color: "#3B82F6", background: "none",
+                    fontSize: 11, color: "var(--accent, #3B82F6)", background: "none",
                     border: "none", cursor: "pointer", fontFamily: "inherit",
                     padding: "2px 4px",
                   }}
@@ -4086,7 +4086,7 @@ function DateGroup({
                   }}
                   style={{
                     fontSize: 12, padding: "5px 14px", borderRadius: 6,
-                    border: "none", background: "#3B82F6", color: "#fff",
+                    border: "none", background: "var(--accent, #3B82F6)", color: "#fff",
                     cursor: "pointer", fontFamily: "inherit",
                   }}
                 >
@@ -4395,7 +4395,7 @@ function DayCard({ date, recs, selected, compact, onClick }) {
       onClick={onClick}
       style={{
         background: "#fff",
-        border: `1px solid ${selected ? "#3B82F6" : "#e2e8f0"}`,
+        border: `1px solid ${selected ? "var(--accent, #3B82F6)" : "#e2e8f0"}`,
         borderRadius: 14,
         padding: compact ? "10px 12px" : "13px 16px",
         marginBottom: 8,
@@ -4827,8 +4827,8 @@ function LogListPage({
                       fontSize: 12,
                       cursor: "pointer",
                       fontFamily: "inherit",
-                      borderColor: isActive ? "#3B82F6" : "#e2e8f0",
-                      background: isActive ? "#3B82F6" : "#f8fafc",
+                      borderColor: isActive ? "var(--accent, #3B82F6)" : "#e2e8f0",
+                      background: isActive ? "var(--accent, #3B82F6)" : "#f8fafc",
                       color: isActive ? "#fff" : "#64748b",
                       fontWeight: isActive ? 600 : 400,
                     }}
@@ -4992,7 +4992,7 @@ function TeamPage({ logs, users, currentUser, groups, onSelectMember }) {
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow =
                 "0 4px 20px rgba(59,130,246,0.15)";
-              e.currentTarget.style.borderColor = "#BFDBFE";
+              e.currentTarget.style.borderColor = "var(--accent-border, #BFDBFE)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
@@ -5155,8 +5155,8 @@ function MemberDetailPage({
             fontFamily: "inherit",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#EFF6FF";
-            e.currentTarget.style.color = "#3B82F6";
+            e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
+            e.currentTarget.style.color = "var(--accent, #3B82F6)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = "#f8fafc";
@@ -5219,7 +5219,7 @@ function MemberDetailPage({
               cursor: "pointer",
               fontSize: 13,
               fontWeight: tab === id ? 600 : 400,
-              background: tab === id ? "#3B82F6" : "transparent",
+              background: tab === id ? "var(--accent, #3B82F6)" : "transparent",
               color: tab === id ? "#fff" : "#64748b",
               transition: "all 0.2s",
               fontFamily: "inherit",
@@ -5489,7 +5489,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                     fontSize: 12,
                     padding: "3px 10px",
                     borderRadius: 20,
-                    background: "#EFF6FF",
+                    background: "var(--accent-light, #EFF6FF)",
                     color: "#1D4ED8",
                     fontWeight: 600,
                   }}
@@ -5525,10 +5525,10 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                   key={c.id}
                   style={{
                     background:
-                      c.author === currentUser.name ? "#EFF6FF" : "#f8fafc",
+                      c.author === currentUser.name ? "var(--accent-light, #EFF6FF)" : "#f8fafc",
                     borderRadius: 10,
                     padding: "10px 12px",
-                    border: `1px solid ${c.author === currentUser.name ? "#BFDBFE" : "#e2e8f0"}`,
+                    border: `1px solid ${c.author === currentUser.name ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
                   }}
                 >
                   <div
@@ -5919,7 +5919,7 @@ function KanbanColumn({
           display: "flex",
           flexDirection: "column",
           gap: 8,
-          background: over ? "#EFF6FF" : "transparent",
+          background: over ? "var(--accent-light, #EFF6FF)" : "transparent",
           transition: "background 0.15s",
           minHeight: 60,
         }}
@@ -5963,9 +5963,9 @@ function KanbanColumn({
             transition: "all 0.15s",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#3B82F6";
-            e.currentTarget.style.color = "#3B82F6";
-            e.currentTarget.style.background = "#EFF6FF";
+            e.currentTarget.style.borderColor = "var(--accent, #3B82F6)";
+            e.currentTarget.style.color = "var(--accent, #3B82F6)";
+            e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = "#cbd5e1";
@@ -6281,9 +6281,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             onClick={() => setViewId(m.id)}
             style={{
               ...BB,
-              background: viewId === m.id ? "#EFF6FF" : "#fff",
+              background: viewId === m.id ? "var(--accent-light, #EFF6FF)" : "#fff",
               color: viewId === m.id ? "#1D4ED8" : "#64748b",
-              borderColor: viewId === m.id ? "#BFDBFE" : "#e2e8f0",
+              borderColor: viewId === m.id ? "var(--accent-border, #BFDBFE)" : "#e2e8f0",
               fontSize: 12,
               padding: "6px 14px",
               gap: 6,
@@ -6456,9 +6456,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
                 transition: "all 0.15s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#3B82F6";
-                e.currentTarget.style.color = "#3B82F6";
-                e.currentTarget.style.background = "#EFF6FF";
+                e.currentTarget.style.borderColor = "var(--accent, #3B82F6)";
+                e.currentTarget.style.color = "var(--accent, #3B82F6)";
+                e.currentTarget.style.background = "var(--accent-light, #EFF6FF)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = "#cbd5e1";
@@ -6777,7 +6777,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                 onClick={() => setSettings((p) => ({ ...p, ai_reference_enabled: !p.ai_reference_enabled }))}
                 style={{
                   width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-                  background: settings.ai_reference_enabled ? "#3B82F6" : "#cbd5e1",
+                  background: settings.ai_reference_enabled ? "var(--accent, #3B82F6)" : "#cbd5e1",
                   position: "relative", transition: "background 0.2s", marginLeft: "auto",
                 }}
               >
@@ -6804,8 +6804,8 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                         onClick={() => setSettings((p) => ({ ...p, ai_reference_level: v }))}
                         style={{
                           padding: "6px 14px", borderRadius: 8, border: "1px solid",
-                          borderColor: settings.ai_reference_level === v ? "#3B82F6" : "#e2e8f0",
-                          background: settings.ai_reference_level === v ? "#EFF6FF" : "#fff",
+                          borderColor: settings.ai_reference_level === v ? "var(--accent, #3B82F6)" : "#e2e8f0",
+                          background: settings.ai_reference_level === v ? "var(--accent-light, #EFF6FF)" : "#fff",
                           color: settings.ai_reference_level === v ? "#1D4ED8" : "#64748b",
                           fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         }}
@@ -6943,7 +6943,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                       onClick={() => toggleRefDocActive(doc)}
                       style={{
                         width: 32, height: 18, borderRadius: 9, border: "none", cursor: "pointer", flexShrink: 0,
-                        background: doc.is_active ? "#3B82F6" : "#cbd5e1", position: "relative",
+                        background: doc.is_active ? "var(--accent, #3B82F6)" : "#cbd5e1", position: "relative",
                       }}
                     >
                       <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: doc.is_active ? 16 : 2 }} />
@@ -7450,8 +7450,8 @@ function MyPage({
                     onClick={() => setWeeklySchedule((p) => ({ ...p, mode: m }))}
                     style={{
                       padding: "7px 16px", borderRadius: 8, border: "1px solid",
-                      borderColor: weeklySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
-                      background: weeklySchedule.mode === m ? "#EFF6FF" : "#fff",
+                      borderColor: weeklySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
+                      background: weeklySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
                       color: weeklySchedule.mode === m ? "#1D4ED8" : "#64748b",
                       fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
@@ -7496,8 +7496,8 @@ function MyPage({
                     onClick={() => setMonthlySchedule((p) => ({ ...p, mode: m }))}
                     style={{
                       padding: "7px 16px", borderRadius: 8, border: "1px solid",
-                      borderColor: monthlySchedule.mode === m ? "#3B82F6" : "#e2e8f0",
-                      background: monthlySchedule.mode === m ? "#EFF6FF" : "#fff",
+                      borderColor: monthlySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
+                      background: monthlySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
                       color: monthlySchedule.mode === m ? "#1D4ED8" : "#64748b",
                       fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
@@ -7637,7 +7637,7 @@ function GroupForm({ groups, setGroups }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="例：営業第3グループ"
             style={I}
-            onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+            onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
             onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
           />
         </div>
@@ -8426,7 +8426,7 @@ function SuperAdminPage({
           disabled={aiRefSaving}
           style={{
             width: 48, height: 26, borderRadius: 13, border: "none", cursor: "pointer", flexShrink: 0,
-            background: aiRefEnabled ? "#3B82F6" : "#cbd5e1", position: "relative", opacity: aiRefSaving ? 0.6 : 1,
+            background: aiRefEnabled ? "var(--accent, #3B82F6)" : "#cbd5e1", position: "relative", opacity: aiRefSaving ? 0.6 : 1,
           }}
         >
           <div style={{
@@ -8501,7 +8501,7 @@ function SuperAdminPage({
                   }
                   type={f === "password" ? "password" : "text"}
                   style={I}
-                  onFocus={(e) => (e.target.style.borderColor = "#3B82F6")}
+                  onFocus={(e) => (e.target.style.borderColor = "var(--accent, #3B82F6)")}
                   onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
                 />
               </div>
@@ -8853,10 +8853,10 @@ function SuperAdminPage({
                             alignItems: "center",
                             gap: 8,
                             padding: "6px 10px",
-                            background: "#EFF6FF",
+                            background: "var(--accent-light, #EFF6FF)",
                             borderRadius: 8,
                             marginBottom: 4,
-                            border: "1px solid #BFDBFE",
+                            border: "1px solid var(--accent-border, #BFDBFE)",
                           }}
                         >
                           <div
@@ -8944,7 +8944,7 @@ function SuperAdminPage({
             >
               現在のデータ数
             </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: "#3B82F6" }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: "var(--accent, #3B82F6)" }}>
               {logs.length}
               <span
                 style={{
@@ -9063,7 +9063,7 @@ function RankingPage({ logs, users, currentUser }) {
               fontSize: 13,
               fontWeight: period === id ? 600 : 400,
               fontFamily: "inherit",
-              background: period === id ? "#3B82F6" : "transparent",
+              background: period === id ? "var(--accent, #3B82F6)" : "transparent",
               color: period === id ? "#fff" : "#64748b",
               transition: "all 0.15s",
             }}
@@ -9088,9 +9088,9 @@ function RankingPage({ logs, users, currentUser }) {
             <div
               key={u.id}
               style={{
-                background: isMe ? "#EFF6FF" : "#fff",
+                background: isMe ? "var(--accent-light, #EFF6FF)" : "#fff",
                 borderRadius: 14,
-                border: `1px solid ${isMe ? "#BFDBFE" : "#e2e8f0"}`,
+                border: `1px solid ${isMe ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
                 padding: "14px 18px",
                 display: "flex",
                 alignItems: "center",
@@ -9151,7 +9151,7 @@ function RankingPage({ logs, users, currentUser }) {
                     <span
                       style={{
                         fontSize: 10,
-                        background: "#3B82F6",
+                        background: "var(--accent, #3B82F6)",
                         color: "#fff",
                         padding: "1px 7px",
                         borderRadius: 10,
@@ -9182,7 +9182,7 @@ function RankingPage({ logs, users, currentUser }) {
                             : rank === 3
                               ? "#CD7F32"
                               : isMe
-                                ? "#3B82F6"
+                                ? "var(--accent, #3B82F6)"
                                 : "#cbd5e1",
                       width: `${maxCount > 0 ? (u.count / maxCount) * 100 : 0}%`,
                       transition: "width 0.6s",
@@ -9953,7 +9953,7 @@ function FeedbackAdminPage() {
               key={f.id}
               style={{
                 ...C,
-                borderLeft: `4px solid ${f.is_read ? "#e2e8f0" : "#3B82F6"}`,
+                borderLeft: `4px solid ${f.is_read ? "#e2e8f0" : "var(--accent, #3B82F6)"}`,
               }}
             >
               <div
@@ -10206,7 +10206,7 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
     <div
       onClick={() => onNavigate?.("announcement")}
       style={{
-        background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 12,
+        background: "var(--accent-light, #EFF6FF)", border: "1px solid var(--accent-border, #BFDBFE)", borderRadius: 12,
         padding: "12px 16px", display: "flex", alignItems: "center", gap: 8,
         cursor: "pointer", flex: hasTasks && hasAnnouncements ? 1 : "0 1 360px",
         minWidth: 260,
@@ -10425,7 +10425,7 @@ const deleteReport = async (r) => {
                 fontSize: 13,
                 fontWeight: reportType === id ? 600 : 400,
                 fontFamily: "inherit",
-                background: reportType === id ? "#3B82F6" : "transparent",
+                background: reportType === id ? "var(--accent, #3B82F6)" : "transparent",
                 color: reportType === id ? "#fff" : "#64748b",
               }}
             >
@@ -10535,8 +10535,8 @@ const deleteReport = async (r) => {
                 key={key}
                 onClick={() => setSelectedPeriod(key)}
                 style={{
-                  background: selectedPeriod === key ? "#EFF6FF" : "#fff",
-                  border: `1px solid ${selectedPeriod === key ? "#BFDBFE" : "#e2e8f0"}`,
+                  background: selectedPeriod === key ? "var(--accent-light, #EFF6FF)" : "#fff",
+                  border: `1px solid ${selectedPeriod === key ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
                   borderRadius: 10,
                   padding: "10px 12px",
                   cursor: "pointer",
@@ -11297,7 +11297,7 @@ export default function App() {
             width: 40,
             height: 40,
             border: "3px solid #e2e8f0",
-            borderTop: "3px solid #3B82F6",
+            borderTop: "3px solid var(--accent, #3B82F6)",
             borderRadius: "50%",
             animation: "spin 0.8s linear infinite",
           }}
@@ -11820,7 +11820,7 @@ export default function App() {
                           fontWeight: dashFilter === t.id ? 600 : 400,
                           fontFamily: "inherit",
                           background:
-                            dashFilter === t.id ? "#3B82F6" : "transparent",
+                            dashFilter === t.id ? "var(--accent, #3B82F6)" : "transparent",
                           color: dashFilter === t.id ? "#fff" : "#64748b",
                           transition: "all 0.15s",
                         }}
