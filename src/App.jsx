@@ -593,7 +593,7 @@ function LoginPage({ onLogin }) {
   const si = {
     width: "100%",
     padding: "12px 14px",
-    background: "#fff",
+    background: "var(--card-bg, #fff)",
     border: "1px solid #D5DCE6",
     borderRadius: 6,
     color: "#1C2534",
@@ -1138,9 +1138,9 @@ function WeatherWidget() {
             onClick={() => setTab("today")}
             style={{
               fontSize: 14, padding: "6px 14px", borderRadius: 8, border: "1px solid",
-              borderColor: tab === "today" ? "var(--accent-border, #93c5fd)" : "#e2e8f0",
+              borderColor: tab === "today" ? "var(--accent-border, #93c5fd)" : "var(--card-border, #e2e8f0)",
               background: tab === "today" ? "var(--accent-light, #EFF6FF)" : "transparent",
-              color: tab === "today" ? "var(--accent-ink, #1d4ed8)" : "#64748b",
+              color: tab === "today" ? "var(--accent-ink, #1d4ed8)" : "var(--text-secondary, #64748b)",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
@@ -1150,9 +1150,9 @@ function WeatherWidget() {
             onClick={() => setTab("week")}
             style={{
               fontSize: 14, padding: "6px 14px", borderRadius: 8, border: "1px solid",
-              borderColor: tab === "week" ? "var(--accent-border, #93c5fd)" : "#e2e8f0",
+              borderColor: tab === "week" ? "var(--accent-border, #93c5fd)" : "var(--card-border, #e2e8f0)",
               background: tab === "week" ? "var(--accent-light, #EFF6FF)" : "transparent",
-              color: tab === "week" ? "var(--accent-ink, #1d4ed8)" : "#64748b",
+              color: tab === "week" ? "var(--accent-ink, #1d4ed8)" : "var(--text-secondary, #64748b)",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
@@ -4676,7 +4676,7 @@ function DayCard({ date, recs, selected, compact, onClick }) {
       onClick={onClick}
       style={{
         background: "var(--card-bg, #fff)",
-        border: `1px solid ${selected ? "var(--accent, #3B82F6)" : "#e2e8f0"}`,
+        border: `1px solid ${selected ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)"}`,
         borderRadius: 10,
         padding: compact ? "10px 12px" : "13px 16px",
         marginBottom: 8,
@@ -5108,8 +5108,8 @@ function LogListPage({
                       fontSize: 13,
                       cursor: "pointer",
                       fontFamily: "inherit",
-                      borderColor: isActive ? "var(--accent, #3B82F6)" : "#e2e8f0",
-                      background: isActive ? "var(--accent, #3B82F6)" : "#f8fafc",
+                      borderColor: isActive ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)",
+                      background: isActive ? "var(--accent, #3B82F6)" : "var(--surface-2, #f8fafc)",
                       color: isActive ? "#fff" : "var(--text-secondary, #64748b)",
                       fontWeight: isActive ? 600 : 400,
                     }}
@@ -5796,7 +5796,7 @@ function CardModal({ card, isOwner, currentUser, onClose, onSave, onDelete }) {
                       c.author === currentUser.name ? "var(--accent-light, #EFF6FF)" : "#f8fafc",
                     borderRadius: 8,
                     padding: "10px 12px",
-                    border: `1px solid ${c.author === currentUser.name ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
+                    border: `1px solid ${c.author === currentUser.name ? "var(--accent-border, #BFDBFE)" : "var(--card-border, #e2e8f0)"}`,
                   }}
                 >
                   <div
@@ -5939,9 +5939,13 @@ function KanbanCard({ card, isOwner, onOpen, onDragStart }) {
       onClick={() => onOpen(card)}
       style={{
         background:
-          dc === "over" ? "#FEF2F2" : dc === "near" ? "#FFFBEB" : "#fff",
+          dc === "over"
+            ? "var(--danger-soft, #FEF2F2)"
+            : dc === "near"
+              ? "var(--note-bg, #FFFBEB)"
+              : "var(--card-bg, #fff)",
         borderRadius: 10,
-        border: `1px solid ${dc === "over" ? "#FECACA" : dc === "near" ? "#FDE68A" : "var(--card-border, #e2e8f0)"}`,
+        border: `1px solid ${dc === "over" ? "var(--danger-border, #FECACA)" : dc === "near" ? "var(--note-line, #FDE68A)" : "var(--card-border, #e2e8f0)"}`,
         padding: "12px 14px",
         cursor: isOwner ? "grab" : "pointer",
         transition: "all 0.15s",
@@ -6478,10 +6482,10 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           </div>
         </div>
         {[
-          ["未着手", totalByStatus.todo, "#64748b"],
+          ["未着手", totalByStatus.todo, "var(--text-secondary, #64748b)"],
           ["進行中", totalByStatus.prog, "#3B82F6"],
           ["完了", totalByStatus.done, "#10B981"],
-          ["合計", totalByStatus.total, "#1e293b"],
+          ["合計", totalByStatus.total, "var(--text-primary, #1e293b)"],
         ].map(([l, v, c]) => (
           <div
             key={l}
@@ -6516,9 +6520,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           onClick={() => setViewId(currentUser.id)}
           style={{
             ...BB,
-            background: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#fff",
+            background: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "var(--card-bg, #fff)",
             color: viewId === currentUser.id ? "#fff" : "var(--text-secondary, #64748b)",
-            borderColor: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#e2e8f0",
+            borderColor: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)",
             fontSize: 13,
             padding: "6px 14px",
             gap: 6,
@@ -6549,9 +6553,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             onClick={() => setViewId(m.id)}
             style={{
               ...BB,
-              background: viewId === m.id ? "var(--accent-light, #EFF6FF)" : "#fff",
-              color: viewId === m.id ? "var(--accent-ink, #1D4ED8)" : "#64748b",
-              borderColor: viewId === m.id ? "var(--accent-border, #BFDBFE)" : "#e2e8f0",
+              background: viewId === m.id ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
+              color: viewId === m.id ? "var(--accent-ink, #1D4ED8)" : "var(--text-secondary, #64748b)",
+              borderColor: viewId === m.id ? "var(--accent-border, #BFDBFE)" : "var(--card-border, #e2e8f0)",
               fontSize: 13,
               padding: "6px 14px",
               gap: 6,
@@ -7072,9 +7076,9 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                         onClick={() => setSettings((p) => ({ ...p, ai_reference_level: v }))}
                         style={{
                           padding: "6px 14px", borderRadius: 8, border: "1px solid",
-                          borderColor: settings.ai_reference_level === v ? "var(--accent, #3B82F6)" : "#e2e8f0",
-                          background: settings.ai_reference_level === v ? "var(--accent-light, #EFF6FF)" : "#fff",
-                          color: settings.ai_reference_level === v ? "var(--accent-ink, #1D4ED8)" : "#64748b",
+                          borderColor: settings.ai_reference_level === v ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)",
+                          background: settings.ai_reference_level === v ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
+                          color: settings.ai_reference_level === v ? "var(--accent-ink, #1D4ED8)" : "var(--text-secondary, #64748b)",
                           fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         }}
                       >
@@ -7650,9 +7654,9 @@ function MyPage({
                     onClick={() => setWeeklySchedule((p) => ({ ...p, mode: m }))}
                     style={{
                       padding: "7px 16px", borderRadius: 8, border: "1px solid",
-                      borderColor: weeklySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
-                      background: weeklySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
-                      color: weeklySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "#64748b",
+                      borderColor: weeklySchedule.mode === m ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)",
+                      background: weeklySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
+                      color: weeklySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "var(--text-secondary, #64748b)",
                       fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
@@ -7696,9 +7700,9 @@ function MyPage({
                     onClick={() => setMonthlySchedule((p) => ({ ...p, mode: m }))}
                     style={{
                       padding: "7px 16px", borderRadius: 8, border: "1px solid",
-                      borderColor: monthlySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
-                      background: monthlySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
-                      color: monthlySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "#64748b",
+                      borderColor: monthlySchedule.mode === m ? "var(--accent, #3B82F6)" : "var(--card-border, #e2e8f0)",
+                      background: monthlySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
+                      color: monthlySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "var(--text-secondary, #64748b)",
                       fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
@@ -9293,9 +9297,9 @@ function RankingPage({ logs, users, currentUser }) {
             <div
               key={u.id}
               style={{
-                background: isMe ? "var(--accent-light, #EFF6FF)" : "#fff",
+                background: isMe ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
                 borderRadius: 10,
-                border: `1px solid ${isMe ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
+                border: `1px solid ${isMe ? "var(--accent-border, #BFDBFE)" : "var(--card-border, #e2e8f0)"}`,
                 padding: "14px 18px",
                 display: "flex",
                 alignItems: "center",
@@ -10407,13 +10411,13 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
     <div
       onClick={() => onNavigate?.("board")}
       style={{
-        background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10,
+        background: "var(--note-bg, #FFFBEB)", border: "1px solid var(--note-line, #FDE68A)", borderRadius: 10,
         padding: "12px 16px", cursor: "pointer", flex: hasTasks && hasAnnouncements ? 1 : "0 1 360px",
         minWidth: 260,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#92400E" }}>期日が近いタスク</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--note-ink, #92400E)" }}>期日が近いタスク</span>
         <span style={{ fontSize: 12, background: "#F59E0B", color: "#fff", padding: "1px 8px", borderRadius: 8, fontWeight: 700 }}>
           {urgentCards.length}件
         </span>
@@ -10433,7 +10437,7 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
       }}
     >
       <span style={{ display: "inline-flex", color: "var(--accent-ink, #1D4ED8)" }}><Icon name="megaphone" size={17} /></span>
-      <span style={{ fontSize: 14, color: "#1D4ED8", fontWeight: 600 }}>
+      <span style={{ fontSize: 14, color: "var(--accent-ink, #1D4ED8)", fontWeight: 600 }}>
         未読のお知らせが {unreadCount}件 あります
       </span>
     </div>
@@ -10755,8 +10759,8 @@ const deleteReport = async (r) => {
                 key={key}
                 onClick={() => setSelectedPeriod(key)}
                 style={{
-                  background: selectedPeriod === key ? "var(--accent-light, #EFF6FF)" : "#fff",
-                  border: `1px solid ${selectedPeriod === key ? "var(--accent-border, #BFDBFE)" : "#e2e8f0"}`,
+                  background: selectedPeriod === key ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
+                  border: `1px solid ${selectedPeriod === key ? "var(--accent-border, #BFDBFE)" : "var(--card-border, #e2e8f0)"}`,
                   borderRadius: 8,
                   padding: "10px 12px",
                   cursor: "pointer",
@@ -11579,8 +11583,13 @@ export default function App() {
   const themeVars = {
     "--accent": accent.primary,
     "--accent-gradient": `linear-gradient(${accent.gradient})`,
-    "--accent-light": accent.light,
-    "--accent-border": accent.border,
+    // ダークモードでは、淡い色をテーマ色を薄く混ぜた暗めの色にする
+    "--accent-light": darkMode
+      ? `color-mix(in srgb, ${accent.primary} 22%, transparent)`
+      : accent.light,
+    "--accent-border": darkMode
+      ? `color-mix(in srgb, ${accent.primary} 45%, transparent)`
+      : accent.border,
     // 選択中の文字色（淡い背景の上で読める濃さ）。ダークでは基本色を使う
     "--accent-ink": darkMode ? accent.primary : accent.ink,
     "--bg": darkMode ? "#0f172a" : "#f1f5f9",
@@ -11841,23 +11850,24 @@ export default function App() {
             </div>
             <button
               onClick={logout}
+              title="ログアウト"
+              aria-label="ログアウト"
               style={{
                 background: "transparent",
                 border: "1px solid rgba(255,255,255,0.16)",
                 cursor: "pointer",
                 color: "rgba(255,255,255,0.75)",
-                padding: "5px 9px",
+                width: 32,
+                height: 32,
+                padding: 0,
                 borderRadius: 6,
                 display: "flex",
                 alignItems: "center",
-                gap: 5,
-                fontSize: 13,
-                whiteSpace: "nowrap",
-                fontFamily: "inherit",
+                justifyContent: "center",
+                flexShrink: 0,
               }}
             >
-              <Icon name="logout" size={13} />
-              ログアウト
+              <Icon name="logout" size={15} />
             </button>
           </div>
           {/* 表示の切り替え：ダークモードとカラーテーマ（設定はこのブラウザに保存される） */}
@@ -12102,6 +12112,7 @@ export default function App() {
                       gap: 16,
                       marginTop: 20,
                       flexWrap: "wrap",
+                      alignItems: "flex-start",
                     }}
                   >
                     <WeatherWidget />
