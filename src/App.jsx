@@ -3714,15 +3714,17 @@ function LogCard({
         }}
         onClick={() => setExpanded((x) => !x)}
       >
-        <div
+        <span
           style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: cat.color,
+            width: 92,
             flexShrink: 0,
+            fontSize: 14,
+            color: "var(--text-secondary, #64748b)",
+            fontVariantNumeric: "tabular-nums",
           }}
-        />
+        >
+          {rec.start}〜{rec.end}
+        </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
@@ -3743,7 +3745,7 @@ function LogCard({
                     onTagClick?.(part.slice(1));
                   }}
                   style={{
-                    color: "#8B5CF6",
+                    color: "var(--accent-ink, #1D4ED8)",
                     cursor: "pointer",
                     fontWeight: 600,
                   }}
@@ -3759,7 +3761,7 @@ function LogCard({
             <div
               style={{
                 fontSize: 13,
-                color: "var(--text-muted, #94a3b8)",
+                color: "var(--text-secondary, #64748b)",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -3782,31 +3784,44 @@ function LogCard({
             <span
               style={{
                 fontSize: 11,
-                background: "#FEF3C7",
-                color: "#D97706",
+                background: "var(--note-bg, #FEF3C7)",
+                color: "var(--note-ink, #D97706)",
                 padding: "2px 6px",
                 borderRadius: 4,
-                border: "1px solid #FDE68A",
+                border: "1px solid var(--note-line, #FDE68A)",
                 fontWeight: 600,
               }}
             >
               上司コメントあり
             </span>
           )}
-          <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)" }}>
-            {rec.start}〜{rec.end}
-          </span>
           <span
             style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 5,
               fontSize: 13,
               fontWeight: 700,
-              color: cat.color,
-              background: cat.bg,
-              padding: "2px 8px",
-              borderRadius: 4,
+              color: "var(--text-secondary, #64748b)",
+              whiteSpace: "nowrap",
             }}
           >
-            {rec.cat}
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 20,
+                height: 20,
+                borderRadius: 4,
+                background: cat.color,
+                color: "#fff",
+                fontSize: 12,
+              }}
+            >
+              {rec.cat === "other" ? "-" : rec.cat}
+            </span>
+            {cat.label}
           </span>
           <span
             style={{
@@ -3867,8 +3882,8 @@ function LogCard({
           )}
           <div
             style={{
-              background: "#FFFBEB",
-              border: "1px solid #FDE68A",
+              background: "var(--note-bg, #FFFBEB)",
+              border: "1px solid var(--note-line, #FDE68A)",
               borderRadius: 8,
               padding: "10px 14px",
               marginBottom: 10,
@@ -3882,7 +3897,7 @@ function LogCard({
                 marginBottom: 6,
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#D97706" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--note-ink, #D97706)" }}>
                 上司コメント（この業務について）
               </span>
               {isAdmin && !editing && (
@@ -3893,9 +3908,9 @@ function LogCard({
                   }}
                   style={{
                     fontSize: 12,
-                    color: "#D97706",
-                    background: "#FEF3C7",
-                    border: "1px solid #FDE68A",
+                    color: "var(--note-ink, #D97706)",
+                    background: "var(--note-bg, #FEF3C7)",
+                    border: "1px solid var(--note-line, #FDE68A)",
                     borderRadius: 5,
                     padding: "3px 8px",
                     cursor: "pointer",
@@ -3917,7 +3932,7 @@ function LogCard({
                     width: "100%",
                     padding: "8px 10px",
                     borderRadius: 7,
-                    border: "1px solid #FDE68A",
+                    border: "1px solid var(--note-line, #FDE68A)",
                     fontSize: 14,
                     outline: "none",
                     resize: "vertical",
@@ -3966,11 +3981,11 @@ function LogCard({
                 </div>
               </div>
             ) : rec.managerComment ? (
-              <div style={{ fontSize: 14, color: "#92400E", lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: "var(--note-ink, #92400E)", lineHeight: 1.7 }}>
                 {rec.managerComment}
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: "#D97706", opacity: 0.5 }}>
+              <div style={{ fontSize: 13, color: "var(--note-ink, #D97706)", opacity: 0.5 }}>
                 {isAdmin
                   ? "（コメントを追加できます）"
                   : "（上司からのコメントはまだありません）"}
@@ -4344,8 +4359,8 @@ function DateGroup({
         </div>
         <div
           style={{
-            background: "#FFFBEB",
-            border: "1px solid #FDE68A",
+            background: "var(--note-bg, #FFFBEB)",
+            border: "1px solid var(--note-line, #FDE68A)",
             borderRadius: 8,
             padding: "10px 14px",
           }}
@@ -4358,7 +4373,7 @@ function DateGroup({
               marginBottom: 6,
             }}
           >
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#D97706" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--note-ink, #D97706)" }}>
               上司からの総括コメント
             </span>
             {isAdmin && !editDay && (
@@ -4366,9 +4381,9 @@ function DateGroup({
                 onClick={() => setEditDay(true)}
                 style={{
                   fontSize: 12,
-                  color: "#D97706",
-                  background: "#FEF3C7",
-                  border: "1px solid #FDE68A",
+                  color: "var(--note-ink, #D97706)",
+                  background: "var(--note-bg, #FEF3C7)",
+                  border: "1px solid var(--note-line, #FDE68A)",
                   borderRadius: 5,
                   padding: "3px 8px",
                   cursor: "pointer",
@@ -4390,7 +4405,7 @@ function DateGroup({
                   width: "100%",
                   padding: "8px 10px",
                   borderRadius: 7,
-                  border: "1px solid #FDE68A",
+                  border: "1px solid var(--note-line, #FDE68A)",
                   fontSize: 14,
                   outline: "none",
                   resize: "vertical",
@@ -4439,11 +4454,11 @@ function DateGroup({
               </div>
             </div>
           ) : managerDayComment ? (
-            <div style={{ fontSize: 14, color: "#92400E", lineHeight: 1.7 }}>
+            <div style={{ fontSize: 14, color: "var(--note-ink, #92400E)", lineHeight: 1.7 }}>
               {managerDayComment}
             </div>
           ) : (
-            <div style={{ fontSize: 13, color: "#D97706", opacity: 0.5 }}>
+            <div style={{ fontSize: 13, color: "var(--note-ink, #D97706)", opacity: 0.5 }}>
               {isAdmin
                 ? "（総括コメントを追加できます）"
                 : "（上司からの総括コメントはまだありません）"}
