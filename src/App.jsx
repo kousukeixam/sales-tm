@@ -589,232 +589,175 @@ function LoginPage({ onLogin }) {
       setLoginSeconds(0);
     }
   };
+  // ログイン画面はテーマ設定の外にあるため、色は直接指定する
   const si = {
     width: "100%",
     padding: "12px 14px",
-    background: "rgba(255,255,255,0.07)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 8,
-    color: "#fff",
+    background: "#fff",
+    border: "1px solid #D5DCE6",
+    borderRadius: 6,
+    color: "#1C2534",
     fontSize: 15,
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "inherit",
   };
+  const lb = {
+    color: "#556070",
+    fontSize: 13,
+    fontWeight: 700,
+    display: "block",
+    marginBottom: 6,
+  };
   return (
     <div
       style={{
         minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background:
-          "#13203A",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
         fontFamily: "'Noto Sans JP','Helvetica Neue',sans-serif",
-        position: "relative",
-        overflow: "hidden",
       }}
     >
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            borderRadius: "50%",
-            width: [300, 200, 400, 150, 250][i],
-            height: [300, 200, 400, 150, 250][i],
-            background: `radial-gradient(circle,rgba(59,130,246,${[0.06, 0.04, 0.03, 0.07, 0.05][i]}) 0%,transparent 70%)`,
-            left: `${[10, 70, 30, 80, 20][i]}%`,
-            top: `${[20, 10, 60, 40, 80][i]}%`,
-            transform: "translate(-50%,-50%)",
-            pointerEvents: "none",
-          }}
-        />
-      ))}
+      {/* 左：アプリの紹介（狭い画面では上に表示） */}
       <div
         style={{
-          background: "rgba(255,255,255,0.03)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: 20,
-          padding: "48px 44px",
-          width: 400,
-          position: "relative",
-          boxShadow: "0 25px 60px rgba(0,0,0,0.4)",
+          background: "#13203A",
+          color: "#fff",
+          padding: "48px 40px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          gap: 32,
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <h1
-            style={{
-              color: "#fff",
-              fontSize: 24,
-              fontWeight: 700,
-              margin: 0,
-              letterSpacing: "-0.5px",
-            }}
-          >
-            Sales TM
-          </h1>
+        <div>
+          <h1 style={{ fontSize: 32, fontWeight: 700, margin: 0 }}>Sales TM</h1>
           <p
             style={{
-              color: "rgba(255,255,255,0.45)",
-              fontSize: 14,
-              margin: "6px 0 0",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: 15,
+              lineHeight: 1.8,
+              margin: "12px 0 0",
+              maxWidth: "30em",
             }}
           >
-            営業生産性向上システム
+            毎日の営業活動を記録して、時間の使い方を振り返るための日報システムです。
           </p>
         </div>
-        {err && (
-          <div
-            style={{
-              background: "rgba(239,68,68,0.12)",
-              border: "1px solid rgba(239,68,68,0.3)",
-              borderRadius: 8,
-              padding: "10px 14px",
-              marginBottom: 20,
-              color: "#fca5a5",
-              fontSize: 14,
-            }}
-          >
-            {err}
-          </div>
-        )}
-        <div style={{ marginBottom: 16 }}>
-          <label
-            style={{
-              color: "rgba(255,255,255,0.6)",
-              fontSize: 13,
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            メールアドレス
-          </label>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="yourname@company.com"
-            style={si}
-            onKeyDown={(e) => e.key === "Enter" && go()}
-          />
-        </div>
-        <div style={{ marginBottom: 24 }}>
-          <label
-            style={{
-              color: "rgba(255,255,255,0.6)",
-              fontSize: 13,
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            パスワード
-          </label>
-          <input
-            type="password"
-            value={pass}
-            onChange={(e) => setPass(e.target.value)}
-            placeholder="••••••••"
-            style={si}
-            onKeyDown={(e) => e.key === "Enter" && go()}
-          />
-        </div>
-        <button
-          onClick={go}
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: 13,
-            borderRadius: 8,
-            border: "none",
-            background: loading
-              ? "rgba(59,130,246,0.4)"
-              : "var(--accent, #3B82F6)",
-            color: "#fff",
-            fontSize: 15,
-            fontWeight: 600,
-            cursor: loading ? "default" : "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          {loading ? `ログイン中...（${loginSeconds}秒経過）` : "ログイン"}
-        </button>
-        <div
-          style={{
-            marginTop: 24,
-            padding: 16,
-            background: "rgba(255,255,255,0.04)",
-            borderRadius: 8,
-            border: "1px solid rgba(255,255,255,0.07)",
-          }}
-        >
-          <p
-            style={{
-              color: "rgba(255,255,255,0.4)",
-              fontSize: 12,
-              margin: "0 0 8px",
-              textAlign: "center",
-            }}
-          >
-            デモ用アカウント
-          </p>
-          {INIT_USERS.map((u) => (
-            <div
-              key={u.id}
-              onClick={() => {
-                setEmail(u.email);
-                setPass(u.password);
-              }}
+        <div style={{ display: "grid", gap: 8, maxWidth: 320 }}>
+          {Object.entries(CATEGORIES).map(([k, v]) => (
+            <span
+              key={k}
               style={{
-                padding: "5px 8px",
-                borderRadius: 6,
-                cursor: "pointer",
-                fontSize: 13,
-                color: "rgba(255,255,255,0.6)",
-                display: "flex",
-                justifyContent: "space-between",
+                display: "inline-flex",
                 alignItems: "center",
+                gap: 8,
+                fontSize: 14,
+                color: "rgba(255,255,255,0.8)",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.07)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "transparent")
-              }
             >
-              <span>{u.name}</span>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <span
-                  style={{
-                    fontSize: 11,
-                    padding: "1px 7px",
-                    borderRadius: 8,
-                    background:
-                      u.role === "superadmin"
-                        ? "rgba(239,68,68,0.2)"
-                        : u.role === "admin"
-                          ? "rgba(245,158,11,0.2)"
-                          : "rgba(59,130,246,0.2)",
-                    color:
-                      u.role === "superadmin"
-                        ? "#FCA5A5"
-                        : u.role === "admin"
-                          ? "#FCD34D"
-                          : "#93C5FD",
-                  }}
-                >
-                  {u.role === "superadmin"
-                    ? "管理者"
-                    : u.role === "admin"
-                      ? "上司"
-                      : "部下"}
-                </span>
-                <span style={{ color: "rgba(255,255,255,0.25)" }}>
-                  {u.password}
-                </span>
-              </div>
-            </div>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 22,
+                  height: 22,
+                  borderRadius: 4,
+                  background: v.color,
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              >
+                {k}
+              </span>
+              {v.label}
+            </span>
           ))}
+        </div>
+      </div>
+
+      {/* 右：ログインフォーム */}
+      <div
+        style={{
+          background: "#F1F4F8",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px 20px",
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 360 }}>
+          <h2 style={{ margin: "0 0 24px", fontSize: 22, fontWeight: 700, color: "#1C2534" }}>
+            ログイン
+          </h2>
+          {err && (
+            <div
+              style={{
+                background: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: 6,
+                padding: "10px 14px",
+                marginBottom: 20,
+                color: "#991B1B",
+                fontSize: 14,
+              }}
+            >
+              {err}
+            </div>
+          )}
+          <div style={{ marginBottom: 16 }}>
+            <label style={lb} htmlFor="login-email">
+              メールアドレス
+            </label>
+            <input
+              id="login-email"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="yourname@company.com"
+              style={si}
+              onKeyDown={(e) => e.key === "Enter" && go()}
+            />
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            <label style={lb} htmlFor="login-pass">
+              パスワード
+            </label>
+            <input
+              id="login-pass"
+              type="password"
+              autoComplete="current-password"
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+              placeholder="••••••••"
+              style={si}
+              onKeyDown={(e) => e.key === "Enter" && go()}
+            />
+          </div>
+          <button
+            onClick={go}
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: 13,
+              borderRadius: 6,
+              border: "none",
+              background: loading ? "rgba(59,130,246,0.5)" : "#2563EB",
+              color: "#fff",
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: loading ? "default" : "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            {loading ? `ログイン中...（${loginSeconds}秒経過）` : "ログイン"}
+          </button>
+          <p style={{ fontSize: 13, color: "#8592A3", textAlign: "center", marginTop: 16 }}>
+            パスワードを忘れた場合は、上司または管理者に連絡してください
+          </p>
         </div>
       </div>
     </div>
