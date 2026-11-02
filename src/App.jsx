@@ -4279,6 +4279,73 @@ function DateGroup({
     </div>
   );
 }
+// 記録一覧の月の見出し（件数・合計時間・区分の割合の帯）。リスト表示とカード表示で共通
+function MonthHeader({ y, m, recs, isExpanded, onClick, compact }) {
+  const totalMins = recs.reduce((s, r) => s + (r.minutes || 0), 0);
+  const catMins = Object.keys(CATEGORIES).map((k) => [
+    k,
+    recs.filter((r) => r.cat === k).reduce((s, r) => s + (r.minutes || 0), 0),
+  ]);
+  const hours = Math.round((totalMins / 60) * 10) / 10;
+  return (
+    <button
+      onClick={onClick}
+      aria-expanded={isExpanded}
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        flexWrap: "wrap",
+        padding: compact ? "8px 12px" : "11px 16px",
+        background: "var(--card-bg, #fff)",
+        border: "1px solid var(--card-border, #e2e8f0)",
+        borderRadius: 10,
+        cursor: "pointer",
+        fontFamily: "inherit",
+        textAlign: "left",
+        marginBottom: isExpanded ? 10 : 0,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          color: "var(--text-muted, #94a3b8)",
+          transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
+          transition: "transform 0.15s",
+          width: 10,
+        }}
+      >
+        ▶
+      </span>
+      <span style={{ fontSize: compact ? 13 : 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
+        {y}年{Number(m)}月
+      </span>
+      <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", whiteSpace: "nowrap" }}>
+        <b style={{ color: "var(--text-primary, #1e293b)", fontSize: 14 }}>{recs.length}</b>件
+      </span>
+      {!compact && (
+        <span style={{ fontSize: 13, color: "var(--text-secondary, #64748b)", whiteSpace: "nowrap" }}>
+          <b style={{ color: "var(--text-primary, #1e293b)", fontSize: 14 }}>{hours}</b>時間
+        </span>
+      )}
+      {!compact && totalMins > 0 && (
+        <span style={{ flex: 1, minWidth: 160, display: "flex", height: 10, gap: 2 }}>
+          {catMins
+            .filter(([, v]) => v > 0)
+            .map(([k, v]) => (
+              <span
+                key={k}
+                title={`${k}: ${CATEGORIES[k].label} ${Math.round((v / 60) * 10) / 10}時間（${Math.round((v / totalMins) * 100)}%）`}
+                style={{ flex: v, background: CATEGORIES[k].color, borderRadius: 2 }}
+              />
+            ))}
+        </span>
+      )}
+    </button>
+  );
+}
+
 function CardLogView({
   grouped,
   currentUser,
@@ -4346,28 +4413,16 @@ function CardLogView({
         {monthGroups.map(([month, dates]) => {
           const isExpanded = expandedMonths.has(month);
           const [y, m] = month.split("-");
-          const totalCount = dates.reduce((s, [, recs]) => s + recs.length, 0);
           return (
             <div key={month} style={{ marginBottom: 16 }}>
-              <button
+              <MonthHeader
+                y={y}
+                m={m}
+                recs={dates.flatMap(([, recs]) => recs)}
+                isExpanded={isExpanded}
                 onClick={() => toggleMonth(month)}
-                style={{
-                  width: "100%", display: "flex", alignItems: "center", gap: 8,
-                  padding: "8px 12px", background: "var(--surface-2, #f8fafc)", border: "1px solid var(--card-border, #e2e8f0)",
-                  borderRadius: 10, cursor: "pointer", fontFamily: "inherit",
-                  marginBottom: isExpanded ? 8 : 0,
-                }}
-              >
-                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-                  {y}年{m}月
-                </span>
-                {!isExpanded && (
-                  <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>{totalCount}件</span>
-                )}
-                <span style={{ marginLeft: "auto", fontSize: 10, color: "var(--text-muted, #94a3b8)", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-                  ▼
-                </span>
-              </button>
+                compact={!!selectedDate}
+              />
               {isExpanded && dates.map(([date, recs]) => (
                 <DayCard
                   key={date}
@@ -4676,7 +4731,7 @@ function LogListPage({
         <input
           value={fk}
           onChange={(e) => setFk(e.target.value)}
-          placeholder="🔍 キーワード検索..."
+          placeholder="キーワードで検索（業務名・詳細）"
           style={{
             padding: "8px 12px",
             borderRadius: 8,
@@ -4757,8 +4812,8 @@ function LogListPage({
             }}
           >
             {[
-              ["list", "📋 リスト"],
-              ["card", "🗂 カード"],
+              ["list", "リスト"],
+              ["card", "カード"],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -4794,7 +4849,7 @@ function LogListPage({
             }}
           >
             <span style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", fontWeight: 600 }}>
-              🏷 タグ
+              タグ
             </span>
             <span style={{ fontSize: 11, color: "var(--text-muted, #94a3b8)" }}>
               タグをクリックで絞り込み・右クリックでピン留め
@@ -4834,7 +4889,7 @@ function LogListPage({
                       fontWeight: isActive ? 600 : 400,
                     }}
                   >
-                    📌 #{tag}
+                    固定 #{tag}
                   </button>
                 );
               })}
@@ -4936,28 +4991,15 @@ function LogListPage({
         monthGroupedForList.map(([month, dateEntries]) => {
           const isExpanded = expandedMonths.has(month);
           const [y, m] = month.split("-");
-          const totalCount = dateEntries.reduce((s, [, recs]) => s + recs.length, 0);
           return (
             <div key={month} style={{ marginBottom: 16 }}>
-              <button
+              <MonthHeader
+                y={y}
+                m={m}
+                recs={dateEntries.flatMap(([, recs]) => recs)}
+                isExpanded={isExpanded}
                 onClick={() => toggleMonth(month)}
-                style={{
-                  width: "100%", display: "flex", alignItems: "center", gap: 8,
-                  padding: "10px 14px", background: "var(--surface-2, #f8fafc)", border: "1px solid var(--card-border, #e2e8f0)",
-                  borderRadius: 10, cursor: "pointer", fontFamily: "inherit",
-                  marginBottom: isExpanded ? 10 : 0,
-                }}
-              >
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-                  {y}年{m}月
-                </span>
-                {!isExpanded && (
-                  <span style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>{totalCount}件</span>
-                )}
-                <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--text-muted, #94a3b8)", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
-                  ▼
-                </span>
-              </button>
+              />
               {isExpanded && dateEntries.map(([date, recs]) => (
                 <DateGroup
                   key={date}
