@@ -454,6 +454,12 @@ const PATHS = {
   settings:
     "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z",
   download: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3",
+  megaphone: "M4 10v4l12 5V5L4 10z M16 9a3 3 0 0 1 0 6",
+  trophy: "M8 21h8 M12 17v4 M7 4h10v5a5 5 0 0 1-10 0V4z M17 6h3v2a3 3 0 0 1-3 3 M7 6H4v2a3 3 0 0 0 3 3",
+  doc: "M6 3h9l4 4v14H6z M14 3v5h5 M9 13h7 M9 17h5",
+  inbox: "M3 13l3-8h12l3 8v6H3z M3 13h5l1 2h6l1-2h5",
+  moon: "M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
+  sun: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M12 2v2 M12 20v2 M2 12h2 M20 12h2 M4.9 4.9l1.4 1.4 M17.7 17.7l1.4 1.4 M4.9 19.1l1.4-1.4 M17.7 6.3l1.4-1.4",
 };
 const Icon = ({ name, size = 16 }) => (
   <svg
@@ -519,7 +525,7 @@ const BP = {
   alignItems: "center",
   gap: 6,
   padding: "9px 20px",
-  background: "linear-gradient(135deg,#3B82F6,#6366F1)",
+  background: "var(--accent, #3B82F6)",
   color: "#fff",
   border: "none",
   borderRadius: 10,
@@ -1204,9 +1210,9 @@ function WeatherWidget() {
             onClick={() => setTab("today")}
             style={{
               fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
-              borderColor: tab === "today" ? "#93c5fd" : "#e2e8f0",
+              borderColor: tab === "today" ? "var(--accent-border, #93c5fd)" : "#e2e8f0",
               background: tab === "today" ? "var(--accent-light, #EFF6FF)" : "transparent",
-              color: tab === "today" ? "#1d4ed8" : "#64748b",
+              color: tab === "today" ? "var(--accent-ink, #1d4ed8)" : "#64748b",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
@@ -1216,9 +1222,9 @@ function WeatherWidget() {
             onClick={() => setTab("week")}
             style={{
               fontSize: 13, padding: "6px 14px", borderRadius: 8, border: "1px solid",
-              borderColor: tab === "week" ? "#93c5fd" : "#e2e8f0",
+              borderColor: tab === "week" ? "var(--accent-border, #93c5fd)" : "#e2e8f0",
               background: tab === "week" ? "var(--accent-light, #EFF6FF)" : "transparent",
-              color: tab === "week" ? "#1d4ed8" : "#64748b",
+              color: tab === "week" ? "var(--accent-ink, #1d4ed8)" : "#64748b",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
@@ -4793,9 +4799,9 @@ function LogListPage({
                       display: "flex",
                       alignItems: "center",
                       gap: 4,
-                      borderColor: isActive ? "#8B5CF6" : "#DDD6FE",
-                      background: isActive ? "#8B5CF6" : "#F5F3FF",
-                      color: isActive ? "#fff" : "#6D28D9",
+                      borderColor: isActive ? "var(--accent, #3B82F6)" : "var(--accent-border, #BFDBFE)",
+                      background: isActive ? "var(--accent, #3B82F6)" : "var(--accent-light, #EFF6FF)",
+                      color: isActive ? "#fff" : "var(--accent-ink, #1D4ED8)",
                       fontWeight: isActive ? 600 : 400,
                     }}
                   >
@@ -6248,9 +6254,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           onClick={() => setViewId(currentUser.id)}
           style={{
             ...BB,
-            background: viewId === currentUser.id ? "#1e293b" : "#fff",
+            background: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#fff",
             color: viewId === currentUser.id ? "#fff" : "#64748b",
-            borderColor: viewId === currentUser.id ? "#1e293b" : "#e2e8f0",
+            borderColor: viewId === currentUser.id ? "var(--accent, #3B82F6)" : "#e2e8f0",
             fontSize: 12,
             padding: "6px 14px",
             gap: 6,
@@ -6282,7 +6288,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
             style={{
               ...BB,
               background: viewId === m.id ? "var(--accent-light, #EFF6FF)" : "#fff",
-              color: viewId === m.id ? "#1D4ED8" : "#64748b",
+              color: viewId === m.id ? "var(--accent-ink, #1D4ED8)" : "#64748b",
               borderColor: viewId === m.id ? "var(--accent-border, #BFDBFE)" : "#e2e8f0",
               fontSize: 12,
               padding: "6px 14px",
@@ -6806,7 +6812,7 @@ function AIReferenceManager({ currentUser, groups, teamMembers }) {
                           padding: "6px 14px", borderRadius: 8, border: "1px solid",
                           borderColor: settings.ai_reference_level === v ? "var(--accent, #3B82F6)" : "#e2e8f0",
                           background: settings.ai_reference_level === v ? "var(--accent-light, #EFF6FF)" : "#fff",
-                          color: settings.ai_reference_level === v ? "#1D4ED8" : "#64748b",
+                          color: settings.ai_reference_level === v ? "var(--accent-ink, #1D4ED8)" : "#64748b",
                           fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                         }}
                       >
@@ -6976,10 +6982,6 @@ function MyPage({
   groups,
   isSA,
   onUpdateUser,
-  darkMode,
-  setDarkMode,
-  accentColor,
-  setAccentColor,
 }) {
   const isAdmin = currentUser.role === "admin" || isSA;
   const [myPageTab, setMyPageTab] = useState("profile");
@@ -7203,7 +7205,6 @@ function MyPage({
       <div style={{ width: 160, flexShrink: 0, display: "flex", flexDirection: "column", gap: 2 }}>
         {[
           ["profile", "プロフィール", "person"],
-          ["display", "表示設定", "settings"],
           ["report", "レポート設定", "chart"],
         ].map(([id, label, icon]) => (
           <button
@@ -7317,78 +7318,6 @@ function MyPage({
         </div>
       )}
 
-      {myPageTab === "display" && (
-        <div style={{ ...C, marginBottom: 16 }}>
-          <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
-            表示設定
-          </h3>
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
-              ダークモード
-            </label>
-            <div style={{ display: "flex", gap: 8 }}>
-              {[
-                ["light", "☀️ ライト"],
-                ["dark", "🌙 ダーク"],
-              ].map(([mode, label]) => (
-                <button
-                  key={mode}
-                  onClick={() => {
-                    const isDark = mode === "dark";
-                    setDarkMode(isDark);
-                    localStorage.setItem("darkMode", String(isDark));
-                  }}
-                  style={{
-                    padding: "8px 20px", borderRadius: 8, border: "1px solid", fontSize: 13, fontWeight: 600,
-                    cursor: "pointer", fontFamily: "inherit",
-                    borderColor: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#e2e8f0",
-                    background: (darkMode ? "dark" : "light") === mode ? "var(--accent-light, #EFF6FF)" : "#fff",
-                    color: (darkMode ? "dark" : "light") === mode ? "var(--accent, #3B82F6)" : "#64748b",
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label style={{ fontSize: 12, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 8 }}>
-              カラーテーマ
-            </label>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {[
-                ["blue", "#3B82F6", "ブルー"],
-                ["purple", "#8B5CF6", "パープル"],
-                ["green", "#10B981", "グリーン"],
-                ["red", "#EF4444", "レッド"],
-                ["orange", "#F59E0B", "オレンジ"],
-                ["pink", "#EC4899", "ピンク"],
-              ].map(([key, color, label]) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setAccentColor(key);
-                    localStorage.setItem("accentColor", key);
-                  }}
-                  style={{
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
-                    padding: "10px 14px", borderRadius: 10, border: "2px solid",
-                    borderColor: accentColor === key ? color : "#e2e8f0",
-                    background: accentColor === key ? color + "18" : "#fff",
-                    cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
-                  }}
-                >
-                  <div style={{ width: 24, height: 24, borderRadius: "50%", background: color, boxShadow: accentColor === key ? `0 0 0 3px ${color}44` : "none" }} />
-                  <span style={{ fontSize: 11, color: accentColor === key ? color : "#64748b", fontWeight: accentColor === key ? 700 : 400 }}>
-                    {label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
       {myPageTab === "report" && (
         <div>
           <div style={{ ...C, marginBottom: 16 }}>
@@ -7452,7 +7381,7 @@ function MyPage({
                       padding: "7px 16px", borderRadius: 8, border: "1px solid",
                       borderColor: weeklySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
                       background: weeklySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
-                      color: weeklySchedule.mode === m ? "#1D4ED8" : "#64748b",
+                      color: weeklySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "#64748b",
                       fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
@@ -7498,7 +7427,7 @@ function MyPage({
                       padding: "7px 16px", borderRadius: 8, border: "1px solid",
                       borderColor: monthlySchedule.mode === m ? "var(--accent, #3B82F6)" : "#e2e8f0",
                       background: monthlySchedule.mode === m ? "var(--accent-light, #EFF6FF)" : "#fff",
-                      color: monthlySchedule.mode === m ? "#1D4ED8" : "#64748b",
+                      color: monthlySchedule.mode === m ? "var(--accent-ink, #1D4ED8)" : "#64748b",
                       fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
                     }}
                   >
@@ -8401,7 +8330,7 @@ function SuperAdminPage({
               cursor: "pointer",
               fontSize: 13,
               fontWeight: tab === id ? 600 : 400,
-              background: tab === id ? "#1e293b" : "transparent",
+              background: tab === id ? "var(--accent, #3B82F6)" : "transparent",
               color: tab === id ? "#fff" : "#64748b",
               transition: "all 0.2s",
               fontFamily: "inherit",
@@ -10948,7 +10877,15 @@ export default function App() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [showInvite, setShowInvite] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  // 画面幅の変化（スマホの向き変更・ウィンドウの拡大縮小）に追従する
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  );
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
   const login = (u) => {
     setCurrentUser({
       ...u,
@@ -11315,37 +11252,51 @@ export default function App() {
       gradient: "135deg,#3B82F6,#6366F1",
       light: "#EFF6FF",
       border: "#BFDBFE",
+      ink: "#1D4ED8",
     },
     purple: {
       primary: "#8B5CF6",
       gradient: "135deg,#8B5CF6,#A855F7",
       light: "#F5F3FF",
       border: "#DDD6FE",
+      ink: "#6D28D9",
     },
     green: {
       primary: "#10B981",
       gradient: "135deg,#10B981,#059669",
       light: "#ECFDF5",
       border: "#A7F3D0",
+      ink: "#047857",
     },
     red: {
       primary: "#EF4444",
       gradient: "135deg,#EF4444,#DC2626",
       light: "#FEF2F2",
       border: "#FECACA",
+      ink: "#B91C1C",
     },
     orange: {
       primary: "#F59E0B",
       gradient: "135deg,#F59E0B,#D97706",
       light: "#FFFBEB",
       border: "#FDE68A",
+      ink: "#B45309",
     },
     pink: {
       primary: "#EC4899",
       gradient: "135deg,#EC4899,#DB2777",
       light: "#FDF2F8",
       border: "#FBCFE8",
+      ink: "#BE185D",
     },
+  };
+  const ACCENT_LABELS = {
+    blue: "ブルー",
+    purple: "パープル",
+    green: "グリーン",
+    red: "レッド",
+    orange: "オレンジ",
+    pink: "ピンク",
   };
   const accent = ACCENT_COLORS[accentColor] || ACCENT_COLORS.blue;
 
@@ -11354,8 +11305,10 @@ export default function App() {
     "--accent-gradient": `linear-gradient(${accent.gradient})`,
     "--accent-light": accent.light,
     "--accent-border": accent.border,
+    // 選択中の文字色（淡い背景の上で読める濃さ）。ダークでは基本色を使う
+    "--accent-ink": darkMode ? accent.primary : accent.ink,
     "--bg": darkMode ? "#0f172a" : "#f1f5f9",
-    "--sidebar-bg": darkMode ? "#020617" : "#0f172a",
+    "--sidebar-bg": darkMode ? "#08101E" : "#13203A",
     "--card-bg": darkMode ? "#1e293b" : "#ffffff",
     "--card-border": darkMode ? "#334155" : "#e2e8f0",
     "--text-primary": darkMode ? "#f1f5f9" : "#1e293b",
@@ -11370,15 +11323,11 @@ export default function App() {
   const isAdmin = currentUser.role === "admin" || isSA;
   const myGroup = groups.find((g) => g.id === currentUser.groupId);
   const roleLabel = isSA
-    ? "管理者 ⚙️"
+    ? "管理者"
     : currentUser.role === "admin"
-      ? "上司 👑"
+      ? "上司"
       : "部下";
-  const avatarBg = isSA
-    ? "linear-gradient(135deg,#EF4444,#F59E0B)"
-    : currentUser.role === "admin"
-      ? "linear-gradient(135deg,#F59E0B,#EF4444)"
-      : "linear-gradient(135deg,#3B82F6,#8B5CF6)";
+  const avatarBg = "var(--accent, #3B82F6)";
   const navItems = [
     { id: "dashboard", label: "ダッシュボード", icon: "chart" },
     { id: "report", label: "日報入力", icon: "edit" },
@@ -11387,12 +11336,13 @@ export default function App() {
       ? [{ id: "team", label: "部下の記録", icon: "users" }]
       : []),
     { id: "board", label: "ToDoリスト", icon: "board" },
-    { id: "announcement", label: "📣 お知らせ", icon: "msg" },
-    { id: "ranking", label: "🏆 ランキング", icon: "chart" },
-    { id: "reports", label: "📊 レポート", icon: "list" },
+    // divider: この項目の上に区切り線を入れる
+    { id: "announcement", label: "お知らせ", icon: "megaphone", divider: true },
+    { id: "ranking", label: "ランキング", icon: "trophy" },
+    { id: "reports", label: "レポート", icon: "doc" },
     { id: "mypage", label: "マイページ", icon: "person" },
-    ...(!isSA ? [{ id: "feedback", label: "📝 意見・要望", icon: "msg" }] : []),
-    ...(isSA ? [{ id: "feedbackAdmin", label: "📬 意見箱", icon: "msg" }] : []),
+    ...(!isSA ? [{ id: "feedback", label: "意見・要望", icon: "msg" }] : []),
+    ...(isSA ? [{ id: "feedbackAdmin", label: "意見箱", icon: "inbox" }] : []),
     ...(isSA
       ? [{ id: "superadmin", label: "システム管理", icon: "settings" }]
       : []),
@@ -11457,7 +11407,7 @@ export default function App() {
       <div
         style={{
           width: 224,
-          background: "#0f172a",
+          background: "var(--sidebar-bg)",
           display: "flex",
           flexDirection: "column",
           position: "fixed",
@@ -11465,61 +11415,26 @@ export default function App() {
           left: 0,
           height: "100vh",
           zIndex: 100,
-          transform: `translateX(${sidebarOpen || window.innerWidth >= 768 ? 0 : -224}px)`,
+          transform: `translateX(${sidebarOpen || !isMobile ? 0 : -224}px)`,
           transition: "transform 0.3s ease",
         }}
       >
         <div
           style={{
-            padding: "22px 18px 18px",
+            padding: "22px 20px 18px",
             borderBottom: "1px solid rgba(255,255,255,0.08)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: "linear-gradient(135deg,#3B82F6,#8B5CF6)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 18,
-                flexShrink: 0,
-              }}
-            >
-              📊
-            </div>
-            <div>
-              <div
-                style={{
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: 15,
-                  lineHeight: 1,
-                }}
-              >
-                Sales TM
-              </div>
-              <div
-                style={{
-                  color: "rgba(255,255,255,0.35)",
-                  fontSize: 10,
-                  marginTop: 2,
-                }}
-              >
-                営業生産性向上システム
-              </div>
-            </div>
+          <div style={{ color: "#fff", fontWeight: 700, fontSize: 17, lineHeight: 1.3 }}>
+            Sales TM
+          </div>
+          <div style={{ color: "rgba(255,255,255,0.6)", fontSize: 12, marginTop: 2 }}>
+            営業生産性向上システム
           </div>
           {myGroup && (
             <div
               style={{
                 marginTop: 10,
-                padding: "3px 10px",
-                borderRadius: 6,
-                background: "rgba(255,255,255,0.06)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
@@ -11527,100 +11442,93 @@ export default function App() {
             >
               <div
                 style={{
-                  width: 6,
-                  height: 6,
+                  width: 8,
+                  height: 8,
                   borderRadius: "50%",
                   background: myGroup.color,
                 }}
               />
-              <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.64)" }}>
                 {myGroup.name}
               </span>
             </div>
           )}
         </div>
-        <nav style={{ flex: 1, padding: "12px 10px" }}>
+        <nav style={{ flex: 1, padding: "12px 10px", overflowY: "auto" }}>
           {navItems.map((item) => {
             const active =
               page === item.id ||
               (item.id === "team" && page === "member_detail");
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.id === "invite") {
-                    setShowInvite(true);
-                    setSidebarOpen(false);
-                    return;
-                  }
-                  setPage(item.id);
-                  if (item.id !== "team") setSelectedMember(null);
-                  setSidebarOpen(false);
-                }}
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "left",
-                  marginBottom: 2,
-                  background: active ? "rgba(59,130,246,0.15)" : "transparent",
-                  color: active ? "#60A5FA" : "rgba(255,255,255,0.55)",
-                  fontSize: 14,
-                  fontWeight: active ? 600 : 400,
-                  transition: "all 0.15s",
-                  fontFamily: "inherit",
-                }}
-              >
-                <Icon name={item.icon} size={16} />
-                {item.label}
-                {active && (
+              <div key={item.id}>
+                {item.divider && (
                   <div
                     style={{
-                      marginLeft: "auto",
-                      width: 4,
-                      height: 4,
-                      borderRadius: "50%",
-                      background: "#60A5FA",
+                      height: 1,
+                      background: "rgba(255,255,255,0.08)",
+                      margin: "10px 4px",
                     }}
                   />
                 )}
-              </button>
+                <button
+                  onClick={() => {
+                    if (item.id === "invite") {
+                      setShowInvite(true);
+                      setSidebarOpen(false);
+                      return;
+                    }
+                    setPage(item.id);
+                    if (item.id !== "team") setSelectedMember(null);
+                    setSidebarOpen(false);
+                  }}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "10px 12px",
+                    borderRadius: 6,
+                    border: "none",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    marginBottom: 2,
+                    background: active
+                      ? "color-mix(in srgb, var(--accent, #3B82F6) 24%, transparent)"
+                      : "transparent",
+                    boxShadow: active ? "inset 3px 0 0 var(--accent, #3B82F6)" : "none",
+                    color: active ? "#fff" : "rgba(255,255,255,0.64)",
+                    fontSize: 14.5,
+                    fontWeight: active ? 700 : 400,
+                    transition: "background 0.15s, color 0.15s",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <Icon name={item.icon} size={18} />
+                  {item.label}
+                </button>
+              </div>
             );
           })}
         </nav>
         <div
           style={{
-            padding: "12px 10px",
+            padding: "14px 16px",
             borderTop: "1px solid rgba(255,255,255,0.08)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              padding: "10px 12px",
-              borderRadius: 10,
-              background: "rgba(255,255,255,0.05)",
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
                 flexShrink: 0,
                 background: avatarBg,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "#fff",
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 700,
               }}
             >
@@ -11630,8 +11538,8 @@ export default function App() {
               <div
                 style={{
                   color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 600,
+                  fontSize: 14,
+                  fontWeight: 700,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -11639,46 +11547,105 @@ export default function App() {
               >
                 {currentUser.name}
               </div>
-              <div style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>
+              <div style={{ color: "rgba(255,255,255,0.64)", fontSize: 12 }}>
                 {roleLabel}
               </div>
             </div>
             <button
               onClick={logout}
               style={{
-                background: "rgba(239,68,68,0.15)",
-                border: "1px solid rgba(239,68,68,0.3)",
+                background: "transparent",
+                border: "1px solid rgba(255,255,255,0.16)",
                 cursor: "pointer",
-                color: "#FCA5A5",
-                padding: "6px 10px",
-                borderRadius: 8,
+                color: "rgba(255,255,255,0.75)",
+                padding: "5px 9px",
+                borderRadius: 6,
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
-                fontSize: 11,
-                fontWeight: 600,
+                gap: 5,
+                fontSize: 12,
                 whiteSpace: "nowrap",
-                transition: "all 0.15s",
                 fontFamily: "inherit",
               }}
             >
-              <Icon name="logout" size={14} />
+              <Icon name="logout" size={13} />
               ログアウト
             </button>
+          </div>
+          {/* 表示の切り替え：ダークモードとカラーテーマ（設定はこのブラウザに保存される） */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              marginTop: 12,
+              paddingTop: 12,
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <button
+              onClick={() => {
+                const next = !darkMode;
+                setDarkMode(next);
+                localStorage.setItem("darkMode", String(next));
+              }}
+              title={darkMode ? "ライトにする" : "ダークにする"}
+              aria-label={darkMode ? "ライトにする" : "ダークにする"}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                border: "1px solid rgba(255,255,255,0.16)",
+                background: "transparent",
+                color: "rgba(255,255,255,0.75)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                padding: 0,
+                marginRight: 4,
+                flexShrink: 0,
+              }}
+            >
+              <Icon name={darkMode ? "sun" : "moon"} size={16} />
+            </button>
+            {Object.entries(ACCENT_COLORS).map(([key, c]) => (
+              <button
+                key={key}
+                onClick={() => {
+                  setAccentColor(key);
+                  localStorage.setItem("accentColor", key);
+                }}
+                title={ACCENT_LABELS[key]}
+                aria-label={`カラーテーマ：${ACCENT_LABELS[key]}`}
+                aria-pressed={accentColor === key}
+                style={{
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  background: c.primary,
+                  border: "2px solid var(--sidebar-bg)",
+                  boxShadow: accentColor === key ? "0 0 0 2px #fff" : "none",
+                  cursor: "pointer",
+                  padding: 0,
+                  flexShrink: 0,
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
       <div
         style={{
-          marginLeft: window.innerWidth >= 768 ? 224 : 0,
+          marginLeft: isMobile ? 0 : 224,
           flex: 1,
-          padding: window.innerWidth >= 768 ? 24 : "16px 12px",
+          padding: isMobile ? "16px 12px" : 24,
           minHeight: "100vh",
-          maxWidth: window.innerWidth >= 768 ? "calc(100vw - 224px)" : "100vw",
+          maxWidth: isMobile ? "100vw" : "calc(100vw - 224px)",
           overflowX: "hidden",
         }}
       >
-        {window.innerWidth < 768 && (
+        {isMobile && (
           <div
             style={{
               display: "flex",
@@ -11690,10 +11657,11 @@ export default function App() {
           >
             <button
               onClick={() => setSidebarOpen(true)}
+              aria-label="メニューを開く"
               style={{
-                background: "#0f172a",
+                background: "var(--sidebar-bg)",
                 border: "none",
-                borderRadius: 10,
+                borderRadius: 8,
                 width: 40,
                 height: 40,
                 display: "flex",
@@ -11718,28 +11686,29 @@ export default function App() {
               </div>
             </button>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: "var(--text-primary, #1e293b)" }}>
                 {titles[page] || ""}
               </div>
-              <div style={{ fontSize: 11, color: "#94a3b8" }}>
+              <div style={{ fontSize: 12, color: "var(--text-secondary, #64748b)" }}>
                 {subs[page] || ""}
               </div>
             </div>
           </div>
         )}
-        {window.innerWidth >= 768 && (
+        {!isMobile && (
           <div style={{ marginBottom: 20 }}>
             <h1
               style={{
                 margin: 0,
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: 700,
-                color: "#1e293b",
+                lineHeight: 1.3,
+                color: "var(--text-primary, #1e293b)",
               }}
             >
               {titles[page] || ""}
             </h1>
-            <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 4 }}>
+            <div style={{ fontSize: 14, color: "var(--text-secondary, #64748b)", marginTop: 4 }}>
               {subs[page] || ""}
             </div>
             {page === "dashboard" && (
@@ -11955,10 +11924,6 @@ export default function App() {
             groups={groups}
             isSA={isSA}
             onUpdateUser={(updated) => setCurrentUser(updated)}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            accentColor={accentColor}
-            setAccentColor={setAccentColor}
           />
         )}
         {page === "superadmin" && isSA && (
