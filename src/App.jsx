@@ -559,6 +559,8 @@ function LoginPage({ onLogin }) {
     setErr("");
     setLoginSeconds(0);
     const timer = setInterval(() => setLoginSeconds((s) => s + 1), 1000);
+    // パスワードの確認に成功したかどうか（成功後に止まった場合は再読み込みで回復させる）
+    let signedIn = false;
     try {
       const { data, error } = await withTimeout(
         supabase.auth.signInWithPassword({ email, password: pass }),
@@ -568,6 +570,7 @@ function LoginPage({ onLogin }) {
         setErr("メールアドレスまたはパスワードが正しくありません");
         return;
       }
+      signedIn = true;
 
       // ログイン直後はセッション同期にタイムラグが生じることがあるため、
       // 失敗時は少し待って最大3回までリトライする
@@ -576,7 +579,7 @@ function LoginPage({ onLogin }) {
       for (let attempt = 1; attempt <= 3; attempt++) {
         const { data: p, error: profileError } = await withTimeout(
           supabase.from("profiles").select("*").eq("id", data.user.id).single(),
-          10000,
+          8000,
         );
         if (p && !profileError) {
           profile = p;
@@ -595,6 +598,13 @@ function LoginPage({ onLogin }) {
       onLogin({ ...profile, email: data.user.email });
     } catch (e) {
       console.error("ログイン処理で例外発生:", e);
+      if (signedIn) {
+        // 長時間放置したタブでは、ログイン自体は成功してもその後の通信が止まることがある。
+        // ログイン状態は保存済みなので、再読み込みすればホーム画面が表示される
+        setErr("ログインできました。画面を読み込み直しています…");
+        setTimeout(() => window.location.reload(), 300);
+        return;
+      }
       setErr("ログインに時間がかかっているか、失敗しました。通信状況をご確認の上、もう一度お試しください。");
     } finally {
       clearInterval(timer);
@@ -11135,8 +11145,18 @@ export default function App() {
   // タブが裏に回っていた後、操作可能な状態に戻ったタイミングでログイン状態を自動チェックする。
   // 一時的な通信の乱れなら自動再試行で回復し、それでも失敗する場合のみ最終手段としてリロードする。
   useEffect(() => {
+    let hiddenAt = null;
     const handleVisibility = async () => {
-      if (document.visibilityState !== "visible") return;
+      if (document.visibilityState !== "visible") {
+        hiddenAt = Date.now();
+        return;
+      }
+      // ログイン画面のまま5分以上裏に回っていたら、入力を始める前に読み込み直す
+      // （招待メールからのパスワード設定画面は、読み込み直すと手続きが崩れるので対象外）
+      if (!currentUser && !inviteSession && hiddenAt && Date.now() - hiddenAt > 5 * 60 * 1000) {
+        window.location.reload();
+        return;
+      }
       try {
         const { data } = await withRetry(
           () => withTimeout(supabase.auth.getSession(), 8000),
@@ -11153,7 +11173,7 @@ export default function App() {
     };
     document.addEventListener("visibilitychange", handleVisibility);
     return () => document.removeEventListener("visibilitychange", handleVisibility);
-  }, [currentUser]);
+  }, [currentUser, inviteSession]);
   const [page, setPage] = useState("dashboard");
   const [logs, setLogs] = useState([]);
   const [reportDraft, _setReportDraft] = useState(() => {
