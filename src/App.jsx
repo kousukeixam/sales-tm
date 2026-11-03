@@ -486,6 +486,19 @@ const Icon = ({ name, size = 16 }) => (
   </svg>
 );
 
+// 画面幅がスマホ相当（768px未満）かどうか。スマホの向き変更やウィンドウの拡大縮小に追従する
+function useIsMobile() {
+  const [mobile, setMobile] = useState(
+    () => typeof window !== "undefined" && window.innerWidth < 768,
+  );
+  useEffect(() => {
+    const onResize = () => setMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return mobile;
+}
+
 const C = {
   background: "var(--card-bg, #fff)",
   borderRadius: 10,
@@ -3680,6 +3693,7 @@ function LogCard({
   onDuplicateRow,
   onTagClick,
 }) {
+  const isMobile = useIsMobile();
   const [editModal, setEditModal] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -3702,7 +3716,8 @@ function LogCard({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 10,
+          flexWrap: isMobile ? "wrap" : "nowrap",
+          gap: isMobile ? "4px 10px" : 10,
           padding: "11px 16px",
           cursor: "pointer",
         }}
@@ -3710,7 +3725,7 @@ function LogCard({
       >
         <span
           style={{
-            width: 92,
+            width: isMobile ? "auto" : 92,
             flexShrink: 0,
             fontSize: 14,
             color: "var(--text-secondary, #64748b)",
@@ -3719,7 +3734,7 @@ function LogCard({
         >
           {rec.start}〜{rec.end}
         </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: isMobile ? "1 1 60%" : 1, minWidth: 0 }}>
           <div
             style={{
               fontSize: 15,
@@ -3772,6 +3787,7 @@ function LogCard({
             alignItems: "center",
             gap: 8,
             flexShrink: 0,
+            marginLeft: isMobile ? "auto" : 0,
           }}
         >
           {rec.managerComment && (
@@ -4171,7 +4187,8 @@ function DateGroup({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 10,
+          flexWrap: "wrap",
+          gap: "4px 10px",
           padding: "14px 16px 10px",
           borderBottom: "1px solid var(--line-soft, #f1f5f9)",
         }}
@@ -4185,7 +4202,7 @@ function DateGroup({
               : `${d.getMonth() + 1}月${d.getDate()}日（${"日月火水木金土"[d.getDay()]}）`;
           })()}
         </span>
-        <span style={{ fontSize: 13.5, color: "var(--text-secondary, #64748b)", fontVariantNumeric: "tabular-nums" }}>
+        <span style={{ fontSize: 13.5, color: "var(--text-secondary, #64748b)", fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" }}>
           {recs.length}件{"  "}{Math.floor(totMins / 60) > 0 ? `${Math.floor(totMins / 60)}時間` : ""}
           {totMins % 60 > 0 || totMins === 0 ? `${totMins % 60}分` : ""}
         </span>
@@ -4204,6 +4221,7 @@ function DateGroup({
               padding: "3px 10px",
               cursor: "pointer",
               fontFamily: "inherit",
+              whiteSpace: "nowrap",
             }}
           >
             この日を複製
@@ -6077,20 +6095,21 @@ function KanbanColumn({
   sortValue,
   onSortChange,
 }) {
+  const isMobile = useIsMobile();
   const [over, setOver] = useState(false);
   const cc = { todo: "#64748b", prog: "#3B82F6", done: "#10B981" };
   const color = cc[col.id] || "#8B5CF6";
   return (
     <div
       style={{
-        width: 280,
+        width: isMobile ? "100%" : 280,
         flexShrink: 0,
         background: "var(--surface-2, #f8fafc)",
         borderRadius: 10,
         border: "1px solid var(--card-border, #e2e8f0)",
         display: "flex",
         flexDirection: "column",
-        maxHeight: "calc(100vh - 280px)",
+        maxHeight: isMobile ? "none" : "calc(100vh - 280px)",
       }}
       onDragOver={(e) => {
         e.preventDefault();
@@ -6259,6 +6278,7 @@ function KanbanColumn({
 }
 
 function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
+  const isMobile = useIsMobile();
   const myGroup = groups.find((g) => g.id === currentUser.groupId);
   const groupMembers = allUsers.filter(
     (u) =>
@@ -6471,7 +6491,7 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           flexWrap: "wrap",
         }}
       >
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: isMobile ? "1 1 100%" : 1, minWidth: 0 }}>
           <div
             style={{
               fontSize: 14,
@@ -6495,8 +6515,9 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
           <div
             key={l}
             style={{
+              flex: isMobile ? "1 1 0" : "none",
               textAlign: "center",
-              padding: "10px 18px",
+              padding: isMobile ? "8px 4px" : "10px 18px",
               background: "var(--surface-2, #f8fafc)",
               borderRadius: 8,
               border: "1px solid var(--card-border, #e2e8f0)",
@@ -6646,10 +6667,11 @@ function BoardPage({ currentUser, allUsers, groups, boards, setBoards }) {
       <div
         style={{
           display: "flex",
+          flexDirection: isMobile ? "column" : "row",
           gap: 12,
-          overflowX: "auto",
+          overflowX: isMobile ? "visible" : "auto",
           paddingBottom: 16,
-          alignItems: "flex-start",
+          alignItems: isMobile ? "stretch" : "flex-start",
         }}
       >
         {board.cols.map((col) => (
@@ -10466,6 +10488,9 @@ function DashboardAlerts({ boards, currentUser, onNavigate, noBottomMargin }) {
 
 function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
   const [reportType, setReportType] = useState("weekly");
+  const isMobile = useIsMobile();
+  // 一覧の月（月次レポートは年）のまとまりのうち、開いているもの。null のときは最新だけ開く
+  const [openGroups, setOpenGroups] = useState(null);
   const [scope, setScope] = useState("self"); // "self" | "all" | memberId
   const [reports, setReports] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState(null);
@@ -10511,6 +10536,7 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
       const { data } = await query;
       setReports(data || []);
       setSelectedPeriod(null);
+      setOpenGroups(null);
       setLoading(false);
     };
     fetchReports();
@@ -10531,9 +10557,33 @@ function ReportPage({ currentUser, allUsers, groups, isAdmin, isSA }) {
     return Object.entries(g).sort((a, b) => b[0].localeCompare(a[0]));
   }, [reports, reportType]);
 
-  const selectedReports = selectedPeriod
-    ? periodGroups.find(([k]) => k === selectedPeriod)?.[1] || []
+  // 何も選んでいないときは、最新の期間を表示する
+  const activePeriod = selectedPeriod ?? periodGroups[0]?.[0] ?? null;
+  const selectedReports = activePeriod
+    ? periodGroups.find(([k]) => k === activePeriod)?.[1] || []
     : [];
+  // 一覧を月ごと（月次は年ごと）にまとめる
+  const listGroups = (() => {
+    const g = [];
+    periodGroups.forEach(([key, recs]) => {
+      const r = recs[0];
+      const gk = reportType === "weekly" ? String(r.period_start).slice(0, 7) : String(r.year);
+      const label =
+        reportType === "weekly"
+          ? `${gk.slice(0, 4)}年${Number(gk.slice(5, 7))}月`
+          : `${gk}年`;
+      const last = g[g.length - 1];
+      if (last && last.gk === gk) last.items.push([key, recs]);
+      else g.push({ gk, label, items: [[key, recs]] });
+    });
+    return g;
+  })();
+  const isGroupOpen = (gk, idx) => (openGroups ? openGroups.includes(gk) : idx === 0);
+  const toggleGroup = (gk) =>
+    setOpenGroups((p) => {
+      const cur = p ?? (listGroups[0] ? [listGroups[0].gk] : []);
+      return cur.includes(gk) ? cur.filter((x) => x !== gk) : [...cur, gk];
+    });
 
 const deleteReport = async (r) => {
     if (!window.confirm(`${periodLabel(r)} のレポートを削除しますか？この操作は取り消せません。`)) return;
@@ -10765,34 +10815,110 @@ const deleteReport = async (r) => {
           レポートがまだありません
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 16 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {periodGroups.map(([key, recs]) => (
-              <div
-                key={key}
-                onClick={() => setSelectedPeriod(key)}
-                style={{
-                  background: selectedPeriod === key ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
-                  border: `1px solid ${selectedPeriod === key ? "var(--accent-border, #BFDBFE)" : "var(--card-border, #e2e8f0)"}`,
-                  borderRadius: 8,
-                  padding: "10px 12px",
-                  cursor: "pointer",
-                }}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "260px 1fr",
+            gap: 16,
+            alignItems: "start",
+          }}
+        >
+          {isMobile ? (
+            // スマホ：月ごとに区切った選択欄
+            <label style={{ display: "block" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary, #64748b)", display: "block", marginBottom: 4 }}>
+                期間を選ぶ
+              </span>
+              <select
+                value={activePeriod || ""}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+                style={{ ...I, fontSize: 15, padding: "10px 12px" }}
               >
-                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
-                  {periodLabel(recs[0])}
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
-                  {scope === "all" ? `${recs.length}名分` : "生成済み"}
-                </div>
-              </div>
-            ))}
-          </div>
+                {listGroups.map((grp) => (
+                  <optgroup key={grp.gk} label={grp.label}>
+                    {grp.items.map(([key, recs]) => (
+                      <option key={key} value={key}>
+                        {periodLabel(recs[0])}
+                        {scope === "all" ? `（${recs.length}名分）` : ""}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+          ) : (
+            // PC：月ごとの見出しで開閉できる一覧
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {listGroups.map((grp, gi) => {
+                const open = isGroupOpen(grp.gk, gi);
+                return (
+                  <div key={grp.gk}>
+                    <button
+                      onClick={() => toggleGroup(grp.gk)}
+                      aria-expanded={open}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "8px 10px",
+                        background: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        textAlign: "left",
+                        color: "var(--text-primary, #1e293b)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 11,
+                          color: "var(--text-muted, #94a3b8)",
+                          transform: open ? "rotate(90deg)" : "none",
+                          transition: "transform 0.15s",
+                        }}
+                      >
+                        ▶
+                      </span>
+                      <span style={{ fontSize: 14, fontWeight: 700 }}>{grp.label}</span>
+                      <span style={{ fontSize: 12.5, color: "var(--text-muted, #94a3b8)" }}>
+                        {grp.items.length}件
+                      </span>
+                    </button>
+                    {open && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
+                        {grp.items.map(([key, recs]) => (
+                          <div
+                            key={key}
+                            onClick={() => setSelectedPeriod(key)}
+                            style={{
+                              background: activePeriod === key ? "var(--accent-light, #EFF6FF)" : "var(--card-bg, #fff)",
+                              border: `1px solid ${activePeriod === key ? "var(--accent-border, #BFDBFE)" : "var(--card-border, #e2e8f0)"}`,
+                              borderRadius: 8,
+                              padding: "9px 12px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary, #1e293b)" }}>
+                              {periodLabel(recs[0])}
+                            </div>
+                            <div style={{ fontSize: 12, color: "var(--text-muted, #94a3b8)" }}>
+                              {scope === "all" ? `${recs.length}名分` : "生成済み"}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div>
-            {!selectedPeriod ? (
+            {!activePeriod ? (
               <div style={{ ...C, textAlign: "center", color: "var(--text-muted, #94a3b8)", padding: 48 }}>
-                左の一覧から期間を選んでください
+                一覧から期間を選んでください
               </div>
             ) : scope === "all" ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -10803,6 +10929,8 @@ const deleteReport = async (r) => {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: 10,
                         marginBottom: 10,
                       }}
                     >
@@ -10830,14 +10958,14 @@ const deleteReport = async (r) => {
                       <div style={{ display: "flex", gap: 6 }}>
                         <button
                           onClick={() => downloadReport(r)}
-                          style={{ ...BB, padding: "5px 12px", fontSize: 13, gap: 4 }}
+                          style={{ ...BB, whiteSpace: "nowrap", padding: "5px 12px", fontSize: 13, gap: 4 }}
                         >
                           <Icon name="download" size={13} />
                           DL
                         </button>
                         <button
                           onClick={() => deleteReport(r)}
-                          style={{ ...BB, padding: "5px 12px", fontSize: 13, gap: 4, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
+                          style={{ ...BB, whiteSpace: "nowrap", padding: "5px 12px", fontSize: 13, gap: 4, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
                         >
                           <Icon name="trash" size={13} />
                         </button>
@@ -10857,6 +10985,8 @@ const deleteReport = async (r) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: 10,
                       marginBottom: 12,
                     }}
                   >
@@ -10871,14 +11001,14 @@ const deleteReport = async (r) => {
                     <div style={{ display: "flex", gap: 8 }}>
                       <button
                         onClick={() => downloadReport(r)}
-                        style={{ ...BB, gap: 6 }}
+                        style={{ ...BB, whiteSpace: "nowrap", gap: 6 }}
                       >
                         <Icon name="download" size={14} />
                         ダウンロード
                       </button>
                       <button
                         onClick={() => deleteReport(r)}
-                        style={{ ...BB, gap: 6, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
+                        style={{ ...BB, whiteSpace: "nowrap", gap: 6, color: "var(--danger, #DC2626)", borderColor: "var(--danger-border, #FECACA)" }}
                       >
                         <Icon name="trash" size={14} />
                         削除
