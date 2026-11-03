@@ -636,152 +636,103 @@ function LoginPage({ onLogin }) {
     <div
       style={{
         minHeight: "100vh",
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "40px 16px",
+        boxSizing: "border-box",
+        background: "#13203A",
         fontFamily: "'Noto Sans JP','Helvetica Neue',sans-serif",
       }}
     >
-      {/* 左：アプリの紹介（狭い画面では上に表示） */}
+      {/* 中央：アプリ名とログインフォームをまとめたカード */}
       <div
         style={{
-          background: "#13203A",
-          color: "#fff",
-          padding: "48px 40px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: 32,
+          width: "100%",
+          maxWidth: 400,
+          background: "#fff",
+          borderRadius: 12,
+          boxShadow: "0 12px 32px rgba(0,0,0,0.25)",
+          padding: "40px 36px 32px",
+          boxSizing: "border-box",
         }}
       >
-        <div>
-          <h1 style={{ fontSize: 32, fontWeight: 700, margin: 0 }}>Sales TM</h1>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.7)",
-              fontSize: 15,
-              lineHeight: 1.8,
-              margin: "12px 0 0",
-              maxWidth: "30em",
-            }}
-          >
-            毎日の営業活動を記録して、時間の使い方を振り返るための日報システムです。
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <h1 style={{ fontSize: 30, fontWeight: 700, margin: 0, color: "#13203A" }}>Sales TM</h1>
+          <p style={{ color: "#556070", fontSize: 14, lineHeight: 1.7, margin: "10px 0 0" }}>
+            {/* 言葉の途中で改行されないよう、まとまりごとに折り返す */}
+            <span style={{ display: "inline-block" }}>毎日の営業活動を記録して、</span>
+            <span style={{ display: "inline-block" }}>時間の使い方を振り返るための</span>
+            <span style={{ display: "inline-block" }}>日報システムです。</span>
           </p>
         </div>
-        <div style={{ display: "grid", gap: 8, maxWidth: 320 }}>
-          {Object.entries(CATEGORIES).map(([k, v]) => (
-            <span
-              key={k}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                fontSize: 14,
-                color: "rgba(255,255,255,0.8)",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 22,
-                  height: 22,
-                  borderRadius: 4,
-                  background: v.color,
-                  color: "#fff",
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
-                {k}
-              </span>
-              {v.label}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* 右：ログインフォーム */}
-      <div
-        style={{
-          background: "#F1F4F8",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px 20px",
-        }}
-      >
-        <div style={{ width: "100%", maxWidth: 360 }}>
-          <h2 style={{ margin: "0 0 24px", fontSize: 22, fontWeight: 700, color: "#1C2534" }}>
-            ログイン
-          </h2>
-          {err && (
-            <div
-              style={{
-                background: "#FEF2F2",
-                border: "1px solid #FECACA",
-                borderRadius: 6,
-                padding: "10px 14px",
-                marginBottom: 20,
-                color: "#991B1B",
-                fontSize: 14,
-              }}
-            >
-              {err}
-            </div>
-          )}
-          <div style={{ marginBottom: 16 }}>
-            <label style={lb} htmlFor="login-email">
-              メールアドレス
-            </label>
-            <input
-              id="login-email"
-              type="email"
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="yourname@company.com"
-              style={si}
-              onKeyDown={(e) => e.key === "Enter" && go()}
-            />
-          </div>
-          <div style={{ marginBottom: 24 }}>
-            <label style={lb} htmlFor="login-pass">
-              パスワード
-            </label>
-            <input
-              id="login-pass"
-              type="password"
-              autoComplete="current-password"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              placeholder="••••••••"
-              style={si}
-              onKeyDown={(e) => e.key === "Enter" && go()}
-            />
-          </div>
-          <button
-            onClick={go}
-            disabled={loading}
+        {err && (
+          <div
             style={{
-              width: "100%",
-              padding: 13,
+              background: "#FEF2F2",
+              border: "1px solid #FECACA",
               borderRadius: 6,
-              border: "none",
-              background: loading ? "rgba(59,130,246,0.5)" : "#2563EB",
-              color: "#fff",
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: loading ? "default" : "pointer",
-              fontFamily: "inherit",
+              padding: "10px 14px",
+              marginBottom: 20,
+              color: "#991B1B",
+              fontSize: 14,
             }}
           >
-            {loading ? `ログイン中...（${loginSeconds}秒経過）` : "ログイン"}
-          </button>
-          <p style={{ fontSize: 13, color: "#8592A3", textAlign: "center", marginTop: 16 }}>
-            パスワードを忘れた場合は、上司または管理者に連絡してください
-          </p>
+            {err}
+          </div>
+        )}
+        <div style={{ marginBottom: 16 }}>
+          <label style={lb} htmlFor="login-email">
+            メールアドレス
+          </label>
+          <input
+            id="login-email"
+            type="email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="yourname@company.com"
+            style={si}
+            onKeyDown={(e) => e.key === "Enter" && go()}
+          />
         </div>
+        <div style={{ marginBottom: 24 }}>
+          <label style={lb} htmlFor="login-pass">
+            パスワード
+          </label>
+          <input
+            id="login-pass"
+            type="password"
+            autoComplete="current-password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+            placeholder="••••••••"
+            style={si}
+            onKeyDown={(e) => e.key === "Enter" && go()}
+          />
+        </div>
+        <button
+          onClick={go}
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: 13,
+            borderRadius: 6,
+            border: "none",
+            background: loading ? "rgba(59,130,246,0.5)" : "#2563EB",
+            color: "#fff",
+            fontSize: 15,
+            fontWeight: 700,
+            cursor: loading ? "default" : "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          {loading ? `ログイン中...（${loginSeconds}秒経過）` : "ログイン"}
+        </button>
+        <p style={{ fontSize: 13, color: "#8592A3", textAlign: "center", marginTop: 16 }}>
+          <span style={{ display: "inline-block" }}>パスワードを忘れた場合は、</span>
+          <span style={{ display: "inline-block" }}>上司または管理者に連絡してください</span>
+        </p>
       </div>
     </div>
   );
