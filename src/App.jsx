@@ -12054,7 +12054,7 @@ export default function App() {
           padding: isMobile ? "16px 12px" : 24,
           minHeight: "100vh",
           maxWidth: isMobile ? "100vw" : "calc(100vw - 224px)",
-          overflowX: "hidden",
+          overflowX: "clip",
         }}
       >
         {isMobile && (
